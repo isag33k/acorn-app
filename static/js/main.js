@@ -93,12 +93,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check for stuck modals every second
     let modalCheckInterval;
     function checkForStuckModals() {
+        const modalResetHelper = document.getElementById('modalResetHelper');
+        if (!modalResetHelper) return; // Skip if the element doesn't exist on this page
+        
         if (document.body.classList.contains('modal-open')) {
             // If a modal has been open for more than 3 seconds, show the emergency button
-            document.getElementById('modalResetHelper').style.display = 'block';
+            modalResetHelper.style.display = 'block';
         } else {
             // If no modal is open, hide the emergency button
-            document.getElementById('modalResetHelper').style.display = 'none';
+            modalResetHelper.style.display = 'none';
         }
     }
     
@@ -131,7 +134,10 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             // Hide the reset helper after use
-            document.getElementById('modalResetHelper').style.display = 'none';
+            const resetHelper = document.getElementById('modalResetHelper');
+            if (resetHelper) {
+                resetHelper.style.display = 'none';
+            }
             
             // Show a success message
             alert("Screen has been reset. You can continue using the application.");
