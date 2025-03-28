@@ -1,4 +1,4 @@
-/* Custom styles for Network Circuit Monitor - Modern UI Version */
+/* Custom styles for A.C.O.R.N. - Modern UI Version */
 
 :root {
     --primary-accent: #3a86ff;
@@ -9,6 +9,7 @@
     --dark-surface: #212529;
     --card-bg: #2a2d31;
     --nav-active: #4361ee;
+    --heading-shadow: rgba(0, 153, 255, 0.4);
 }
 
 /* Body and global styles */
@@ -308,6 +309,28 @@ body {
     font-weight: 500;
 }
 
+/* 3D Heading Styles */
+h1, h2, h3, h4, h5, h6, .card-title, .display-4, .display-5, .display-6 {
+    color: #ffffff;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 0 #000, 
+                 2px 2px 0 #000,
+                 3px 3px 0 var(--heading-shadow),
+                 4px 4px 0 var(--heading-shadow),
+                 5px 5px 10px rgba(0, 0, 0, 0.6);
+    transition: all 0.2s ease;
+}
+
+h1:hover, h2:hover, h3:hover, .display-4:hover, .display-5:hover {
+    transform: translateY(-2px);
+    text-shadow: 1px 1px 0 #000, 
+                 2px 2px 0 #000,
+                 3px 3px 0 var(--heading-shadow),
+                 4px 4px 0 var(--heading-shadow),
+                 5px 5px 15px rgba(0, 0, 0, 0.8);
+}
+
 /* Utility classes */
 .rounded-custom {
     border-radius: 0.5rem;
@@ -323,6 +346,14 @@ body {
 
 .bg-accent {
     background-color: var(--primary-accent) !important;
+}
+
+.text-3d {
+    text-shadow: 1px 1px 0 #000, 
+                 2px 2px 0 #000,
+                 3px 3px 0 var(--heading-shadow),
+                 4px 4px 0 var(--heading-shadow),
+                 5px 5px 10px rgba(0, 0, 0, 0.6);
 }
 
 /* Animation for page transitions */
