@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import inspect, Text
 from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -16,6 +17,7 @@ class Base(DeclarativeBase):
 
 db = SQLAlchemy(model_class=Base)
 login_manager = LoginManager()
+csrf = CSRFProtect()
 
 # Create the app
 app = Flask(__name__)
@@ -30,6 +32,9 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
 }
+
+# Configure CSRF protection
+app.config["WTF_CSRF_ENABLED"] = True
 
 def alter_column_type(table_name, column_name, new_type):
     """Helper function to alter column type in the database"""
@@ -51,6 +56,7 @@ def alter_column_type(table_name, column_name, new_type):
 
 # Initialize the app with the extensions
 db.init_app(app)
+csrf.init_app(app)
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 

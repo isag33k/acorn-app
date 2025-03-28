@@ -183,7 +183,10 @@ def user_credentials():
     # Create a dict of existing credentials for easier access
     credentials_dict = {cred.equipment_id: cred for cred in user_credentials}
     
-    return render_template('credentials.html', equipment=equipment, credentials=credentials_dict)
+    # Create a form instance for CSRF token
+    form = UserCredentialForm()
+    
+    return render_template('credentials.html', equipment=equipment, credentials=credentials_dict, form=form)
 
 @app.route('/credentials/add', methods=['POST'])
 @login_required
