@@ -902,4 +902,6 @@ def delete_contact(id):
 def view_contact(id):
     """View detailed information for a single contact"""
     contact = Contact.query.get_or_404(id)
-    return render_template('view_contact.html', contact=contact)
+    # Create a basic form for CSRF protection
+    form = FlaskForm()
+    return render_template('view_contact.html', contact=contact, form=form)
