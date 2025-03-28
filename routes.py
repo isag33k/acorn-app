@@ -376,6 +376,28 @@ def submit_alert():
             # Disconnect after all commands are executed
             ssh_client.disconnect()
             
+        except ValueError as e:
+            # This is specific to the TACACS credential error we're raising in get_credentials_for_user
+            error_message = str(e)
+            logger.error(f"Credential error for equipment {equipment.name}: {error_message}")
+            
+            # Add a more user-friendly message for missing TACACS credentials
+            if "requires personal credentials" in error_message:
+                results.append({
+                    'equipment_name': equipment.name,
+                    'command': mapping.command,
+                    'output': f"⚠️ {error_message}",
+                    'status': 'error',
+                    'is_tacacs_error': True
+                })
+            else:
+                results.append({
+                    'equipment_name': equipment.name,
+                    'command': mapping.command,
+                    'output': error_message,
+                    'status': 'error'
+                })
+                
         except Exception as e:
             logger.error(f"SSH error for equipment {equipment.name}: {str(e)}")
             results.append({
@@ -430,12 +452,21 @@ def add_equipment():
     name = request.form.get('name')
     ip_address = request.form.get('ip_address')
     ssh_port = request.form.get('ssh_port', 22, type=int)
+    credential_type = request.form.get('credential_type')
     username = request.form.get('username')
     password = request.form.get('password')
     
     # Basic validation
-    if not all([name, ip_address, username, password]):
-        flash('All fields are required', 'danger')
+    if not all([name, ip_address]):
+        flash('Equipment name and IP address are required', 'danger')
+        return redirect(url_for('equipment_list'))
+    
+    # Handle TACACS credential type
+    if credential_type == 'tacacs' or username == 'TACACS':
+        username = 'TACACS'
+        password = 'TACACS_PLACEHOLDER'  # Will be replaced with user-specific credentials at runtime
+    elif not all([username, password]):
+        flash('Username and password are required for custom credentials', 'danger')
         return redirect(url_for('equipment_list'))
     
     new_equipment = Equipment(
@@ -449,7 +480,12 @@ def add_equipment():
     db.session.add(new_equipment)
     db.session.commit()
     
-    flash(f'Equipment "{name}" added successfully', 'success')
+    # If using TACACS, add a reminder to set up personal credentials
+    if username == 'TACACS':
+        flash(f'Equipment "{name}" added with TACACS authentication. Make sure to set up your personal credentials in the "My Credentials" section.', 'info')
+    else:
+        flash(f'Equipment "{name}" added successfully with custom credentials', 'success')
+    
     return redirect(url_for('equipment_list'))
 
 @app.route('/equipment/delete/<int:id>', methods=['POST'])
@@ -474,16 +510,31 @@ def edit_equipment(id):
     equipment.name = request.form.get('name')
     equipment.ip_address = request.form.get('ip_address')
     equipment.ssh_port = request.form.get('ssh_port', 22, type=int)
-    equipment.username = request.form.get('username')
     
-    # Only update password if a new one is provided
-    new_password = request.form.get('password')
-    if new_password:
-        equipment.password = new_password
+    credential_type = request.form.get('credential_type')
+    username = request.form.get('username')
+    
+    # Handle TACACS credential type
+    if credential_type == 'tacacs' or username == 'TACACS':
+        equipment.username = 'TACACS'
+        equipment.password = 'TACACS_PLACEHOLDER'  # Will be replaced with user-specific credentials at runtime
+    else:
+        # Only update username if not using TACACS
+        equipment.username = username
+        
+        # Only update password if a new one is provided for custom credentials
+        new_password = request.form.get('password')
+        if new_password:
+            equipment.password = new_password
     
     db.session.commit()
     
-    flash(f'Equipment "{equipment.name}" updated successfully!', 'success')
+    # Provide specific feedback based on credential type
+    if equipment.username == 'TACACS':
+        flash(f'Equipment "{equipment.name}" updated with TACACS authentication. Make sure you have set up your personal credentials in the "My Credentials" section.', 'info')
+    else:
+        flash(f'Equipment "{equipment.name}" updated successfully with custom credentials!', 'success')
+    
     return redirect(url_for('equipment_list'))
 
 @app.route('/mapping/add', methods=['POST'])

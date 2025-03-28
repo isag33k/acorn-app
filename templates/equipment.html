@@ -47,13 +47,25 @@
                                     <label for="ssh_port" class="form-label">SSH Port</label>
                                     <input type="number" class="form-control" id="ssh_port" name="ssh_port" value="22" required>
                                 </div>
-                                <div class="col-md-6">
-                                    <label for="username" class="form-label">SSH Username</label>
-                                    <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                                <div class="col-md-12 mb-3">
+                                    <label for="credential_type" class="form-label">SSH Credential Type</label>
+                                    <select class="form-select" id="credential_type" name="credential_type" onchange="toggleCredentialFields()">
+                                        <option value="tacacs">TACACS (Use My Credentials)</option>
+                                        <option value="custom">Custom Credentials</option>
+                                    </select>
+                                    <div class="form-text small text-muted">
+                                        <i class="fas fa-info-circle me-1"></i> 
+                                        "TACACS" will use your personal credentials from the "My Credentials" section
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
+                                
+                                <div class="col-md-6 credential-fields" style="display: none;">
+                                    <label for="username" class="form-label">SSH Username</label>
+                                    <input type="text" class="form-control" id="username" name="username" placeholder="Username">
+                                </div>
+                                <div class="col-md-6 credential-fields" style="display: none;">
                                     <label for="password" class="form-label">SSH Password</label>
-                                    <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                                    <input type="password" class="form-control" id="password" name="password" placeholder="Password">
                                 </div>
                                 <div class="col-12 text-end">
                                     <button type="submit" class="btn btn-primary">
@@ -88,7 +100,14 @@
                                         <td>{{ item.name }}</td>
                                         <td>{{ item.ip_address }}</td>
                                         <td>{{ item.ssh_port }}</td>
-                                        <td>{{ item.username }}</td>
+                                        <td>
+                                            {% if item.username == 'TACACS' %}
+                                                <span class="badge bg-info">TACACS</span>
+                                                <small class="text-muted d-block">Using personal credentials</small>
+                                            {% else %}
+                                                {{ item.username }}
+                                            {% endif %}
+                                        </td>
                                         <td>
                                             <!-- Edit Button -->
                                             <button type="button" class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#editEquipmentModal{{ item.id }}">
@@ -132,13 +151,26 @@
                                                                         <input type="number" class="form-control" id="edit_ssh_port{{ item.id }}" 
                                                                                name="ssh_port" value="{{ item.ssh_port }}" required>
                                                                     </div>
-                                                                    <div class="col-md-6">
+                                                                    <div class="col-md-12 mb-3">
+                                                                        <label for="edit_credential_type{{ item.id }}" class="form-label">SSH Credential Type</label>
+                                                                        <select class="form-select" id="edit_credential_type{{ item.id }}" 
+                                                                                name="credential_type" onchange="toggleEditCredentialFields({{ item.id }})">
+                                                                            <option value="tacacs" {% if item.username == 'TACACS' %}selected{% endif %}>TACACS (Use My Credentials)</option>
+                                                                            <option value="custom" {% if item.username != 'TACACS' %}selected{% endif %}>Custom Credentials</option>
+                                                                        </select>
+                                                                        <div class="form-text small text-muted">
+                                                                            <i class="fas fa-info-circle me-1"></i> 
+                                                                            "TACACS" will use your personal credentials from the "My Credentials" section
+                                                                        </div>
+                                                                    </div>
+                                                                    
+                                                                    <div class="col-md-6 edit-credential-fields{{ item.id }}" {% if item.username == 'TACACS' %}style="display: none;"{% endif %}>
                                                                         <label for="edit_username{{ item.id }}" class="form-label">SSH Username</label>
                                                                         <input type="text" class="form-control" id="edit_username{{ item.id }}" 
-                                                                               name="username" value="{{ item.username }}" required>
+                                                                               name="username" value="{% if item.username != 'TACACS' %}{{ item.username }}{% endif %}">
                                                                     </div>
-                                                                    <div class="col-md-6">
-                                                                        <label for="edit_password{{ item.id }}" class="form-label">SSH Password (leave blank to keep current)</label>
+                                                                    <div class="col-md-6 edit-credential-fields{{ item.id }}" {% if item.username == 'TACACS' %}style="display: none;"{% endif %}>
+                                                                        <label for="edit_password{{ item.id }}" class="form-label">SSH Password {% if item.username != 'TACACS' %}(leave blank to keep current){% endif %}</label>
                                                                         <input type="password" class="form-control" id="edit_password{{ item.id }}" 
                                                                                name="password" placeholder="Enter new password or leave blank">
                                                                     </div>

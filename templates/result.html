@@ -61,7 +61,24 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <pre class="mb-0 command-output bg-dark text-light p-3 rounded">{{ result.output }}</pre>
+                            {% if result.is_tacacs_error is defined and result.is_tacacs_error %}
+                                <div class="alert alert-danger">
+                                    <h5 class="alert-heading mb-3">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        TACACS Authentication Required
+                                    </h5>
+                                    <p>{{ result.output }}</p>
+                                    <hr>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <p class="mb-0">You need to set your personal network credentials for this equipment.</p>
+                                        <a href="{{ url_for('user_credentials') }}" class="btn btn-primary">
+                                            <i class="fas fa-key me-1"></i> Set Up My Credentials
+                                        </a>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <pre class="mb-0 command-output bg-dark text-light p-3 rounded">{{ result.output }}</pre>
+                            {% endif %}
                         </div>
                     </div>
                     {% endfor %}

@@ -61,10 +61,21 @@ class Equipment(db.Model):
     
     def get_credentials_for_user(self, user):
         """Get equipment credentials for a specific user"""
-        # Check if user has specific credentials for this equipment
+        # Check if this equipment uses TACACS authentication
+        if self.username == 'TACACS':
+            # With TACACS, we must use the user's personal credentials
+            user_cred = UserCredential.query.filter_by(user_id=user.id, equipment_id=self.id).first()
+            if user_cred:
+                return {'username': user_cred.username, 'password': user_cred.password}
+            else:
+                # If no personal credentials are set up, raise an error
+                raise ValueError(f"Equipment '{self.name}' requires personal credentials but none are set up. Please set them in 'My Credentials' section.")
+        
+        # For non-TACACS equipment, check if user has specific credentials for this equipment
         user_cred = UserCredential.query.filter_by(user_id=user.id, equipment_id=self.id).first()
         if user_cred:
             return {'username': user_cred.username, 'password': user_cred.password}
+            
         # Return default credentials if no user-specific credentials found
         return {'username': self.username, 'password': self.password}
 

@@ -2,8 +2,67 @@
  * Main JavaScript for the Network Circuit Monitor application
  */
 
+// Function to toggle credential fields in the Add Equipment form
+function toggleCredentialFields() {
+    const credentialType = document.getElementById('credential_type').value;
+    const credentialFields = document.querySelectorAll('.credential-fields');
+    
+    if (credentialType === 'tacacs') {
+        // Hide username/password fields
+        credentialFields.forEach(field => {
+            field.style.display = 'none';
+        });
+        
+        // Set a hidden value for TACACS
+        document.getElementById('username').value = 'TACACS';
+        document.getElementById('password').value = 'TACACS_PLACEHOLDER';
+    } else {
+        // Show username/password fields
+        credentialFields.forEach(field => {
+            field.style.display = 'block';
+        });
+        
+        // Clear the fields
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+    }
+}
+
+// Function to toggle credential fields in Edit Equipment form
+function toggleEditCredentialFields(itemId) {
+    const credentialType = document.getElementById(`edit_credential_type${itemId}`).value;
+    const credentialFields = document.querySelectorAll(`.edit-credential-fields${itemId}`);
+    
+    if (credentialType === 'tacacs') {
+        // Hide username/password fields
+        credentialFields.forEach(field => {
+            field.style.display = 'none';
+        });
+        
+        // Set a hidden value for TACACS
+        document.getElementById(`edit_username${itemId}`).value = 'TACACS';
+        document.getElementById(`edit_password${itemId}`).value = '';
+    } else {
+        // Show username/password fields
+        credentialFields.forEach(field => {
+            field.style.display = 'block';
+        });
+        
+        // Only clear if it was TACACS before
+        if (document.getElementById(`edit_username${itemId}`).value === 'TACACS') {
+            document.getElementById(`edit_username${itemId}`).value = '';
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM fully loaded - initializing tabs");
+    
+    // Initialize credential fields on page load
+    const credentialTypeSelect = document.getElementById('credential_type');
+    if (credentialTypeSelect) {
+        toggleCredentialFields();
+    }
     
     // Tab switching functionality
     document.querySelectorAll('.nav-tabs .nav-link').forEach(function(tabLink) {
