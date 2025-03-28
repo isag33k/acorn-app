@@ -1,5 +1,15 @@
 import paramiko
 import logging
+import sys
+import os
+
+# Configure basic logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    filename='ssh_debug.log',
+    filemode='a'
+)
 
 logger = logging.getLogger(__name__)
 
@@ -24,13 +34,16 @@ class SSHClient:
             
             logger.debug(f"Connecting to {self.hostname}:{self.port} as {self.username}")
             
-            # Connect to the host
+            # Connect to the host with more tolerant settings
             self.client.connect(
                 hostname=self.hostname,
                 port=self.port,
                 username=self.username,
                 password=self.password,
-                timeout=10
+                timeout=15,
+                allow_agent=False,
+                look_for_keys=False,
+                banner_timeout=15
             )
             
             logger.debug(f"Successfully connected to {self.hostname}")
