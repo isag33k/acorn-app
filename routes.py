@@ -10,6 +10,7 @@ from models import Equipment, CircuitMapping, User, UserCredential
 from utils.ssh_client import SSHClient
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
 
 # Login form
 class LoginForm(FlaskForm):
@@ -201,18 +202,36 @@ def user_credentials():
 @login_required
 def add_credential():
     """Add or update user credential for equipment"""
-    # Create form for CSRF validation only
-    form = FlaskForm()
-    
-    if form.validate_on_submit():
-        # Get form data directly from request
+    try:
+        logger.debug(f"Raw POST data: {request.form}")
+        csrf_token = request.form.get('csrf_token')
         equipment_id = request.form.get('equipment_id')
         username = request.form.get('username')
         password = request.form.get('password')
         
+        logger.debug(f"Extracted values - csrf_token: {csrf_token}, equipment_id: {equipment_id}, username: {username}, password exists: {'yes' if password else 'no'}")
+        
         # Basic validation
+        if not csrf_token:
+            logger.error("Missing CSRF token")
+            flash('CSRF token missing', 'danger')
+            return redirect(url_for('user_credentials'))
+            
         if not equipment_id or not username or not password:
-            flash('All fields are required', 'danger')
+            missing = []
+            if not equipment_id: missing.append("Equipment ID")
+            if not username: missing.append("Username") 
+            if not password: missing.append("Password")
+            logger.error(f"Missing fields: {missing}")
+            flash(f'Missing required fields: {", ".join(missing)}', 'danger')
+            return redirect(url_for('user_credentials'))
+            
+        # Convert equipment_id to integer
+        try:
+            equipment_id = int(equipment_id)
+        except ValueError:
+            logger.error(f"Invalid equipment ID: {equipment_id}")
+            flash('Invalid equipment ID', 'danger')
             return redirect(url_for('user_credentials'))
             
         # Check if credential already exists
@@ -225,6 +244,7 @@ def add_credential():
             # Update existing
             credential.username = username
             credential.password = password
+            logger.debug(f"Updated credential for equipment ID {equipment_id}")
             flash('Credential updated successfully', 'success')
         else:
             # Create new
@@ -234,12 +254,14 @@ def add_credential():
                 username=username,
                 password=password
             )
+            logger.debug(f"Created new credential for equipment ID {equipment_id}")
             db.session.add(credential)
             flash('Credential added successfully', 'success')
             
         db.session.commit()
-    else:
-        flash('CSRF validation failed', 'danger')
+    except Exception as e:
+        logger.error(f"Error in add_credential: {str(e)}")
+        flash(f'An error occurred: {str(e)}', 'danger')
                 
     return redirect(url_for('user_credentials'))
 
