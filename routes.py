@@ -323,6 +323,19 @@ def submit_alert():
         flash(f'No equipment mappings found for circuit ID: {circuit_id}', 'warning')
         return redirect(url_for('index'))
     
+    # Extract contact information from the first mapping 
+    # (assuming the same circuit ID has the same contact across mappings)
+    if mappings and (mappings[0].contact_name or mappings[0].contact_email or 
+                      mappings[0].contact_phone or mappings[0].contact_notes):
+        contact_info = {
+            'name': mappings[0].contact_name,
+            'email': mappings[0].contact_email,
+            'phone': mappings[0].contact_phone,
+            'notes': mappings[0].contact_notes
+        }
+    else:
+        contact_info = None
+        
     results = []
     
     # Execute commands on each mapped equipment
@@ -372,7 +385,7 @@ def submit_alert():
                 'status': 'error'
             })
     
-    return render_template('result.html', circuit_id=circuit_id, results=results)
+    return render_template('result.html', circuit_id=circuit_id, results=results, contact_info=contact_info)
 
 @app.route('/equipment')
 @login_required
@@ -458,6 +471,12 @@ def add_mapping():
     command = request.form.get('command')
     description = request.form.get('description', '')
     
+    # Contact information
+    contact_name = request.form.get('contact_name', '')
+    contact_email = request.form.get('contact_email', '')
+    contact_phone = request.form.get('contact_phone', '')
+    contact_notes = request.form.get('contact_notes', '')
+    
     # Basic validation
     if not all([circuit_id, equipment_id, command]):
         flash('Circuit ID, equipment and command are required', 'danger')
@@ -467,7 +486,11 @@ def add_mapping():
         circuit_id=circuit_id,
         equipment_id=equipment_id,
         command=command,
-        description=description
+        description=description,
+        contact_name=contact_name,
+        contact_email=contact_email,
+        contact_phone=contact_phone,
+        contact_notes=contact_notes
     )
     
     db.session.add(new_mapping)
@@ -498,6 +521,12 @@ def edit_mapping(id):
     mapping.equipment_id = request.form.get('equipment_id', type=int)
     mapping.command = request.form.get('command')
     mapping.description = request.form.get('description', '')
+    
+    # Contact information
+    mapping.contact_name = request.form.get('contact_name', '')
+    mapping.contact_email = request.form.get('contact_email', '')
+    mapping.contact_phone = request.form.get('contact_phone', '')
+    mapping.contact_notes = request.form.get('contact_notes', '')
     
     db.session.commit()
     

@@ -83,6 +83,12 @@ class CircuitMapping(db.Model):
     # Description of the circuit
     description = db.Column(db.String(255), nullable=True)
     
+    # Contact information for the circuit
+    contact_name = db.Column(db.String(100), nullable=True)
+    contact_email = db.Column(db.String(120), nullable=True)
+    contact_phone = db.Column(db.String(20), nullable=True)
+    contact_notes = db.Column(db.Text, nullable=True)
+    
     def get_commands_list(self):
         """Returns the command string as a list of individual commands"""
         if not self.command:

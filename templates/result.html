@@ -14,6 +14,38 @@
                         <i class="fas fa-search me-1"></i> New Query
                     </a>
                 </div>
+                {% if contact_info %}
+                <div class="mt-2 d-flex align-items-center">
+                    <i class="fas fa-address-card me-2 text-info"></i>
+                    <span class="text-info">Contact Information:</span>
+                </div>
+                <div class="row mt-1 g-2">
+                    {% if contact_info.name %}
+                    <div class="col-md-3">
+                        <small class="text-muted">Name:</small>
+                        <div>{{ contact_info.name }}</div>
+                    </div>
+                    {% endif %}
+                    {% if contact_info.email %}
+                    <div class="col-md-3">
+                        <small class="text-muted">Email:</small>
+                        <div><a href="mailto:{{ contact_info.email }}">{{ contact_info.email }}</a></div>
+                    </div>
+                    {% endif %}
+                    {% if contact_info.phone %}
+                    <div class="col-md-3">
+                        <small class="text-muted">Phone:</small>
+                        <div><a href="tel:{{ contact_info.phone }}">{{ contact_info.phone }}</a></div>
+                    </div>
+                    {% endif %}
+                    {% if contact_info.notes %}
+                    <div class="col-md-3">
+                        <small class="text-muted">Notes:</small>
+                        <div>{{ contact_info.notes }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
             <div class="card-body">
                 {% if results %}
