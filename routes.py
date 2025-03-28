@@ -94,6 +94,13 @@ class ProfileForm(FlaskForm):
     phone = StringField('Phone', validators=[Length(max=20)])
     avatar = FileField('Profile Picture', validators=[Optional(), FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Images only!')])
     submit = SubmitField('Update Profile')
+    
+# Password change form
+class PasswordChangeForm(FlaskForm):
+    current_password = PasswordField('Current Password', validators=[DataRequired()])
+    new_password = PasswordField('New Password', validators=[DataRequired(), Length(min=8)])
+    confirm_password = PasswordField('Confirm New Password', validators=[DataRequired(), EqualTo('new_password')])
+    submit = SubmitField('Change Password')
 
 @app.route('/')
 @login_required
@@ -530,6 +537,38 @@ def delete_avatar():
         flash(f'Error removing profile picture: {str(e)}', 'danger')
         db.session.rollback()
         
+    return redirect(url_for('user_profile'))
+
+@app.route('/profile/password/change', methods=['POST'])
+@login_required
+def change_password():
+    """Change the user's password"""
+    form = PasswordChangeForm()
+    
+    if form.validate_on_submit():
+        try:
+            # Verify current password is correct
+            if not current_user.check_password(form.current_password.data):
+                flash('Current password is incorrect', 'danger')
+                return redirect(url_for('user_profile'))
+                
+            # Set the new password
+            current_user.set_password(form.new_password.data)
+            db.session.commit()
+            
+            flash('Password changed successfully', 'success')
+            
+        except Exception as e:
+            logger.error(f"Error changing password: {str(e)}")
+            flash(f'Error changing password: {str(e)}', 'danger')
+            db.session.rollback()
+            
+    else:
+        # Handle validation errors
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f'{getattr(form, field).label.text}: {error}', 'danger')
+                
     return redirect(url_for('user_profile'))
 
 @app.route('/submit_alert', methods=['POST'])
