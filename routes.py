@@ -111,6 +111,26 @@ def delete_equipment(id):
     flash(f'Equipment "{equipment.name}" deleted successfully', 'success')
     return redirect(url_for('equipment_list'))
 
+@app.route('/equipment/edit/<int:id>', methods=['POST'])
+def edit_equipment(id):
+    """Edit equipment"""
+    equipment = Equipment.query.get_or_404(id)
+    
+    equipment.name = request.form.get('name')
+    equipment.ip_address = request.form.get('ip_address')
+    equipment.ssh_port = request.form.get('ssh_port', 22, type=int)
+    equipment.username = request.form.get('username')
+    
+    # Only update password if a new one is provided
+    new_password = request.form.get('password')
+    if new_password:
+        equipment.password = new_password
+    
+    db.session.commit()
+    
+    flash(f'Equipment "{equipment.name}" updated successfully!', 'success')
+    return redirect(url_for('equipment_list'))
+
 @app.route('/mapping/add', methods=['POST'])
 def add_mapping():
     """Add new circuit mapping"""

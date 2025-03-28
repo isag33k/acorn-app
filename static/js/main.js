@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Log that the tab initialization is complete
     console.log("Tab event listeners initialized");
     
-    // Handle "Show Circuit Mappings Tab" button
+    // Handle Tab Helper Buttons
     const showCircuitTabBtn = document.getElementById('showCircuitTab');
     if (showCircuitTabBtn) {
         showCircuitTabBtn.addEventListener('click', function() {
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 circuitsTab.classList.add('active');
                 
                 // Highlight the edit buttons by adding a temporary class
-                document.querySelectorAll('.btn-sm.btn-primary').forEach(function(btn) {
+                document.querySelectorAll('#circuits .btn-sm.btn-primary').forEach(function(btn) {
                     btn.classList.add('btn-lg');
                     setTimeout(function() {
                         btn.classList.remove('btn-lg');
@@ -65,6 +65,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
+    }
+    
+    // Add helper text for equipment edit
+    const tabHelper = document.getElementById('tabHelper');
+    if (tabHelper) {
+        // Create equipment edit helper text
+        const equipmentEditHelper = document.createElement('div');
+        equipmentEditHelper.className = 'mt-2';
+        equipmentEditHelper.innerHTML = `
+            <p class="mb-0"><strong>NEW:</strong> You can now edit equipment details using the <span class="badge bg-primary"><i class="fas fa-edit"></i></span> button.</p>
+            <button class="btn btn-sm btn-info mt-2" id="highlightEditButtons">Highlight Edit Buttons</button>
+        `;
+        
+        // Add it to the helper panel
+        tabHelper.appendChild(equipmentEditHelper);
+        
+        // Add event listener for the highlight button
+        const highlightBtn = document.getElementById('highlightEditButtons');
+        if (highlightBtn) {
+            highlightBtn.addEventListener('click', function() {
+                // Highlight all edit buttons
+                document.querySelectorAll('.btn-sm.btn-primary').forEach(function(btn) {
+                    btn.classList.add('btn-lg');
+                    setTimeout(function() {
+                        btn.classList.remove('btn-lg');
+                    }, 1500);
+                });
+            });
+        }
     }
     
     // Handle alert dismissal
