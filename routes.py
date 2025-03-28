@@ -394,10 +394,21 @@ def equipment_list():
     equipment = Equipment.query.all()
     circuits = CircuitMapping.query.all()
     
-    # Create a form instance for CSRF protection
-    form = FlaskForm()
+    # Create separate form instances for each form on the page
+    add_equipment_form = FlaskForm(prefix="add_equipment")
+    add_mapping_form = FlaskForm(prefix="add_mapping")
+    edit_equipment_form = FlaskForm(prefix="edit_equipment")
+    edit_mapping_form = FlaskForm(prefix="edit_mapping")
+    delete_form = FlaskForm(prefix="delete")
     
-    return render_template('equipment.html', equipment=equipment, circuits=circuits, form=form)
+    return render_template('equipment.html', 
+                          equipment=equipment, 
+                          circuits=circuits, 
+                          add_equipment_form=add_equipment_form,
+                          add_mapping_form=add_mapping_form,
+                          edit_equipment_form=edit_equipment_form,
+                          edit_mapping_form=edit_mapping_form,
+                          delete_form=delete_form)
 
 @app.route('/equipment/add', methods=['POST'])
 @login_required
