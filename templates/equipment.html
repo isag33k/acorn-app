@@ -117,10 +117,10 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            <!-- Edit Button -->
-                                            <button type="button" class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#editEquipmentModal{{ item.id }}">
+                                            <!-- Edit Button (Link to dedicated edit page) -->
+                                            <a href="{{ url_for('edit_equipment', id=item.id) }}" class="btn btn-sm btn-primary me-1">
                                                 <i class="fas fa-edit"></i>
-                                            </button>
+                                            </a>
                                             
                                             <!-- Delete Form -->
                                             <form action="{{ url_for('delete_equipment', id=item.id) }}" method="POST" class="d-inline">

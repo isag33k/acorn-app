@@ -791,12 +791,17 @@ def delete_equipment(id):
     flash(f'Equipment "{equipment.name}" deleted successfully', 'success')
     return redirect(url_for('equipment_list'))
 
-@app.route('/equipment/edit/<int:id>', methods=['POST'])
+@app.route('/equipment/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_equipment(id):
-    """Edit equipment"""
+    """Edit equipment - now with dedicated page instead of modal"""
     equipment = Equipment.query.get_or_404(id)
     
+    # GET request - show the edit form
+    if request.method == 'GET':
+        return render_template('edit_equipment.html', equipment=equipment)
+    
+    # POST request - process the form submission
     equipment.name = request.form.get('name')
     equipment.ip_address = request.form.get('ip_address')
     equipment.ssh_port = request.form.get('ssh_port', 22, type=int)
@@ -818,6 +823,7 @@ def edit_equipment(id):
             equipment.password = new_password
     
     db.session.commit()
+    flash('Equipment updated successfully.', 'success')
     
     # Provide specific feedback based on credential type
     if equipment.username == 'TACACS':
