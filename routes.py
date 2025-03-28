@@ -144,7 +144,10 @@ def edit_user(id):
         
     user = User.query.get_or_404(id)
     
-    if request.method == 'POST':
+    # Create a basic form for CSRF protection
+    form = FlaskForm()
+    
+    if request.method == 'POST' and form.validate_on_submit():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
@@ -171,7 +174,7 @@ def edit_user(id):
         flash(f'User {username} updated successfully', 'success')
         return redirect(url_for('user_list'))
         
-    return render_template('edit_user.html', user=user)
+    return render_template('edit_user.html', user=user, form=form)
 
 @app.route('/credentials', methods=['GET'])
 @login_required
