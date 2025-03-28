@@ -116,7 +116,7 @@
     </div>
     <div class="card-body">
         <form method="POST" action="{{ url_for('change_password') }}">
-            {{ csrf_token() }}
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             
             <div class="form-group mb-3">
                 <label for="current_password" class="form-label">Current Password</label>
