@@ -201,13 +201,20 @@ def user_credentials():
 @login_required
 def add_credential():
     """Add or update user credential for equipment"""
-    form = UserCredentialForm()
+    # Create form for CSRF validation only
+    form = FlaskForm()
     
     if form.validate_on_submit():
-        equipment_id = form.equipment_id.data
-        username = form.username.data
-        password = form.password.data
+        # Get form data directly from request
+        equipment_id = request.form.get('equipment_id')
+        username = request.form.get('username')
+        password = request.form.get('password')
         
+        # Basic validation
+        if not equipment_id or not username or not password:
+            flash('All fields are required', 'danger')
+            return redirect(url_for('user_credentials'))
+            
         # Check if credential already exists
         credential = UserCredential.query.filter_by(
             user_id=current_user.id,
@@ -232,9 +239,7 @@ def add_credential():
             
         db.session.commit()
     else:
-        for field, errors in form.errors.items():
-            for error in errors:
-                flash(f'{getattr(form, field).label.text}: {error}', 'danger')
+        flash('CSRF validation failed', 'danger')
                 
     return redirect(url_for('user_credentials'))
 
@@ -242,6 +247,12 @@ def add_credential():
 @login_required
 def delete_credential(equipment_id):
     """Delete user credential for equipment"""
+    # Validate CSRF token
+    form = FlaskForm()
+    if not form.validate_on_submit():
+        flash('CSRF validation failed', 'danger')
+        return redirect(url_for('user_credentials'))
+
     credential = UserCredential.query.filter_by(
         user_id=current_user.id,
         equipment_id=equipment_id
