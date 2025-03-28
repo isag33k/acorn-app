@@ -16,6 +16,7 @@
                 </p>
                 
                 <form action="{{ url_for('submit_alert') }}" method="POST">
+                    {{ form.hidden_tag() }}
                     <div class="mb-4">
                         <label for="circuit_id" class="form-label">Circuit ID:</label>
                         <div class="input-group">

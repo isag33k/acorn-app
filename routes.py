@@ -48,7 +48,9 @@ class UserCredentialForm(FlaskForm):
 @login_required
 def index():
     """Render the main page for alert submission"""
-    return render_template('index.html')
+    # Create a form for CSRF protection
+    form = FlaskForm()
+    return render_template('index.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -187,9 +189,27 @@ def user_credentials():
     credentials_dict = {cred.equipment_id: cred for cred in user_credentials}
     
     # Create a form instance for CSRF token
-    form = UserCredentialForm()
+    forms = {}
+    for equip in equipment:
+        form = UserCredentialForm()
+        form.equipment_id.data = str(equip.id)  # Convert to string for form data
+        
+        # Pre-populate form values if credentials exist
+        if equip.id in credentials_dict:
+            cred = credentials_dict[equip.id]
+            form.username.data = cred.username
+            form.password.data = cred.password
+        else:
+            form.username.data = equip.username
+            form.password.data = equip.password
+            
+        forms[equip.id] = form
     
-    return render_template('credentials.html', equipment=equipment, credentials=credentials_dict, form=form)
+    # Create a basic form for CSRF token in delete form
+    csrf_form = FlaskForm()
+    
+    return render_template('credentials.html', equipment=equipment, credentials=credentials_dict, 
+                          forms=forms, csrf_form=csrf_form)
 
 @app.route('/credentials/add', methods=['POST'])
 @login_required
@@ -251,6 +271,12 @@ def delete_credential(equipment_id):
 @login_required
 def submit_alert():
     """Process the submitted alert and run the SSH command(s)"""
+    # Validate CSRF token
+    form = FlaskForm()
+    if not form.validate_on_submit():
+        flash('CSRF token missing or invalid', 'danger')
+        return redirect(url_for('index'))
+        
     circuit_id = request.form.get('circuit_id', '').strip()
     
     if not circuit_id:
