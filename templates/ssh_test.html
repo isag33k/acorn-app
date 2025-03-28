@@ -12,6 +12,24 @@
                 </div>
                 <div class="card-body">
                     <p class="text-muted">This page allows you to directly test SSH connectivity to the mock server.</p>
+
+                    <div class="alert alert-info">
+                        <h6>Connection Details</h6>
+                        <p class="mb-1"><strong>Host:</strong> 127.0.0.1</p>
+                        <p class="mb-1"><strong>Port:</strong> 2222</p>
+                        <p class="mb-1"><strong>Username:</strong> test</p>
+                        <p class="mb-1"><strong>Password:</strong> Ac0rN$</p>
+                    </div>
+                    
+                    <div class="alert alert-secondary">
+                        <h6>Available Commands:</h6>
+                        <ul class="mb-0">
+                            <li><code>show version</code> - Display router version information</li>
+                            <li><code>show interface ge-0/0/0</code> - Display interface details</li>
+                            <li><code>show circuit id TEST-001</code> - Show information for test circuit 001</li>
+                            <li><code>show circuit id TEST-002</code> - Show information for test circuit 002 (with warnings)</li>
+                        </ul>
+                    </div>
                     
                     {% if results %}
                     <div class="mt-4 mb-4">

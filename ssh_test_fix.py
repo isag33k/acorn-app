@@ -3,156 +3,193 @@
 Test script for SSH connection to identify and fix issues
 """
 
-import paramiko
 import socket
+import paramiko
+import sys
 import time
 import logging
-import sys
+import os
 
-# Set up logging
+# Configure logging
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    stream=sys.stdout  # Print to console
+    filename='ssh_test_fix.log',
+    filemode='w'
 )
 
-# Test connectivity using a socket
+logger = logging.getLogger(__name__)
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+formatter = logging.Formatter('%(levelname)s - %(message)s')
+console.setFormatter(formatter)
+logger.addHandler(console)
+
 def test_socket(hostname, port):
+    """Test basic socket connectivity"""
+    print(f"Testing socket connection to {hostname}:{port}")
     try:
-        print(f"Testing raw socket connection to {hostname}:{port}...")
+        # Create socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(5)
-        sock.connect((hostname, port))
-        print("✓ Socket connection successful!")
+        
+        # Try to connect
+        start_time = time.time()
+        result = sock.connect_ex((hostname, port))
+        elapsed = time.time() - start_time
+        
+        if result == 0:
+            print(f"SUCCESS: Connected to {hostname}:{port} in {elapsed:.2f}s")
+            socket_ok = True
+        else:
+            print(f"FAILURE: Could not connect to {hostname}:{port} (error code: {result})")
+            socket_ok = False
+            
         sock.close()
-        return True
+        return socket_ok
     except Exception as e:
-        print(f"✗ Socket connection failed: {str(e)}")
+        print(f"ERROR: Socket test failed - {str(e)}")
         return False
 
-# Test SSH connectivity using paramiko
 def test_ssh(hostname, port, username, password):
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    
+    """Test SSH connection with standard method"""
+    print(f"Testing SSH connection to {hostname}:{port}")
     try:
-        print(f"Testing SSH connection to {hostname}:{port} as {username}...")
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        
+        # Connect with tolerant settings
         client.connect(
             hostname=hostname,
             port=port,
-            username=username,
+            username=username, 
             password=password,
             timeout=10,
             allow_agent=False,
-            look_for_keys=False
+            look_for_keys=False,
+            disabled_algorithms=dict(pubkeys=["rsa-sha2-256", "rsa-sha2-512"])
         )
-        print("✓ SSH connection successful!")
         
-        print("\nTesting command execution...")
+        # Try a simple command
         stdin, stdout, stderr = client.exec_command('show version')
         output = stdout.read().decode('utf-8')
         error = stderr.read().decode('utf-8')
         
+        print("Command output:")
+        print(output)
         if error:
-            print(f"✗ Command execution failed: {error}")
-        else:
-            print("✓ Command execution successful!")
-            print(f"Output: {output}")
-        
+            print("Command error:")
+            print(error)
+            
         client.close()
+        print("SUCCESS: SSH connection and command execution successful")
         return True
     except Exception as e:
-        print(f"✗ SSH connection failed: {str(e)}")
-        print(f"Error type: {type(e).__name__}")
+        print(f"ERROR: SSH connection failed - {str(e)}")
         return False
-        
-# Utility function to create a transport without client
+
 def test_transport(hostname, port, username, password):
+    """Test SSH connection at transport level"""
+    print(f"Testing SSH transport to {hostname}:{port}")
+    transport = None
     try:
-        print(f"\nTesting direct transport to {hostname}:{port}...")
+        # Create a socket first
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(10)
         sock.connect((hostname, port))
         
-        # Create transport
+        # Create the transport
         transport = paramiko.Transport(sock)
         transport.start_client()
         
-        # Authenticate
+        # Try authentication
         transport.auth_password(username, password)
         
         if transport.is_authenticated():
-            print("✓ Transport authentication successful!")
+            print("SUCCESS: SSH transport authentication successful")
             
-            # Try to open a channel and execute a command
+            # Try a command
             channel = transport.open_session()
             channel.exec_command('show version')
-            
-            # Get output
-            output = channel.recv(4096).decode('utf-8')
-            print(f"Output: {output}")
+            output = channel.recv(1024).decode('utf-8')
+            print("Command output:")
+            print(output)
             
             channel.close()
-            transport.close()
             return True
         else:
-            print("✗ Transport authentication failed")
-            transport.close()
+            print("FAILURE: SSH transport authentication failed")
             return False
+            
     except Exception as e:
-        print(f"✗ Transport connection failed: {str(e)}")
-        print(f"Error type: {type(e).__name__}")
+        print(f"ERROR: Transport test failed - {str(e)}")
+        return False
+        
+    finally:
+        if transport:
+            transport.close()
+
+def update_hosts_file():
+    """Update /etc/hosts file to ensure localhost resolves properly"""
+    try:
+        # We can't actually modify the host file in this environment
+        # This is just a placeholder for documentation
+        print("In a real environment, you might need to check if localhost is properly configured")
+        print("Example: Adding '127.0.0.1 localhost' to /etc/hosts")
+        return True
+    except Exception as e:
+        print(f"Error: {str(e)}")
         return False
 
-# Update host file for localhost aliases
-def update_hosts_file():
-    print("\nChecking if we need to update /etc/hosts...")
-    try:
-        # Check if we have write permission
-        if not os.access('/etc/hosts', os.W_OK):
-            print("✗ Cannot write to /etc/hosts - skipping this step")
-            return
-            
-        with open('/etc/hosts', 'r') as f:
-            hosts_content = f.read()
-            
-        if '127.0.0.1 localhost' not in hosts_content:
-            with open('/etc/hosts', 'a') as f:
-                f.write('\n127.0.0.1 localhost\n')
-            print("✓ Added localhost to /etc/hosts")
-        else:
-            print("✓ /etc/hosts already has localhost entry")
-    except Exception as e:
-        print(f"✗ Error updating hosts file: {str(e)}")
-
 if __name__ == "__main__":
-    # Configuration
     hostname = "127.0.0.1"
     port = 2222
     username = "test"
     password = "Ac0rN$"
     
-    # Run tests
+    print("=" * 50)
+    print("SSH Connection Test and Fix Utility")
+    print("=" * 50)
+    
+    # Step 1: Test socket connection
+    print("\nStep 1: Testing basic TCP socket connection")
     socket_ok = test_socket(hostname, port)
+    ssh_ok = False
+    transport_ok = False
+    
+    # Step 2: Test SSH connection
     if socket_ok:
+        print("\nStep 2: Testing SSH connection")
         ssh_ok = test_ssh(hostname, port, username, password)
-        if not ssh_ok:
-            # Try transport directly
-            transport_ok = test_transport(hostname, port, username, password)
+    else:
+        print("\nSkipping SSH test as socket connection failed")
         
-    print("\nSummary:")
-    print(f"Socket connection: {'✓' if socket_ok else '✗'}")
-    print(f"SSH connection: {'✓' if 'ssh_ok' in locals() and ssh_ok else '✗'}")
+    # Step 3: Test low-level transport if regular SSH failed
+    if socket_ok and not ssh_ok:
+        print("\nStep 3: Testing SSH transport layer")
+        transport_ok = test_transport(hostname, port, username, password)
     
-    # Provide potential fixes
+    # Summary
+    print("\n" + "=" * 50)
+    print("Summary:")
+    print(f"Socket Connection: {'SUCCESS' if socket_ok else 'FAILURE'}")
+    print(f"SSH Connection: {'SUCCESS' if ssh_ok else 'FAILURE'}")
+    if transport_ok:
+        print(f"Transport Layer: {'SUCCESS' if transport_ok else 'FAILURE'}")
+    
+    # Tips based on results
+    print("\nRecommendations:")
     if not socket_ok:
-        print("\nPossible fixes for socket issues:")
-        print("1. Check if the SSH server is running")
-        print("2. Check if the port is correct")
-        print("3. Check if there's a firewall blocking the connection")
+        print("- Check if the SSH server is running (run 'ps aux | grep ssh')")
+        print("- Ensure port 2222 is not blocked by a firewall")
+        print("- Try restarting the SSH server")
+    elif not ssh_ok and not transport_ok:
+        print("- Check if SSH credentials are correct")
+        print("- Review SSH server logs for errors")
+        print("- Try connecting with verbose logging (ssh -vvv)")
+    elif ssh_ok:
+        print("✅ SSH connection is working properly!")
+    elif transport_ok:
+        print("✅ SSH transport is working, but paramiko needs configuration")
     
-    if socket_ok and not ('ssh_ok' in locals() and ssh_ok):
-        print("\nPossible fixes for SSH issues:")
-        print("1. Check if the SSH server is properly configured")
-        print("2. Check if the username and password are correct")
-        print("3. Check if the SSH server supports the SSH protocol version")
-        print("4. Try using a transport directly instead of the high-level client")
+    print("=" * 50)

@@ -1110,47 +1110,100 @@ def test_ssh_connection():
     results = []
     command = None
     
+    # First, always do a socket test
+    try:
+        import socket
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(5)
+        socket_result = sock.connect_ex(('127.0.0.1', 2222))
+        
+        if socket_result == 0:
+            # Try to get the SSH banner
+            try:
+                banner = sock.recv(1024)
+                banner_text = banner.decode('utf-8', errors='ignore').strip()
+                socket_status = f"Socket connection successful. SSH banner: {banner_text}"
+                socket_test_passed = True
+            except Exception as banner_error:
+                socket_status = f"Socket connected but couldn't read SSH banner: {str(banner_error)}"
+                socket_test_passed = True  # Still count as success if we can connect
+        else:
+            socket_status = f"Socket connection failed with error code {socket_result}"
+            socket_test_passed = False
+            
+        sock.close()
+        
+        results.append({
+            'command': 'Socket Test',
+            'output': socket_status,
+            'status': 'success' if socket_test_passed else 'error'
+        })
+    except Exception as e:
+        results.append({
+            'command': 'Socket Test',
+            'output': f"Socket test error: {str(e)}",
+            'status': 'error'
+        })
+        socket_test_passed = False
+    
+    # Then, process any command if submitted
     if request.method == 'POST' and test_form.validate_on_submit():
         command = request.form.get('command', 'show version').strip()
         
-        try:
-            # Import the SSH client class
-            from utils.ssh_client import SSHClient
-            
-            # Direct connection to the mock SSH server
-            ssh_client = SSHClient(
-                hostname="127.0.0.1",
-                port=2222,
-                username="test",
-                password="Ac0rN$"
-            )
-            
-            # Connect to the SSH server
-            logger.debug("Connecting to mock SSH server")
-            ssh_client.connect()
-            
-            # Execute the command
-            logger.debug(f"Executing command: {command}")
-            output = ssh_client.execute_command(command)
-            
-            # Disconnect
-            ssh_client.disconnect()
-            
-            # Add the result
+        # Only try SSH if socket test passed
+        if socket_test_passed:
+            try:
+                # Import the debug SSH client class
+                from debug_ssh_connection import DebugSSHClient
+                
+                # Direct connection to the mock SSH server
+                ssh_client = DebugSSHClient(
+                    hostname="127.0.0.1",
+                    port=2222,
+                    username="test",
+                    password="Ac0rN$"
+                )
+                
+                # Connect to the SSH server with advanced options
+                logger.debug("Connecting to mock SSH server")
+                connection_result = ssh_client.connect()
+                
+                if connection_result:
+                    # Execute the command
+                    logger.debug(f"Executing command: {command}")
+                    output = ssh_client.execute_command(command)
+                    
+                    # Disconnect
+                    ssh_client.disconnect()
+                    
+                    # Add the result
+                    results.append({
+                        'command': command,
+                        'output': output,
+                        'status': 'success'
+                    })
+                else:
+                    results.append({
+                        'command': command,
+                        'output': "Failed to establish SSH session. Socket connected but SSH protocol failed.",
+                        'status': 'error'
+                    })
+                
+            except Exception as e:
+                logger.error(f"SSH test error: {str(e)}")
+                logger.error(f"Traceback: {traceback.format_exc()}")
+                
+                # Add the error to results
+                results.append({
+                    'command': command,
+                    'output': f"Error: {str(e)}",
+                    'status': 'error'
+                })
+        else:
+            # If socket test failed, don't try SSH
             results.append({
                 'command': command,
-                'output': output,
-                'status': 'success'
-            })
-            
-        except Exception as e:
-            logger.error(f"SSH test error: {str(e)}")
-            logger.error(f"Traceback: {traceback.format_exc()}")
-            
-            # Add the error to results
-            results.append({
-                'command': command,
-                'output': f"Error: {str(e)}",
+                'output': "Cannot execute command - Socket connection to SSH server failed.",
                 'status': 'error'
             })
     
