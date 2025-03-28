@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-terminal me-2"></i>
+                        Circuit Status: {{ circuit_id }}
+                    </h4>
+                    <a href="{{ url_for('index') }}" class="btn btn-sm btn-light">
+                        <i class="fas fa-search me-1"></i> New Query
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if results %}
+                    {% for result in results %}
+                    <div class="card mb-3 {% if result.status == 'error' %}border-danger{% else %}border-success{% endif %}">
+                        <div class="card-header {% if result.status == 'error' %}bg-danger{% else %}bg-success{% endif %} text-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-server me-2"></i>
+                                    {{ result.equipment_name }}
+                                </h5>
+                                <span class="badge bg-dark">Command: <code>{{ result.command }}</code></span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <pre class="mb-0 command-output bg-dark text-light p-3 rounded">{{ result.output }}</pre>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    No results were returned. Please verify the circuit ID and try again.
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer text-end">
+                <a href="{{ url_for('equipment_list') }}" class="btn btn-secondary">
+                    <i class="fas fa-cogs me-1"></i> Manage Mappings
+                </a>
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="fas fa-search me-1"></i> New Query
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

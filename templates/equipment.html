@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4"><i class="fas fa-cogs me-2"></i>Equipment & Circuit Mappings</h2>
+        
+        <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="equipment-tab" data-bs-toggle="tab" data-bs-target="#equipment" type="button">
+                    <i class="fas fa-server me-1"></i> Network Equipment
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="circuits-tab" data-bs-toggle="tab" data-bs-target="#circuits" type="button">
+                    <i class="fas fa-plug me-1"></i> Circuit Mappings
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="myTabContent">
+            <!-- Equipment Tab -->
+            <div class="tab-pane fade show active" id="equipment" role="tabpanel">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Add New Equipment</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ url_for('add_equipment') }}" method="POST">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="name" class="form-label">Equipment Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" placeholder="e.g., Core Router 1" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="ip_address" class="form-label">IP Address</label>
+                                    <input type="text" class="form-control" id="ip_address" name="ip_address" placeholder="e.g., 192.168.1.1" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="ssh_port" class="form-label">SSH Port</label>
+                                    <input type="number" class="form-control" id="ssh_port" name="ssh_port" value="22" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="username" class="form-label">SSH Username</label>
+                                    <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="password" class="form-label">SSH Password</label>
+                                    <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                                </div>
+                                <div class="col-12 text-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-plus-circle me-1"></i> Add Equipment
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="fas fa-server me-2"></i>Equipment List</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if equipment %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>IP Address</th>
+                                        <th>SSH Port</th>
+                                        <th>Username</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in equipment %}
+                                    <tr>
+                                        <td>{{ item.name }}</td>
+                                        <td>{{ item.ip_address }}</td>
+                                        <td>{{ item.ssh_port }}</td>
+                                        <td>{{ item.username }}</td>
+                                        <td>
+                                            <form action="{{ url_for('delete_equipment', id=item.id) }}" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this equipment? This will also delete all associated circuit mappings.')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            No equipment added yet. Add your first device above.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Circuit Mappings Tab -->
+            <div class="tab-pane fade" id="circuits" role="tabpanel">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-plug me-2"></i>Add New Circuit Mapping</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if equipment %}
+                        <form action="{{ url_for('add_mapping') }}" method="POST">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="circuit_id" class="form-label">Circuit ID</label>
+                                    <input type="text" class="form-control" id="circuit_id" name="circuit_id" placeholder="e.g., CIRCUIT-12345" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="equipment_id" class="form-label">Equipment</label>
+                                    <select class="form-select" id="equipment_id" name="equipment_id" required>
+                                        <option value="" selected disabled>Select equipment...</option>
+                                        {% for item in equipment %}
+                                        <option value="{{ item.id }}">{{ item.name }} ({{ item.ip_address }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="command" class="form-label">Command to Execute</label>
+                                    <input type="text" class="form-control" id="command" name="command" 
+                                           placeholder="e.g., show interface GigabitEthernet1/0" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="description" class="form-label">Description (Optional)</label>
+                                    <input type="text" class="form-control" id="description" name="description" 
+                                           placeholder="e.g., Main uplink connection">
+                                </div>
+                                <div class="col-12 text-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-plus-circle me-1"></i> Add Mapping
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            You need to add equipment first before creating circuit mappings.
+                            <a href="#" class="alert-link" data-bs-toggle="tab" data-bs-target="#equipment">Go to Equipment tab</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="fas fa-plug me-2"></i>Circuit Mappings</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if circuits %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Circuit ID</th>
+                                        <th>Equipment</th>
+                                        <th>Command</th>
+                                        <th>Description</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for mapping in circuits %}
+                                    <tr>
+                                        <td>{{ mapping.circuit_id }}</td>
+                                        <td>{{ mapping.equipment.name }}</td>
+                                        <td><code>{{ mapping.command }}</code></td>
+                                        <td>{{ mapping.description or '-' }}</td>
+                                        <td>
+                                            <form action="{{ url_for('delete_mapping', id=mapping.id) }}" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this mapping?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            No circuit mappings added yet.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-search me-2"></i>
+                    Network Circuit Monitor
+                </h4>
+            </div>
+            <div class="card-body">
+                <p class="lead mb-4">
+                    Enter a circuit ID from your network alert to retrieve its current status by connecting to the associated equipment.
+                </p>
+                
+                <form action="{{ url_for('submit_alert') }}" method="POST">
+                    <div class="mb-4">
+                        <label for="circuit_id" class="form-label">Circuit ID:</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark"><i class="fas fa-barcode"></i></span>
+                            <input type="text" id="circuit_id" name="circuit_id" class="form-control" 
+                                   placeholder="Enter circuit ID (e.g., CIRCUIT-12345)" required autofocus>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-terminal me-1"></i> Check Status
+                            </button>
+                        </div>
+                        <div class="form-text text-muted">
+                            Enter the circuit ID exactly as it appears in your alert notification.
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    How It Works
+                </h5>
+            </div>
+            <div class="card-body">
+                <ol class="mb-0">
+                    <li class="mb-2">Enter the circuit ID from your network alert</li>
+                    <li class="mb-2">The system will identify the equipment associated with this circuit</li>
+                    <li class="mb-2">It will automatically SSH into each device and run the appropriate command</li>
+                    <li class="mb-2">Results will be displayed for all equipment with color-coded status indicators</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-cogs me-2"></i>
+                    System Management
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('equipment_list') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-server me-2"></i>
+                        Manage Equipment
+                    </a>
+                    <a href="{{ url_for('equipment_list') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-plug me-2"></i>
+                        Manage Circuit Mappings
+                    </a>
+                </div>
+                <hr>
+                <div class="alert alert-secondary mt-3 mb-0">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    <strong>Tip:</strong> You can add new equipment and circuit mappings to extend monitoring capabilities.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
