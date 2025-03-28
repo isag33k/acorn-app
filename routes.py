@@ -318,7 +318,11 @@ def equipment_list():
     """List all equipment and circuit mappings"""
     equipment = Equipment.query.all()
     circuits = CircuitMapping.query.all()
-    return render_template('equipment.html', equipment=equipment, circuits=circuits)
+    
+    # Create a form instance for CSRF protection
+    form = FlaskForm()
+    
+    return render_template('equipment.html', equipment=equipment, circuits=circuits, form=form)
 
 @app.route('/equipment/add', methods=['POST'])
 @login_required
