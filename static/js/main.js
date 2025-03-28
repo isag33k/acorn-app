@@ -190,4 +190,64 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // Fix for modal backdrop issues
+    // Handle proper closing of modals that might have backdrop issues
+    const editModalElements = document.querySelectorAll('.modal');
+    
+    editModalElements.forEach(modal => {
+        // Add event listener for when the modal is hidden
+        modal.addEventListener('hidden.bs.modal', function() {
+            // Ensure backdrop is removed
+            document.body.classList.remove('modal-open');
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => {
+                backdrop.remove();
+            });
+            
+            // Reset body styling that might have been added by Bootstrap
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        });
+        
+        // Add event listener for when the modal is shown
+        modal.addEventListener('shown.bs.modal', function() {
+            console.log('Modal shown:', modal.id);
+        });
+        
+        // Add event listener for any form submissions inside modals
+        const modalForms = modal.querySelectorAll('form');
+        modalForms.forEach(form => {
+            form.addEventListener('submit', function() {
+                // Force close the modal properly before form submission
+                const modalInstance = bootstrap.Modal.getInstance(modal);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+            });
+        });
+        
+        // Add event listener for cancel/close buttons in modals
+        const closeButtons = modal.querySelectorAll('[data-bs-dismiss="modal"]');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Ensure the modal is fully closed
+                const modalInstance = bootstrap.Modal.getInstance(modal);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+                
+                // Manual cleanup
+                document.body.classList.remove('modal-open');
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                backdrops.forEach(backdrop => {
+                    backdrop.remove();
+                });
+                
+                // Reset body styling
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+            });
+        });
+    });
 });

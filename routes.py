@@ -895,7 +895,23 @@ def edit_mapping(id):
     
     db.session.commit()
     
-    flash('Circuit mapping updated successfully!', 'success')
+    # Add a special JavaScript to ensure the modal backdrop is cleared
+    flash('''
+        <script>
+            // Clean up any leftover modal backdrops
+            document.addEventListener('DOMContentLoaded', function() {
+                document.body.classList.remove('modal-open');
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                backdrops.forEach(function(backdrop) {
+                    backdrop.remove();
+                });
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+            });
+        </script>
+        Circuit mapping updated successfully!
+    ''', 'success')
+    
     return redirect(url_for('equipment_list'))
     
     

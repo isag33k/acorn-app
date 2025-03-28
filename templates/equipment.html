@@ -460,6 +460,27 @@
             bootstrap.Tab.getInstance(circuitsTab).show();
             document.getElementById('tabHelper').style.display = 'none';
         });
+        
+        // Fix for edit modal issues
+        document.querySelectorAll('.btn[data-bs-toggle="modal"]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                // Get the target modal ID
+                var modalId = this.getAttribute('data-bs-target');
+                var modalElement = document.querySelector(modalId);
+                
+                // Initialize modal if it exists
+                if (modalElement) {
+                    var bsModal = new bootstrap.Modal(modalElement, {
+                        backdrop: true,
+                        keyboard: true,
+                        focus: true
+                    });
+                    
+                    // Show the modal
+                    bsModal.show();
+                }
+            });
+        });
     });
 </script>
 {% endblock %}
