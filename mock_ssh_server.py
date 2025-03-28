@@ -2,18 +2,18 @@
 """
 Mock SSH Server for testing ACORN application
 
-This is a wrapper script that uses the improved implementation from
-improved_ssh_server.py for better reliability and debugging.
+This is a wrapper script that now uses the simple implementation
+which is more reliable than the previous version.
 """
 
 import sys
 import os
 import logging
 
-# Import the improved SSH server code
-from improved_ssh_server import start_server
+# Import the simple SSH server code
+from simple_ssh_server import start_server
 
-# Just start the server directly from our improved implementation
+# Start the server directly from our simple implementation
 if __name__ == "__main__":
-    print("Starting SSH server using improved implementation")
+    print("Starting SSH server using simple implementation")
     start_server()

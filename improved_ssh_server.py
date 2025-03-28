@@ -86,8 +86,11 @@ class MockSSHServer(paramiko.ServerInterface):
     def check_channel_exec_request(self, channel, command):
         logger.debug(f"Command received: {command}")
         
-        # The command handling is done in the handle_client function
-        # This just signals that the command is accepted
+        # Store the command on the channel so it can be accessed later
+        channel.set_name("exec")
+        channel.command = command
+        
+        # Signal that a command was received
         self.event.set()
         return True
 
@@ -133,8 +136,8 @@ def handle_client(client, addr):
         
         # Get the command from the session
         command = ""
-        if hasattr(channel, 'get_command'):
-            command = channel.get_command().decode('utf-8')
+        if hasattr(channel, 'command'):
+            command = channel.command.decode('utf-8')
             logger.info(f"Command received: {command}")
 
         # Send banner

@@ -1,77 +1,100 @@
 {% extends 'base.html' %}
 
-{% block title %}SSH Test{% endblock %}
+{% block title %}ACORN - SSH Test{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container my-4">
     <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card card-custom">
-                <div class="card-header">
-                    <h4 class="mb-0">SSH Connection Test</h4>
+        <div class="col-12">
+            <h1 class="mb-4">SSH Connection Test</h1>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Test SSH Connection</h5>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted">This page allows you to directly test SSH connectivity to the mock server.</p>
-
-                    <div class="alert alert-info">
-                        <h6>Connection Details</h6>
-                        <p class="mb-1"><strong>Host:</strong> 127.0.0.1</p>
-                        <p class="mb-1"><strong>Port:</strong> 2222</p>
-                        <p class="mb-1"><strong>Username:</strong> test</p>
-                        <p class="mb-1"><strong>Password:</strong> Ac0rN$</p>
-                    </div>
-                    
-                    <div class="alert alert-secondary">
-                        <h6>Available Commands:</h6>
-                        <ul class="mb-0">
-                            <li><code>show version</code> - Display router version information</li>
-                            <li><code>show interface ge-0/0/0</code> - Display interface details</li>
-                            <li><code>show circuit id TEST-001</code> - Show information for test circuit 001</li>
-                            <li><code>show circuit id TEST-002</code> - Show information for test circuit 002 (with warnings)</li>
-                        </ul>
-                    </div>
-                    
-                    {% if results %}
-                    <div class="mt-4 mb-4">
-                        <h5>Test Results:</h5>
-                        {% for result in results %}
-                        <div class="card mt-3 mb-3 {% if result.status == 'success' %}border-success{% else %}border-danger{% endif %}">
-                            <div class="card-header d-flex justify-content-between">
-                                <span>
-                                    {% if result.status == 'success' %}
-                                    <span class="status-indicator status-success"></span>
-                                    {% else %}
-                                    <span class="status-indicator status-danger"></span>
-                                    {% endif %}
-                                    {{ result.command }}
-                                </span>
-                                <span class="badge {% if result.status == 'success' %}bg-success{% else %}bg-danger{% endif %}">
-                                    {{ result.status }}
-                                </span>
-                            </div>
-                            <div class="card-body">
-                                <pre class="command-output">{{ result.output }}</pre>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                    
                     <form method="post" action="{{ url_for('test_ssh_connection') }}">
-                        {{ test_form.hidden_tag() }}
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> 
+                            This page allows you to test the SSH connectivity to the mock server.
+                            It will verify that the application can connect and execute commands.
+                        </div>
                         
                         <div class="mb-3">
-                            <label for="command" class="form-label">Command to Test</label>
-                            <input type="text" class="form-control" id="command" name="command" 
-                                  value="{{ command or 'show version' }}" required>
-                            <div class="form-text">Enter a command to test on the mock SSH server</div>
+                            <label class="form-label">Target Server</label>
+                            <input type="text" class="form-control" value="localhost:2222 (Mock SSH Server)" disabled>
+                            <div class="form-text">The test will use the mock SSH server running on port 2222</div>
                         </div>
                         
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Run Test</button>
-                            <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Main Page</a>
+                        <div class="mb-3">
+                            <label class="form-label">Test Credentials</label>
+                            <input type="text" class="form-control" value="test / Ac0rN$" disabled>
+                            <div class="form-text">The test uses hardcoded credentials for the mock server</div>
                         </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Test Command</label>
+                            <select name="command" class="form-select">
+                                <option value="show version">show version</option>
+                                <option value="show interface ge-0/0/0">show interface ge-0/0/0</option>
+                                <option value="show circuit id TEST-001">show circuit id TEST-001</option>
+                                <option value="show circuit id TEST-002">show circuit id TEST-002</option>
+                                <option value="show circuit id TEST-999">show circuit id TEST-999</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Run Test</button>
                     </form>
+                </div>
+            </div>
+            
+            {% if result %}
+            <div class="card mb-4">
+                <div class="card-header {% if success %}bg-success{% else %}bg-danger{% endif %} text-white">
+                    <h5 class="card-title mb-0">Test Results</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Status: {% if success %}Success{% else %}Failed{% endif %}</h6>
+                    
+                    {% if connection_time %}
+                    <p><strong>Connection Time:</strong> {{ connection_time }}ms</p>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Command Output</label>
+                        <pre class="bg-dark text-light p-3 rounded">{{ result }}</pre>
+                    </div>
+                    
+                    {% if error %}
+                    <div class="alert alert-danger">
+                        <h6 class="alert-heading">Error Details</h6>
+                        <p>{{ error }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title mb-0">SSH Troubleshooting</h5>
+                </div>
+                <div class="card-body">
+                    <p>If you encounter issues with the SSH connection, try the following:</p>
+                    <ol>
+                        <li>Ensure the SSH server is running (check the "SSH Server" workflow)</li>
+                        <li>Verify that port 2222 is open and accessible</li>
+                        <li>Check that the mock SSH server has the correct credentials</li>
+                        <li>Review the logs for detailed error messages</li>
+                    </ol>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Remember that in a production environment, you'll need to use real network equipment 
+                        credentials and IP addresses instead of the mock server.
+                    </div>
                 </div>
             </div>
         </div>
