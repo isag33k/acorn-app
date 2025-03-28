@@ -5,6 +5,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import inspect, Text
+from flask_login import LoginManager
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -14,10 +15,11 @@ class Base(DeclarativeBase):
     pass
 
 db = SQLAlchemy(model_class=Base)
+login_manager = LoginManager()
 
 # Create the app
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET")
+app.secret_key = os.environ.get("SESSION_SECRET") or "development-secret-key"
 
 # Enable host as 0.0.0.0 to be accessible from outside
 app.config["SERVER_NAME"] = None
@@ -47,8 +49,16 @@ def alter_column_type(table_name, column_name, new_type):
         logger.error(f"Error changing column type: {str(e)}")
         return False
 
-# Initialize the app with the extension
+# Initialize the app with the extensions
 db.init_app(app)
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Load the user from the database by id"""
+    from models import User
+    return User.query.get(int(user_id))
 
 with app.app_context():
     # Import models
@@ -69,4 +79,14 @@ with app.app_context():
                     alter_column_type('circuit_mapping', 'command', 'TEXT')
                 break
     
+    # Create default admin user if it doesn't exist
+    from models import User
+    admin_user = User.query.filter_by(username='admin').first()
+    if not admin_user:
+        admin_user = User(username='admin', email='admin@example.com', is_admin=True)
+        admin_user.set_password('Welcome1@123')
+        db.session.add(admin_user)
+        db.session.commit()
+        logger.info("Created default admin user")
+
     logger.debug("Database tables created")
