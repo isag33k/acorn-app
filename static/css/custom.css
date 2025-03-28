@@ -66,6 +66,17 @@ body {
     border-radius: 3px 3px 0 0;
 }
 
+/* User avatar in the navbar */
+.user-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: inline-block;
+    vertical-align: middle;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
 /* Card styling */
 .card {
     background-color: var(--card-bg);

@@ -11,6 +11,14 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     
+    # User profile fields
+    first_name = db.Column(db.String(50), nullable=True)
+    last_name = db.Column(db.String(50), nullable=True)
+    phone = db.Column(db.String(20), nullable=True)
+    avatar = db.Column(db.String(255), nullable=True)  # Store path to avatar image
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    
     # TACACS personal credentials
     tacacs_username = db.Column(db.String(50), nullable=True)
     tacacs_password = db.Column(db.String(100), nullable=True)

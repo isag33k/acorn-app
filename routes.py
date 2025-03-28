@@ -1,12 +1,16 @@
 import logging
 import datetime
 import traceback
+import os
+import uuid
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, EmailField, TextAreaField, SelectField, HiddenField, SearchField
-from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError
+from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
 from sqlalchemy import or_
+from werkzeug.utils import secure_filename
 
 from app import app, db
 from models import Equipment, CircuitMapping, User, UserCredential, Contact
@@ -81,6 +85,15 @@ class ContactSearchForm(FlaskForm):
         ('location', 'City/State')
     ])
     submit = SubmitField('Search')
+    
+# User profile form
+class ProfileForm(FlaskForm):
+    first_name = StringField('First Name', validators=[Length(max=50)])
+    last_name = StringField('Last Name', validators=[Length(max=50)])
+    email = EmailField('Email', validators=[DataRequired(), Email(), Length(max=120)])
+    phone = StringField('Phone', validators=[Length(max=20)])
+    avatar = FileField('Profile Picture', validators=[Optional(), FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Images only!')])
+    submit = SubmitField('Update Profile')
 
 @app.route('/')
 @login_required
@@ -411,6 +424,113 @@ def delete_tacacs_credential():
         db.session.rollback()
     
     return redirect(url_for('user_credentials'))
+
+@app.route('/profile', methods=['GET'])
+@login_required
+def user_profile():
+    """Display and manage user profile"""
+    form = ProfileForm()
+    
+    # Pre-populate form with existing user data
+    form.first_name.data = current_user.first_name
+    form.last_name.data = current_user.last_name
+    form.email.data = current_user.email
+    form.phone.data = current_user.phone
+    
+    return render_template('profile.html', form=form, user=current_user)
+
+@app.route('/profile/update', methods=['POST'])
+@login_required
+def update_profile():
+    """Update user profile information"""
+    form = ProfileForm()
+    
+    if form.validate_on_submit():
+        try:
+            # Update profile fields
+            current_user.first_name = form.first_name.data
+            current_user.last_name = form.last_name.data
+            
+            # Check if email already exists (and not the current user's email)
+            if form.email.data != current_user.email:
+                existing_user = User.query.filter_by(email=form.email.data).first()
+                if existing_user and existing_user.id != current_user.id:
+                    flash('Email address already in use by another account', 'danger')
+                    return redirect(url_for('user_profile'))
+                    
+            current_user.email = form.email.data
+            current_user.phone = form.phone.data
+            
+            # Handle avatar upload
+            if form.avatar.data:
+                # Create a unique filename
+                filename = secure_filename(form.avatar.data.filename)
+                unique_filename = f"{uuid.uuid4().hex}_{filename}"
+                
+                # Save the file
+                avatar_path = os.path.join(app.root_path, 'static', 'uploads', 'avatars', unique_filename)
+                form.avatar.data.save(avatar_path)
+                
+                # Delete old avatar if exists (to save space)
+                if current_user.avatar:
+                    old_avatar_path = os.path.join(app.root_path, 'static', current_user.avatar.lstrip('/'))
+                    try:
+                        if os.path.exists(old_avatar_path):
+                            os.remove(old_avatar_path)
+                    except Exception as e:
+                        logger.warning(f"Error deleting old avatar: {str(e)}")
+                
+                # Update avatar path in database (store relative URL)
+                current_user.avatar = f"/uploads/avatars/{unique_filename}"
+            
+            # Save changes
+            db.session.commit()
+            flash('Profile updated successfully', 'success')
+            
+        except Exception as e:
+            logger.error(f"Error updating profile: {str(e)}")
+            flash(f'Error updating profile: {str(e)}', 'danger')
+            db.session.rollback()
+            
+    else:
+        # Handle validation errors
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f'{getattr(form, field).label.text}: {error}', 'danger')
+                
+    return redirect(url_for('user_profile'))
+
+@app.route('/profile/avatar/delete', methods=['POST'])
+@login_required
+def delete_avatar():
+    """Delete the user's profile avatar"""
+    try:
+        # Check for CSRF token
+        form = FlaskForm()
+        if not form.validate_on_submit():
+            flash('CSRF token missing or invalid', 'danger')
+            return redirect(url_for('user_profile'))
+            
+        # Delete avatar file if exists
+        if current_user.avatar:
+            avatar_path = os.path.join(app.root_path, 'static', current_user.avatar.lstrip('/'))
+            try:
+                if os.path.exists(avatar_path):
+                    os.remove(avatar_path)
+            except Exception as e:
+                logger.warning(f"Error deleting avatar file: {str(e)}")
+            
+        # Clear avatar field in database
+        current_user.avatar = None
+        db.session.commit()
+        flash('Profile picture removed successfully', 'success')
+        
+    except Exception as e:
+        logger.error(f"Error deleting avatar: {str(e)}")
+        flash(f'Error removing profile picture: {str(e)}', 'danger')
+        db.session.rollback()
+        
+    return redirect(url_for('user_profile'))
 
 @app.route('/submit_alert', methods=['POST'])
 @login_required
