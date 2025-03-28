@@ -3,35 +3,69 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Bootstrap tabs
-    var triggerTabList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tab"]'))
-    triggerTabList.forEach(function(triggerEl) {
-        new bootstrap.Tab(triggerEl);
-    });
+    console.log("DOM fully loaded - initializing tabs");
     
-    // Manually handle tab link clicks if needed
-    const tabLinks = document.querySelectorAll('[data-bs-toggle="tab"]');
-    
-    tabLinks.forEach(tab => {
-        tab.addEventListener('click', function(e) {
+    // Tab switching functionality
+    document.querySelectorAll('.nav-tabs .nav-link').forEach(function(tabLink) {
+        tabLink.addEventListener('click', function(e) {
+            console.log("Tab clicked:", this.getAttribute('data-bs-target'));
             e.preventDefault();
             
-            // Get target tab
-            const target = document.querySelector(this.getAttribute('data-bs-target'));
-            
-            // Remove active class from all tabs and panes
-            document.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-pane').forEach(p => {
-                p.classList.remove('show');
-                p.classList.remove('active');
+            // Hide all tabs
+            document.querySelectorAll('.tab-pane').forEach(function(tab) {
+                tab.classList.remove('show', 'active');
             });
             
-            // Add active class to current tab and pane
+            // Show the selected tab
+            const target = document.querySelector(this.getAttribute('data-bs-target'));
+            target.classList.add('show', 'active');
+            
+            // Update active state on tab buttons
+            document.querySelectorAll('.nav-tabs .nav-link').forEach(function(link) {
+                link.classList.remove('active');
+            });
             this.classList.add('active');
-            target.classList.add('show');
-            target.classList.add('active');
         });
     });
+    
+    // Log that the tab initialization is complete
+    console.log("Tab event listeners initialized");
+    
+    // Handle "Show Circuit Mappings Tab" button
+    const showCircuitTabBtn = document.getElementById('showCircuitTab');
+    if (showCircuitTabBtn) {
+        showCircuitTabBtn.addEventListener('click', function() {
+            // Find the circuit mappings tab and click it
+            const circuitsTab = document.getElementById('circuits-tab');
+            if (circuitsTab) {
+                // Simulate a click on the circuits tab
+                console.log("Showing circuit mappings tab via button");
+                
+                // Hide all tabs first
+                document.querySelectorAll('.tab-pane').forEach(function(tab) {
+                    tab.classList.remove('show', 'active');
+                });
+                
+                // Show the circuits tab and set it as active
+                const circuitsPane = document.getElementById('circuits');
+                circuitsPane.classList.add('show', 'active');
+                
+                // Update active state on tab buttons
+                document.querySelectorAll('.nav-tabs .nav-link').forEach(function(link) {
+                    link.classList.remove('active');
+                });
+                circuitsTab.classList.add('active');
+                
+                // Highlight the edit buttons by adding a temporary class
+                document.querySelectorAll('.btn-sm.btn-primary').forEach(function(btn) {
+                    btn.classList.add('btn-lg');
+                    setTimeout(function() {
+                        btn.classList.remove('btn-lg');
+                    }, 1500);
+                });
+            }
+        });
+    }
     
     // Handle alert dismissal
     const alerts = document.querySelectorAll('.alert-dismissible');
