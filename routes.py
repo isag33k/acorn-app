@@ -3,7 +3,7 @@ import datetime
 import traceback
 import os
 import uuid
-from flask import render_template, request, redirect, url_for, flash, jsonify
+from flask import render_template, request, redirect, url_for, flash, jsonify, send_from_directory
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
@@ -136,6 +136,11 @@ def logout():
     """User logout"""
     logout_user()
     return redirect(url_for('login'))
+
+@app.route('/uploads/<path:filename>')
+def serve_uploads(filename):
+    """Serve files from the uploads directory"""
+    return send_from_directory('uploads', filename)
 
 @app.route('/users')
 @login_required
@@ -474,21 +479,26 @@ def update_profile():
                 filename = secure_filename(form.avatar.data.filename)
                 unique_filename = f"{uuid.uuid4().hex}_{filename}"
                 
-                # Save the file
-                avatar_path = os.path.join(app.root_path, 'static', 'uploads', 'avatars', unique_filename)
+                # Ensure the avatars directory exists (persistent storage)
+                avatar_dir = os.path.join('uploads', 'avatars')
+                if not os.path.exists(avatar_dir):
+                    os.makedirs(avatar_dir, exist_ok=True)
+                
+                # Save the file to persistent storage
+                avatar_path = os.path.join(avatar_dir, unique_filename)
                 form.avatar.data.save(avatar_path)
                 
                 # Delete old avatar if exists (to save space)
                 if current_user.avatar:
-                    old_avatar_path = os.path.join(app.root_path, 'static', current_user.avatar.lstrip('/'))
+                    old_avatar_path = current_user.avatar.lstrip('/')
                     try:
                         if os.path.exists(old_avatar_path):
                             os.remove(old_avatar_path)
                     except Exception as e:
                         logger.warning(f"Error deleting old avatar: {str(e)}")
                 
-                # Update avatar path in database (store relative URL)
-                current_user.avatar = f"/uploads/avatars/{unique_filename}"
+                # Update avatar path in database (store absolute path)
+                current_user.avatar = avatar_path
             
             # Save changes
             db.session.commit()
@@ -520,10 +530,9 @@ def delete_avatar():
             
         # Delete avatar file if exists
         if current_user.avatar:
-            avatar_path = os.path.join(app.root_path, 'static', current_user.avatar.lstrip('/'))
             try:
-                if os.path.exists(avatar_path):
-                    os.remove(avatar_path)
+                if os.path.exists(current_user.avatar):
+                    os.remove(current_user.avatar)
             except Exception as e:
                 logger.warning(f"Error deleting avatar file: {str(e)}")
             
