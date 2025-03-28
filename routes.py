@@ -1,12 +1,14 @@
 import logging
+import datetime
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, EmailField, TextAreaField, SelectField, HiddenField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, EmailField, TextAreaField, SelectField, HiddenField, SearchField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError
+from sqlalchemy import or_
 
 from app import app, db
-from models import Equipment, CircuitMapping, User, UserCredential
+from models import Equipment, CircuitMapping, User, UserCredential, Contact
 from utils.ssh_client import SSHClient
 
 logger = logging.getLogger(__name__)
@@ -50,6 +52,34 @@ class TacacsCredentialForm(FlaskForm):
     tacacs_username = StringField('TACACS Username', validators=[DataRequired(), Length(max=50)])
     tacacs_password = PasswordField('TACACS Password', validators=[DataRequired(), Length(max=100)])
     submit = SubmitField('Save TACACS Credentials')
+    
+# Contact form for POC Database
+class ContactForm(FlaskForm):
+    first_name = StringField('First Name', validators=[DataRequired(), Length(max=50)])
+    last_name = StringField('Last Name', validators=[DataRequired(), Length(max=50)])
+    company = StringField('Company', validators=[DataRequired(), Length(max=100)])
+    email = EmailField('Email', validators=[Length(max=120), Email()])
+    phone = StringField('Phone', validators=[Length(max=20)])
+    mobile = StringField('Mobile', validators=[Length(max=20)])
+    title = StringField('Job Title', validators=[Length(max=100)])
+    address = StringField('Address', validators=[Length(max=200)])
+    city = StringField('City', validators=[Length(max=50)])
+    state = StringField('State', validators=[Length(max=50)])
+    zip_code = StringField('ZIP/Postal Code', validators=[Length(max=20)])
+    notes = TextAreaField('Notes')
+    submit = SubmitField('Save Contact')
+    
+# Contact search form
+class ContactSearchForm(FlaskForm):
+    search_term = StringField('Search', validators=[Length(max=100)])
+    search_field = SelectField('Search By', choices=[
+        ('all', 'All Fields'),
+        ('name', 'Name (First or Last)'),
+        ('company', 'Company'),
+        ('phone', 'Phone Number'),
+        ('location', 'City/State')
+    ])
+    submit = SubmitField('Search')
 
 @app.route('/')
 @login_required
@@ -696,3 +726,180 @@ def edit_mapping(id):
     
     flash('Circuit mapping updated successfully!', 'success')
     return redirect(url_for('equipment_list'))
+    
+    
+# POC Database Routes
+
+@app.route('/contacts', methods=['GET'])
+@login_required
+def contact_list():
+    """Display and search contacts in the POC Database"""
+    search_form = ContactSearchForm()
+    
+    # Get search parameters
+    search_term = request.args.get('search_term', '')
+    search_field = request.args.get('search_field', 'all')
+    
+    # Base query
+    query = Contact.query
+    
+    # Apply search filters if a term is provided
+    if search_term:
+        if search_field == 'name':
+            # Search in first_name OR last_name
+            query = query.filter(
+                or_(
+                    Contact.first_name.ilike(f'%{search_term}%'),
+                    Contact.last_name.ilike(f'%{search_term}%')
+                )
+            )
+        elif search_field == 'company':
+            query = query.filter(Contact.company.ilike(f'%{search_term}%'))
+        elif search_field == 'phone':
+            query = query.filter(
+                or_(
+                    Contact.phone.ilike(f'%{search_term}%'),
+                    Contact.mobile.ilike(f'%{search_term}%')
+                )
+            )
+        elif search_field == 'location':
+            query = query.filter(
+                or_(
+                    Contact.city.ilike(f'%{search_term}%'),
+                    Contact.state.ilike(f'%{search_term}%')
+                )
+            )
+        else:  # 'all' fields
+            query = query.filter(
+                or_(
+                    Contact.first_name.ilike(f'%{search_term}%'),
+                    Contact.last_name.ilike(f'%{search_term}%'),
+                    Contact.company.ilike(f'%{search_term}%'),
+                    Contact.phone.ilike(f'%{search_term}%'),
+                    Contact.mobile.ilike(f'%{search_term}%'),
+                    Contact.email.ilike(f'%{search_term}%'),
+                    Contact.city.ilike(f'%{search_term}%'),
+                    Contact.state.ilike(f'%{search_term}%')
+                )
+            )
+    
+    # Order by company then last name
+    contacts = query.order_by(Contact.company, Contact.last_name).all()
+    
+    # Create a new contact form
+    contact_form = ContactForm()
+    
+    # CSRF form for delete operations
+    csrf_form = FlaskForm()
+    
+    return render_template(
+        'contacts.html',
+        contacts=contacts,
+        search_form=search_form,
+        contact_form=contact_form,
+        csrf_form=csrf_form,
+        search_term=search_term,
+        search_field=search_field
+    )
+
+
+
+@app.route('/contacts/add', methods=['POST'])
+@login_required
+def add_contact():
+    """Add a new contact to the POC Database"""
+    form = ContactForm()
+    
+    if form.validate_on_submit():
+        # Create new contact from form data
+        contact = Contact(
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+            company=form.company.data,
+            email=form.email.data,
+            phone=form.phone.data,
+            mobile=form.mobile.data,
+            title=form.title.data,
+            address=form.address.data,
+            city=form.city.data,
+            state=form.state.data,
+            zip_code=form.zip_code.data,
+            notes=form.notes.data
+        )
+        
+        db.session.add(contact)
+        db.session.commit()
+        
+        flash(f'Contact {contact.first_name} {contact.last_name} added successfully!', 'success')
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f'{getattr(form, field).label.text}: {error}', 'danger')
+    
+    return redirect(url_for('contact_list'))
+
+@app.route('/contacts/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_contact(id):
+    """Edit an existing contact"""
+    contact = Contact.query.get_or_404(id)
+    
+    if request.method == 'GET':
+        # Pre-populate the form with contact data
+        form = ContactForm(obj=contact)
+        return render_template('edit_contact.html', form=form, contact=contact)
+    
+    # POST request - update the contact
+    form = ContactForm()
+    
+    if form.validate_on_submit():
+        # Update contact from form data
+        contact.first_name = form.first_name.data
+        contact.last_name = form.last_name.data
+        contact.company = form.company.data
+        contact.email = form.email.data
+        contact.phone = form.phone.data
+        contact.mobile = form.mobile.data
+        contact.title = form.title.data
+        contact.address = form.address.data
+        contact.city = form.city.data
+        contact.state = form.state.data
+        contact.zip_code = form.zip_code.data
+        contact.notes = form.notes.data
+        contact.updated_at = datetime.datetime.utcnow()
+        
+        db.session.commit()
+        
+        flash(f'Contact {contact.first_name} {contact.last_name} updated successfully!', 'success')
+        return redirect(url_for('contact_list'))
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f'{getattr(form, field).label.text}: {error}', 'danger')
+        return redirect(url_for('edit_contact', id=id))
+
+@app.route('/contacts/delete/<int:id>', methods=['POST'])
+@login_required
+def delete_contact(id):
+    """Delete a contact from the POC Database"""
+    # Validate CSRF token
+    form = FlaskForm()
+    if not form.validate_on_submit():
+        flash('CSRF token missing or invalid', 'danger')
+        return redirect(url_for('contact_list'))
+    
+    contact = Contact.query.get_or_404(id)
+    name = f"{contact.first_name} {contact.last_name}"
+    
+    db.session.delete(contact)
+    db.session.commit()
+    
+    flash(f'Contact {name} deleted successfully!', 'success')
+    return redirect(url_for('contact_list'))
+
+@app.route('/contacts/view/<int:id>')
+@login_required
+def view_contact(id):
+    """View detailed information for a single contact"""
+    contact = Contact.query.get_or_404(id)
+    return render_template('view_contact.html', contact=contact)

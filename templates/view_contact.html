@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-address-card me-2"></i>
+            Contact Details
+        </h2>
+        <div>
+            <a href="{{ url_for('edit_contact', id=contact.id) }}" class="btn btn-primary me-2">
+                <i class="fas fa-edit me-1"></i> Edit
+            </a>
+            <a href="{{ url_for('contact_list') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Back to Contacts
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Contact Info Card -->
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        {{ contact.first_name }} {{ contact.last_name }}
+                        {% if contact.title %}
+                            <small class="ms-2">{{ contact.title }}</small>
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h6 class="fw-bold text-muted mb-2">Company</h6>
+                            <p class="fs-5 mb-1">{{ contact.company }}</p>
+                        </div>
+                        
+                        {% if contact.email %}
+                        <div class="col-md-6 mb-3">
+                            <h6 class="fw-bold text-muted mb-2">Email</h6>
+                            <p class="mb-1">
+                                <a href="mailto:{{ contact.email }}" class="d-flex align-items-center">
+                                    <i class="fas fa-envelope me-2"></i>
+                                    {{ contact.email }}
+                                </a>
+                            </p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if contact.phone %}
+                        <div class="col-md-6 mb-3">
+                            <h6 class="fw-bold text-muted mb-2">Phone</h6>
+                            <p class="mb-1">
+                                <a href="tel:{{ contact.phone }}" class="d-flex align-items-center">
+                                    <i class="fas fa-phone me-2"></i>
+                                    {{ contact.phone }}
+                                </a>
+                            </p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if contact.mobile %}
+                        <div class="col-md-6 mb-3">
+                            <h6 class="fw-bold text-muted mb-2">Mobile</h6>
+                            <p class="mb-1">
+                                <a href="tel:{{ contact.mobile }}" class="d-flex align-items-center">
+                                    <i class="fas fa-mobile-alt me-2"></i>
+                                    {{ contact.mobile }}
+                                </a>
+                            </p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if contact.address or contact.city or contact.state or contact.zip_code %}
+                        <div class="col-12 mb-3">
+                            <h6 class="fw-bold text-muted mb-2">Address</h6>
+                            <p class="mb-1">
+                                <span class="d-flex align-items-start">
+                                    <i class="fas fa-map-marker-alt me-2 mt-1"></i>
+                                    <span>
+                                        {% if contact.address %}{{ contact.address }}<br>{% endif %}
+                                        {% if contact.city or contact.state or contact.zip_code %}
+                                            {{ contact.city }}{{ ', ' if contact.city and contact.state }}{{ contact.state }} {{ contact.zip_code }}
+                                        {% endif %}
+                                    </span>
+                                </span>
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if contact.notes %}
+                    <div class="mt-3">
+                        <h6 class="fw-bold text-muted mb-2">Notes</h6>
+                        <div class="card bg-light">
+                            <div class="card-body py-2 px-3">
+                                <p class="mb-0">{{ contact.notes|nl2br }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer text-muted">
+                    <div class="d-flex justify-content-between">
+                        <small>Created: {{ contact.created_at.strftime('%b %d, %Y') }}</small>
+                        <small>Last updated: {{ contact.updated_at.strftime('%b %d, %Y') }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions Card -->
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-tasks me-2"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% if contact.email %}
+                        <a href="mailto:{{ contact.email }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-envelope me-2"></i> Send Email
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        {% endif %}
+                        
+                        {% if contact.phone %}
+                        <a href="tel:{{ contact.phone }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-phone me-2"></i> Call (Office)
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        {% endif %}
+                        
+                        {% if contact.mobile %}
+                        <a href="tel:{{ contact.mobile }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-mobile-alt me-2"></i> Call (Mobile)
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('edit_contact', id=contact.id) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-edit me-2"></i> Edit Contact
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        
+                        <button type="button" class="list-group-item list-group-item-action text-danger" 
+                                data-bs-toggle="modal" data-bs-target="#deleteContactModal">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-trash me-2"></i> Delete Contact
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteContactModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Contact</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong>{{ contact.first_name }} {{ contact.last_name }}</strong> from <strong>{{ contact.company }}</strong>?</p>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    This action cannot be undone.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('delete_contact', id=contact.id) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

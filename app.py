@@ -65,13 +65,23 @@ login_manager.login_view = 'login'
 def utility_processor():
     """Add utility functions to Jinja templates"""
     from flask_wtf.csrf import generate_csrf
+    import re
+    from markupsafe import Markup
     
     def get_csrf_token():
         """Generate a CSRF token that can be used in any form"""
         return generate_csrf()
     
+    def nl2br(value):
+        """Convert newlines to <br> tags for text display"""
+        if value:
+            value = str(value)
+            return Markup(re.sub(r'\r\n|\r|\n', '<br>', value))
+        return ""
+    
     return {
         'csrf_token': get_csrf_token,
+        'nl2br': nl2br,
     }
 
 @login_manager.user_loader

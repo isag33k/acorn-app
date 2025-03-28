@@ -43,6 +43,11 @@
                                 <i class="fas fa-key me-1"></i> My Credentials
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == url_for('contact_list') %}active{% endif %}" href="{{ url_for('contact_list') }}">
+                                <i class="fas fa-address-book me-1"></i> POC Database
+                            </a>
+                        </li>
                         {% if current_user.is_admin %}
                             <li class="nav-item">
                                 <a class="nav-link {% if request.path == url_for('user_list') %}active{% endif %}" href="{{ url_for('user_list') }}">
@@ -66,6 +71,9 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li><a class="dropdown-item" href="{{ url_for('user_credentials') }}">
                                     <i class="fas fa-key me-2"></i> My Credentials
+                                </a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('contact_list') }}">
+                                    <i class="fas fa-address-book me-2"></i> POC Database
                                 </a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{{ url_for('logout') }}">

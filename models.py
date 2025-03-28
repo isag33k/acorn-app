@@ -1,6 +1,7 @@
 from app import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+import datetime
 
 class User(UserMixin, db.Model):
     """User model for authentication"""
@@ -125,3 +126,25 @@ class CircuitMapping(db.Model):
     
     def __repr__(self):
         return f"<CircuitMapping {self.circuit_id} -> {self.equipment.name if self.equipment else 'None'}>"
+
+
+class Contact(db.Model):
+    """Model for global contacts database (POC Database)"""
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(50), nullable=False, index=True)
+    last_name = db.Column(db.String(50), nullable=False, index=True)
+    company = db.Column(db.String(100), nullable=False, index=True)
+    email = db.Column(db.String(120), nullable=True)
+    phone = db.Column(db.String(20), nullable=True, index=True)
+    mobile = db.Column(db.String(20), nullable=True)
+    title = db.Column(db.String(100), nullable=True)
+    address = db.Column(db.String(200), nullable=True)
+    city = db.Column(db.String(50), nullable=True, index=True)
+    state = db.Column(db.String(50), nullable=True, index=True)
+    zip_code = db.Column(db.String(20), nullable=True)
+    notes = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    
+    def __repr__(self):
+        return f"<Contact {self.first_name} {self.last_name} ({self.company})>"

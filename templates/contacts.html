@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-address-book me-2"></i>
+            Point of Contact Database
+        </h2>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addContactModal">
+            <i class="fas fa-plus me-1"></i> Add New Contact
+        </button>
+    </div>
+    
+    <!-- Search Form -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="fas fa-search me-2"></i> Search POC Database</h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('contact_list') }}" class="row g-3">
+                <div class="col-md-6">
+                    {{ search_form.search_term(class="form-control", placeholder="Enter search term...", value=search_term) }}
+                </div>
+                <div class="col-md-4">
+                    {{ search_form.search_field(class="form-select") }}
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Results -->
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i> Contact List</h5>
+            <span class="badge bg-light text-primary">{{ contacts|length }} contact{{ 's' if contacts|length != 1 }}</span>
+        </div>
+        <div class="card-body">
+            {% if contacts %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Company</th>
+                                <th>Title</th>
+                                <th>Contact Info</th>
+                                <th>Location</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contact in contacts %}
+                                <tr>
+                                    <td>{{ contact.first_name }} {{ contact.last_name }}</td>
+                                    <td>{{ contact.company }}</td>
+                                    <td>{{ contact.title or '-' }}</td>
+                                    <td>
+                                        {% if contact.email %}
+                                            <div><i class="fas fa-envelope me-1"></i> {{ contact.email }}</div>
+                                        {% endif %}
+                                        {% if contact.phone %}
+                                            <div><i class="fas fa-phone me-1"></i> {{ contact.phone }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ contact.city }}{{ ', ' + contact.state if contact.state else '' }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{{ url_for('view_contact', id=contact.id) }}" class="btn btn-sm btn-outline-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('edit_contact', id=contact.id) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" 
+                                                    data-bs-target="#deleteContactModal{{ contact.id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Delete Modal -->
+                                        <div class="modal fade" id="deleteContactModal{{ contact.id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Delete Contact</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Are you sure you want to delete <strong>{{ contact.first_name }} {{ contact.last_name }}</strong> from <strong>{{ contact.company }}</strong>?</p>
+                                                        <div class="alert alert-danger">
+                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                            This action cannot be undone.
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <form action="{{ url_for('delete_contact', id=contact.id) }}" method="POST">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    {% if search_term %}
+                        <i class="fas fa-info-circle me-2"></i>
+                        No contacts found matching your search criteria.
+                    {% else %}
+                        <i class="fas fa-info-circle me-2"></i>
+                        No contacts found in the database. Click "Add New Contact" to add your first contact.
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Add Contact Modal -->
+<div class="modal fade" id="addContactModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Contact</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_contact') }}">
+                {{ contact_form.hidden_tag() }}
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ contact_form.first_name.label(class="form-label") }}
+                            {{ contact_form.first_name(class="form-control", placeholder="First name") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ contact_form.last_name.label(class="form-label") }}
+                            {{ contact_form.last_name(class="form-control", placeholder="Last name") }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            {{ contact_form.company.label(class="form-label") }}
+                            {{ contact_form.company(class="form-control", placeholder="Company name") }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ contact_form.title.label(class="form-label") }}
+                            {{ contact_form.title(class="form-control", placeholder="Job title") }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            {{ contact_form.email.label(class="form-label") }}
+                            {{ contact_form.email(class="form-control", placeholder="Email address") }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ contact_form.phone.label(class="form-label") }}
+                            {{ contact_form.phone(class="form-control", placeholder="Work phone") }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ contact_form.mobile.label(class="form-label") }}
+                            {{ contact_form.mobile(class="form-control", placeholder="Mobile phone") }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ contact_form.address.label(class="form-label") }}
+                        {{ contact_form.address(class="form-control", placeholder="Street address") }}
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            {{ contact_form.city.label(class="form-label") }}
+                            {{ contact_form.city(class="form-control", placeholder="City") }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ contact_form.state.label(class="form-label") }}
+                            {{ contact_form.state(class="form-control", placeholder="State/Province") }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ contact_form.zip_code.label(class="form-label") }}
+                            {{ contact_form.zip_code(class="form-control", placeholder="ZIP/Postal code") }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ contact_form.notes.label(class="form-label") }}
+                        {{ contact_form.notes(class="form-control", rows=3, placeholder="Additional notes about this contact") }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    {{ contact_form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
