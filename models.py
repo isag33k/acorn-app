@@ -24,11 +24,26 @@ class CircuitMapping(db.Model):
     equipment_id = db.Column(db.Integer, db.ForeignKey('equipment.id'), nullable=False)
     equipment = db.relationship('Equipment', back_populates='circuit_mappings')
     
-    # Command to execute on the equipment
-    command = db.Column(db.String(255), nullable=False)
+    # Commands to execute on the equipment (semicolon-separated for multiple commands)
+    command = db.Column(db.Text, nullable=False)
     
     # Description of the circuit
     description = db.Column(db.String(255), nullable=True)
+    
+    def get_commands_list(self):
+        """Returns the command string as a list of individual commands"""
+        if not self.command:
+            return []
+        # Split by semicolons but ignore escaped semicolons (\;)
+        import re
+        # First replace escaped semicolons with a placeholder
+        temp = self.command.replace('\\;', '##ESCAPED_SEMICOLON##')
+        # Split by actual semicolons
+        commands = [cmd.strip() for cmd in temp.split(';')]
+        # Restore escaped semicolons
+        commands = [cmd.replace('##ESCAPED_SEMICOLON##', ';') for cmd in commands]
+        # Return only non-empty commands
+        return [cmd for cmd in commands if cmd]
     
     def __repr__(self):
         return f"<CircuitMapping {self.circuit_id} -> {self.equipment.name if self.equipment else 'None'}>"

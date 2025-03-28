@@ -13,7 +13,7 @@ def index():
 
 @app.route('/submit_alert', methods=['POST'])
 def submit_alert():
-    """Process the submitted alert and run the SSH command"""
+    """Process the submitted alert and run the SSH command(s)"""
     circuit_id = request.form.get('circuit_id', '').strip()
     
     if not circuit_id:
@@ -32,6 +32,12 @@ def submit_alert():
     # Execute commands on each mapped equipment
     for mapping in mappings:
         equipment = mapping.equipment
+        commands_list = mapping.get_commands_list()
+        
+        # If no valid commands, skip this mapping
+        if not commands_list:
+            logger.warning(f"No valid commands found for circuit {circuit_id} on {equipment.name}")
+            continue
         
         try:
             ssh_client = SSHClient(
@@ -41,17 +47,22 @@ def submit_alert():
                 password=equipment.password
             )
             
-            # Connect and execute the command
+            # Connect to the equipment
             ssh_client.connect()
-            output = ssh_client.execute_command(mapping.command)
-            ssh_client.disconnect()
             
-            results.append({
-                'equipment_name': equipment.name,
-                'command': mapping.command,
-                'output': output,
-                'status': 'success'
-            })
+            # Execute each command and collect outputs
+            for cmd in commands_list:
+                output = ssh_client.execute_command(cmd)
+                
+                results.append({
+                    'equipment_name': equipment.name,
+                    'command': cmd,
+                    'output': output,
+                    'status': 'success'
+                })
+            
+            # Disconnect after all commands are executed
+            ssh_client.disconnect()
             
         except Exception as e:
             logger.error(f"SSH error for equipment {equipment.name}: {str(e)}")

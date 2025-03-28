@@ -191,9 +191,12 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="command" class="form-label">Command to Execute</label>
-                                    <input type="text" class="form-control" id="command" name="command" 
-                                           placeholder="e.g., show interface GigabitEthernet1/0" required>
+                                    <label for="command" class="form-label">Command(s) to Execute</label>
+                                    <textarea class="form-control" id="command" name="command" 
+                                           placeholder="Enter one or more commands separated by semicolons, e.g.:&#10;show interface GigabitEthernet1/0;&#10;show ip route" rows="3" required></textarea>
+                                    <div class="form-text text-muted">
+                                        <i class="fas fa-info-circle me-1"></i> For multiple commands, separate with semicolons. Use \; for literal semicolons.
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="description" class="form-label">Description (Optional)</label>
@@ -229,7 +232,7 @@
                                     <tr>
                                         <th>Circuit ID</th>
                                         <th>Equipment</th>
-                                        <th>Command</th>
+                                        <th>Command(s)</th>
                                         <th>Description</th>
                                         <th>Actions</th>
                                     </tr>
@@ -239,7 +242,16 @@
                                     <tr>
                                         <td>{{ mapping.circuit_id }}</td>
                                         <td>{{ mapping.equipment.name }}</td>
-                                        <td><code>{{ mapping.command }}</code></td>
+                                        <td>
+                                            {% for cmd in mapping.get_commands_list() %}
+                                            <div class="mb-1"><code>{{ cmd }}</code></div>
+                                            {% else %}
+                                            <code>{{ mapping.command }}</code>
+                                            {% endfor %}
+                                            {% if mapping.get_commands_list()|length > 1 %}
+                                            <span class="badge bg-info">{{ mapping.get_commands_list()|length }} commands</span>
+                                            {% endif %}
+                                        </td>
                                         <td>{{ mapping.description or '-' }}</td>
                                         <td>
                                             <!-- Edit Button -->
@@ -283,9 +295,12 @@
                                                                         </select>
                                                                     </div>
                                                                     <div class="col-md-6">
-                                                                        <label for="edit_command{{ mapping.id }}" class="form-label">Command to Execute</label>
-                                                                        <input type="text" class="form-control" id="edit_command{{ mapping.id }}" 
-                                                                               name="command" value="{{ mapping.command }}" required>
+                                                                        <label for="edit_command{{ mapping.id }}" class="form-label">Command(s) to Execute</label>
+                                                                        <textarea class="form-control" id="edit_command{{ mapping.id }}" 
+                                                                               name="command" rows="3" required>{{ mapping.command }}</textarea>
+                                                                        <div class="form-text text-muted">
+                                                                            <i class="fas fa-info-circle me-1"></i> For multiple commands, separate with semicolons. Use \; for literal semicolons.
+                                                                        </div>
                                                                     </div>
                                                                     <div class="col-md-6">
                                                                         <label for="edit_description{{ mapping.id }}" class="form-label">Description (Optional)</label>
