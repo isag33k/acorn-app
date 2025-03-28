@@ -3,7 +3,13 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Switch tabs on equipment page
+    // Initialize Bootstrap tabs
+    var triggerTabList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tab"]'))
+    triggerTabList.forEach(function(triggerEl) {
+        new bootstrap.Tab(triggerEl);
+    });
+    
+    // Manually handle tab link clicks if needed
     const tabLinks = document.querySelectorAll('[data-bs-toggle="tab"]');
     
     tabLinks.forEach(tab => {

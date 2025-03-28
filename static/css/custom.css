@@ -54,6 +54,15 @@
     font-weight: 500;
 }
 
+/* Make edit buttons stand out */
+.btn-sm.btn-primary {
+    background-color: #0d6efd;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    margin-right: 0.25rem;
+    border-color: #0d6efd;
+}
+
 /* Footer styling */
 .footer {
     margin-top: 3rem;

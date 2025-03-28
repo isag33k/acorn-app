@@ -160,5 +160,5 @@ def edit_mapping(id):
     
     db.session.commit()
     
-    flash(f'Circuit mapping updated successfully', 'success')
+    flash('Circuit mapping updated successfully!', 'success')
     return redirect(url_for('equipment_list'))
