@@ -61,6 +61,19 @@ csrf.init_app(app)
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+@app.context_processor
+def utility_processor():
+    """Add utility functions to Jinja templates"""
+    from flask_wtf.csrf import generate_csrf
+    
+    def get_csrf_token():
+        """Generate a CSRF token that can be used in any form"""
+        return generate_csrf()
+    
+    return {
+        'csrf_token': get_csrf_token,
+    }
+
 @login_manager.user_loader
 def load_user(user_id):
     """Load the user from the database by id"""
