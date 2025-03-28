@@ -69,7 +69,7 @@
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                data-bs-toggle="dropdown" aria-expanded="false">
                                 {% if current_user.avatar %}
-                                    <img src="{{ '/' + current_user.avatar }}" alt="Avatar" class="user-avatar me-1">
+                                    <img src="{{ url_for('serve_uploads', filename=current_user.avatar.replace('uploads/', '')) }}" alt="Avatar" class="user-avatar me-1">
                                 {% else %}
                                     <i class="fas fa-user-circle me-1"></i>
                                 {% endif %}

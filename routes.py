@@ -140,7 +140,9 @@ def logout():
 @app.route('/uploads/<path:filename>')
 def serve_uploads(filename):
     """Serve files from the uploads directory"""
-    return send_from_directory('uploads', filename)
+    # For security, only allow access to avatar files
+    if filename.startswith('avatars/'):
+        return send_from_directory('uploads', filename)
 
 @app.route('/users')
 @login_required
@@ -490,14 +492,14 @@ def update_profile():
                 
                 # Delete old avatar if exists (to save space)
                 if current_user.avatar:
-                    old_avatar_path = current_user.avatar.lstrip('/')
+                    old_avatar_path = current_user.avatar
                     try:
                         if os.path.exists(old_avatar_path):
                             os.remove(old_avatar_path)
                     except Exception as e:
                         logger.warning(f"Error deleting old avatar: {str(e)}")
                 
-                # Update avatar path in database (store absolute path)
+                # Update avatar path in database (store relative path)
                 current_user.avatar = avatar_path
             
             # Save changes

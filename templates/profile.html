@@ -13,7 +13,7 @@
             <div class="col-md-4 mb-4 mb-md-0 text-center">
                 <div class="avatar-container mb-3">
                     {% if user.avatar %}
-                        <img src="{{ '/' + user.avatar }}" alt="Profile Picture" class="img-fluid rounded-circle profile-avatar shadow-sm">
+                        <img src="{{ url_for('serve_uploads', filename=user.avatar.replace('uploads/', '')) }}" alt="Profile Picture" class="img-fluid rounded-circle profile-avatar shadow-sm">
                     {% else %}
                         <div class="default-avatar rounded-circle d-flex align-items-center justify-content-center shadow-sm">
                             <i class="fas fa-user fa-3x"></i>
