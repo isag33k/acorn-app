@@ -11,6 +11,14 @@
             <button class="btn btn-sm btn-primary mt-2" id="showCircuitTab">Show Circuit Mappings Tab</button>
         </div>
         
+        <!-- Emergency Modal Reset Button (Will appear if modals get stuck) -->
+        <div class="alert alert-danger mb-3" id="modalResetHelper" style="display: none;">
+            <p class="mb-0"><strong>HAVING TROUBLE?</strong> If you're stuck with a dark screen after editing, use this button:</p>
+            <button class="btn btn-danger mt-2" id="emergencyModalReset">
+                <i class="fas fa-exclamation-triangle me-2"></i>Reset Screen (Use If Stuck)
+            </button>
+        </div>
+        
         <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="equipment-tab" data-bs-toggle="tab" data-bs-target="#equipment" type="button" role="tab" aria-controls="equipment" aria-selected="true">
@@ -461,24 +469,76 @@
             document.getElementById('tabHelper').style.display = 'none';
         });
         
-        // Fix for edit modal issues
+        // Completely replace Bootstrap's modal implementation to fix the issue
+        // This overrides the default behavior for edit buttons
         document.querySelectorAll('.btn[data-bs-toggle="modal"]').forEach(function(btn) {
-            btn.addEventListener('click', function() {
+            // Remove the data-bs-toggle attribute to prevent Bootstrap from handling it
+            btn.removeAttribute('data-bs-toggle');
+            
+            // Add our own click handler
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
                 // Get the target modal ID
                 var modalId = this.getAttribute('data-bs-target');
                 var modalElement = document.querySelector(modalId);
                 
-                // Initialize modal if it exists
-                if (modalElement) {
-                    var bsModal = new bootstrap.Modal(modalElement, {
-                        backdrop: true,
-                        keyboard: true,
-                        focus: true
+                if (!modalElement) return;
+                
+                // Show the modal directly without Bootstrap's Modal class
+                modalElement.style.display = 'block';
+                modalElement.classList.add('show');
+                modalElement.removeAttribute('aria-hidden');
+                modalElement.setAttribute('aria-modal', 'true');
+                modalElement.setAttribute('role', 'dialog');
+                
+                // Add backdrop manually
+                var backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade show custom-backdrop';
+                document.body.appendChild(backdrop);
+                
+                // Apply modal open styling to body
+                document.body.classList.add('modal-open');
+                
+                // Handle close buttons in this modal
+                modalElement.querySelectorAll('[data-bs-dismiss="modal"]').forEach(function(closeBtn) {
+                    closeBtn.addEventListener('click', function() {
+                        // Hide the modal
+                        modalElement.style.display = 'none';
+                        modalElement.classList.remove('show');
+                        modalElement.setAttribute('aria-hidden', 'true');
+                        modalElement.removeAttribute('aria-modal');
+                        
+                        // Remove backdrop
+                        document.querySelectorAll('.modal-backdrop').forEach(function(backdrop) {
+                            backdrop.remove();
+                        });
+                        
+                        // Remove modal open class from body
+                        document.body.classList.remove('modal-open');
+                        document.body.style.overflow = '';
+                        document.body.style.paddingRight = '';
                     });
-                    
-                    // Show the modal
-                    bsModal.show();
-                }
+                });
+                
+                // Handle form submissions in this modal
+                modalElement.querySelectorAll('form').forEach(function(form) {
+                    form.addEventListener('submit', function() {
+                        // Hide the modal before submitting the form
+                        modalElement.style.display = 'none';
+                        modalElement.classList.remove('show');
+                        
+                        // Remove backdrop
+                        document.querySelectorAll('.modal-backdrop').forEach(function(backdrop) {
+                            backdrop.remove();
+                        });
+                        
+                        // Remove modal open class from body
+                        document.body.classList.remove('modal-open');
+                        document.body.style.overflow = '';
+                        document.body.style.paddingRight = '';
+                    });
+                });
             });
         });
     });

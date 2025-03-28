@@ -90,6 +90,54 @@ document.addEventListener('DOMContentLoaded', function() {
     // Log that the tab initialization is complete
     console.log("Tab event listeners initialized");
     
+    // Check for stuck modals every second
+    let modalCheckInterval;
+    function checkForStuckModals() {
+        if (document.body.classList.contains('modal-open')) {
+            // If a modal has been open for more than 3 seconds, show the emergency button
+            document.getElementById('modalResetHelper').style.display = 'block';
+        } else {
+            // If no modal is open, hide the emergency button
+            document.getElementById('modalResetHelper').style.display = 'none';
+        }
+    }
+    
+    // Start checking for stuck modals
+    modalCheckInterval = setInterval(checkForStuckModals, 1000);
+    
+    // Emergency modal reset button functionality
+    const emergencyResetBtn = document.getElementById('emergencyModalReset');
+    if (emergencyResetBtn) {
+        emergencyResetBtn.addEventListener('click', function() {
+            console.log("Emergency modal reset triggered");
+            
+            // Remove all modal-related classes and elements
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            
+            // Remove all modal backdrops
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(function(backdrop) {
+                backdrop.remove();
+            });
+            
+            // Close all open modals by removing their show class
+            const openModals = document.querySelectorAll('.modal.show');
+            openModals.forEach(function(modal) {
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+                modal.setAttribute('aria-hidden', 'true');
+            });
+            
+            // Hide the reset helper after use
+            document.getElementById('modalResetHelper').style.display = 'none';
+            
+            // Show a success message
+            alert("Screen has been reset. You can continue using the application.");
+        });
+    }
+    
     // Handle Tab Helper Buttons
     const showCircuitTabBtn = document.getElementById('showCircuitTab');
     if (showCircuitTabBtn) {
