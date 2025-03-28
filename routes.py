@@ -189,11 +189,17 @@ def user_credentials():
     # Create a dict of existing credentials for easier access
     credentials_dict = {cred.equipment_id: cred for cred in user_credentials}
     
-    # Create a single form for compatibility with the existing template
-    form = UserCredentialForm()
+    # Create a basic form for CSRF token
+    form = FlaskForm()
     
-    # Create a basic form for CSRF token in delete form
+    # Create a form for delete operations
     csrf_form = FlaskForm()
+    
+    # Debug info
+    for equip in equipment:
+        logger.debug(f"Equipment ID: {equip.id}, type: {type(equip.id)}")
+    
+    logger.debug(f"Credentials dict keys: {list(credentials_dict.keys())}")
     
     return render_template('credentials.html', equipment=equipment, credentials=credentials_dict, 
                           form=form, csrf_form=csrf_form)
@@ -269,21 +275,29 @@ def add_credential():
 @login_required
 def delete_credential(equipment_id):
     """Delete user credential for equipment"""
-    # Validate CSRF token
-    form = FlaskForm()
-    if not form.validate_on_submit():
-        flash('CSRF validation failed', 'danger')
-        return redirect(url_for('user_credentials'))
-
-    credential = UserCredential.query.filter_by(
-        user_id=current_user.id,
-        equipment_id=equipment_id
-    ).first_or_404()
+    try:
+        # Check for CSRF token presence
+        csrf_token = request.form.get('csrf_token')
+        if not csrf_token:
+            logger.error("Missing CSRF token in delete_credential")
+            flash('CSRF token missing', 'danger')
+            return redirect(url_for('user_credentials'))
+            
+        # Find the credential
+        credential = UserCredential.query.filter_by(
+            user_id=current_user.id,
+            equipment_id=equipment_id
+        ).first_or_404()
+        
+        logger.debug(f"Deleting credential for equipment ID {equipment_id}")
+        db.session.delete(credential)
+        db.session.commit()
+        flash('Credential deleted successfully', 'success')
+        
+    except Exception as e:
+        logger.error(f"Error in delete_credential: {str(e)}")
+        flash(f'An error occurred: {str(e)}', 'danger')
     
-    db.session.delete(credential)
-    db.session.commit()
-    
-    flash('Credential deleted successfully', 'success')
     return redirect(url_for('user_credentials'))
 
 @app.route('/submit_alert', methods=['POST'])
