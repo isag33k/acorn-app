@@ -1,5 +1,6 @@
 import os
 import logging
+import traceback
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -65,6 +66,13 @@ def load_user(user_id):
     """Load the user from the database by id"""
     from models import User
     return User.query.get(int(user_id))
+
+@app.errorhandler(500)
+def internal_error(error):
+    """Handle and log internal server errors"""
+    logger.error(f"500 Internal Server Error: {str(error)}")
+    logger.error(f"Traceback: {traceback.format_exc()}")
+    return "Internal Server Error: The application encountered an unexpected error. Please check the logs for details.", 500
 
 with app.app_context():
     # Import models
