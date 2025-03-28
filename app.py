@@ -78,6 +78,7 @@ def utility_processor():
     from flask_wtf.csrf import generate_csrf
     import re
     from markupsafe import Markup
+    import datetime
     
     def get_csrf_token():
         """Generate a CSRF token that can be used in any form"""
@@ -93,6 +94,7 @@ def utility_processor():
     return {
         'csrf_token': get_csrf_token,
         'nl2br': nl2br,
+        'now': datetime.datetime.now(),
     }
 
 @login_manager.user_loader
