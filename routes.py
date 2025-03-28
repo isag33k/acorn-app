@@ -1100,3 +1100,58 @@ def view_contact(id):
         logger.error(f"Traceback: {traceback.format_exc()}")
         flash(f"Error viewing contact: {str(e)}", "danger")
         return redirect(url_for('contact_list'))
+
+@app.route('/ssh_test', methods=['GET', 'POST'])
+@login_required
+def test_ssh_connection():
+    """Test SSH connection to the mock server"""
+    # Create a form for CSRF protection
+    test_form = FlaskForm()
+    results = []
+    command = None
+    
+    if request.method == 'POST' and test_form.validate_on_submit():
+        command = request.form.get('command', 'show version').strip()
+        
+        try:
+            # Import the SSH client class
+            from utils.ssh_client import SSHClient
+            
+            # Direct connection to the mock SSH server
+            ssh_client = SSHClient(
+                hostname="127.0.0.1",
+                port=2222,
+                username="test",
+                password="Ac0rN$"
+            )
+            
+            # Connect to the SSH server
+            logger.debug("Connecting to mock SSH server")
+            ssh_client.connect()
+            
+            # Execute the command
+            logger.debug(f"Executing command: {command}")
+            output = ssh_client.execute_command(command)
+            
+            # Disconnect
+            ssh_client.disconnect()
+            
+            # Add the result
+            results.append({
+                'command': command,
+                'output': output,
+                'status': 'success'
+            })
+            
+        except Exception as e:
+            logger.error(f"SSH test error: {str(e)}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            
+            # Add the error to results
+            results.append({
+                'command': command,
+                'output': f"Error: {str(e)}",
+                'status': 'error'
+            })
+    
+    return render_template('ssh_test.html', test_form=test_form, results=results, command=command)

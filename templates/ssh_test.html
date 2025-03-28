@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}SSH Test{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card card-custom">
+                <div class="card-header">
+                    <h4 class="mb-0">SSH Connection Test</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">This page allows you to directly test SSH connectivity to the mock server.</p>
+                    
+                    {% if results %}
+                    <div class="mt-4 mb-4">
+                        <h5>Test Results:</h5>
+                        {% for result in results %}
+                        <div class="card mt-3 mb-3 {% if result.status == 'success' %}border-success{% else %}border-danger{% endif %}">
+                            <div class="card-header d-flex justify-content-between">
+                                <span>
+                                    {% if result.status == 'success' %}
+                                    <span class="status-indicator status-success"></span>
+                                    {% else %}
+                                    <span class="status-indicator status-danger"></span>
+                                    {% endif %}
+                                    {{ result.command }}
+                                </span>
+                                <span class="badge {% if result.status == 'success' %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ result.status }}
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <pre class="command-output">{{ result.output }}</pre>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" action="{{ url_for('test_ssh_connection') }}">
+                        {{ test_form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            <label for="command" class="form-label">Command to Test</label>
+                            <input type="text" class="form-control" id="command" name="command" 
+                                  value="{{ command or 'show version' }}" required>
+                            <div class="form-text">Enter a command to test on the mock SSH server</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Run Test</button>
+                            <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Main Page</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
