@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A.C.O.R.N. - Automated Circuit Operations & Reporting Network</title>
+    <title>A.C.O.R.N.</title>
     
     <!-- Bootstrap CSS (Replit Dark Theme) -->
     <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
@@ -25,7 +25,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark mb-4">
         <div class="container">
             <a class="navbar-brand fw-bold text-3d" href="{{ url_for('index') }}">
-                <i class="fas fa-network-wired me-2"></i>
+                <img src="{{ url_for('static', filename='img/liveoak_logo.png') }}" alt="LiveOak" class="me-2" height="30">
                 A.C.O.R.N.
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,7 +69,7 @@
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                data-bs-toggle="dropdown" aria-expanded="false">
                                 {% if current_user.avatar %}
-                                    <img src="{{ url_for('static', filename=current_user.avatar.lstrip('/')) }}" alt="Avatar" class="user-avatar me-1">
+                                    <img src="{{ '/' + current_user.avatar }}" alt="Avatar" class="user-avatar me-1">
                                 {% else %}
                                     <i class="fas fa-user-circle me-1"></i>
                                 {% endif %}
