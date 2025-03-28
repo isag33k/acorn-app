@@ -188,28 +188,14 @@ def user_credentials():
     # Create a dict of existing credentials for easier access
     credentials_dict = {cred.equipment_id: cred for cred in user_credentials}
     
-    # Create a form instance for CSRF token
-    forms = {}
-    for equip in equipment:
-        form = UserCredentialForm()
-        form.equipment_id.data = str(equip.id)  # Convert to string for form data
-        
-        # Pre-populate form values if credentials exist
-        if equip.id in credentials_dict:
-            cred = credentials_dict[equip.id]
-            form.username.data = cred.username
-            form.password.data = cred.password
-        else:
-            form.username.data = equip.username
-            form.password.data = equip.password
-            
-        forms[equip.id] = form
+    # Create a single form for compatibility with the existing template
+    form = UserCredentialForm()
     
     # Create a basic form for CSRF token in delete form
     csrf_form = FlaskForm()
     
     return render_template('credentials.html', equipment=equipment, credentials=credentials_dict, 
-                          forms=forms, csrf_form=csrf_form)
+                          form=form, csrf_form=csrf_form)
 
 @app.route('/credentials/add', methods=['POST'])
 @login_required
