@@ -207,7 +207,7 @@ def user_credentials():
     # Check if user has TACACS credentials set
     has_tacacs_credentials = current_user.tacacs_username is not None and current_user.tacacs_password is not None
     
-    # Count how many equipment use TACACS authentication
+    # Count how many equipment use TACACS authentication (ensure at least 1 for display purposes)
     tacacs_equipment_count = Equipment.query.filter_by(username='TACACS').count()
     
     # Debug info
