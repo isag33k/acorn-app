@@ -876,43 +876,36 @@ def delete_mapping(id):
     flash(f'Circuit mapping deleted successfully', 'success')
     return redirect(url_for('equipment_list'))
 
-@app.route('/mapping/edit/<int:id>', methods=['POST'])
+@app.route('/mapping/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_mapping(id):
-    """Edit circuit mapping"""
+    """Edit circuit mapping on a dedicated page (not a modal)"""
     mapping = CircuitMapping.query.get_or_404(id)
+    equipment_list = Equipment.query.all()
     
-    mapping.circuit_id = request.form.get('circuit_id')
-    mapping.equipment_id = request.form.get('equipment_id', type=int)
-    mapping.command = request.form.get('command')
-    mapping.description = request.form.get('description', '')
-    
-    # Contact information
-    mapping.contact_name = request.form.get('contact_name', '')
-    mapping.contact_email = request.form.get('contact_email', '')
-    mapping.contact_phone = request.form.get('contact_phone', '')
-    mapping.contact_notes = request.form.get('contact_notes', '')
-    
-    db.session.commit()
-    
-    # Add a special JavaScript to ensure the modal backdrop is cleared
-    flash('''
-        <script>
-            // Clean up any leftover modal backdrops
-            document.addEventListener('DOMContentLoaded', function() {
-                document.body.classList.remove('modal-open');
-                const backdrops = document.querySelectorAll('.modal-backdrop');
-                backdrops.forEach(function(backdrop) {
-                    backdrop.remove();
-                });
-                document.body.style.overflow = '';
-                document.body.style.paddingRight = '';
-            });
-        </script>
-        Circuit mapping updated successfully!
-    ''', 'success')
-    
-    return redirect(url_for('equipment_list'))
+    # If this is a POST request, process the form data
+    if request.method == 'POST':
+        mapping.circuit_id = request.form.get('circuit_id')
+        mapping.equipment_id = request.form.get('equipment_id', type=int)
+        mapping.command = request.form.get('command')
+        mapping.description = request.form.get('description', '')
+        
+        # Contact information
+        mapping.contact_name = request.form.get('contact_name', '')
+        mapping.contact_email = request.form.get('contact_email', '')
+        mapping.contact_phone = request.form.get('contact_phone', '')
+        mapping.contact_notes = request.form.get('contact_notes', '')
+        
+        db.session.commit()
+        flash('Circuit mapping updated successfully!', 'success')
+        return redirect(url_for('equipment_list'))
+        
+    # If it's a GET request, render the edit form with the mapping data
+    form = FlaskForm()  # For CSRF protection
+    return render_template('edit_mapping.html', 
+                          form=form, 
+                          mapping=mapping, 
+                          equipment_list=equipment_list)
     
     
 # POC Database Routes

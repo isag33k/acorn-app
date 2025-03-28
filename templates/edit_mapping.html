@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Circuit Mapping{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>Edit Circuit Mapping
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('edit_mapping', id=mapping.id) }}" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="circuit_id" class="form-label">Circuit ID</label>
+                                <input type="text" class="form-control" id="circuit_id" 
+                                       name="circuit_id" value="{{ mapping.circuit_id }}" required>
+                                <div class="form-text">The unique identifier for this circuit</div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="equipment_id" class="form-label">Equipment</label>
+                                <select class="form-select" id="equipment_id" name="equipment_id" required>
+                                    {% for equipment in equipment_list %}
+                                    <option value="{{ equipment.id }}" 
+                                            {% if equipment.id == mapping.equipment_id %}selected{% endif %}>
+                                        {{ equipment.name }} ({{ equipment.ip_address }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">The network equipment to check this circuit on</div>
+                            </div>
+                            
+                            <div class="col-12 mb-3">
+                                <label for="command" class="form-label">Command(s)</label>
+                                <textarea class="form-control" id="command" name="command" 
+                                          rows="5" required>{{ mapping.command }}</textarea>
+                                <div class="form-text">
+                                    Enter one or more commands to execute, separated by semicolons (;)
+                                </div>
+                            </div>
+                            
+                            <div class="col-12 mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" 
+                                          rows="2">{{ mapping.description }}</textarea>
+                                <div class="form-text">Optional notes about this circuit</div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <h5 class="mt-3 mb-3 border-bottom pb-2">
+                                    <i class="fas fa-address-card me-2"></i>Contact Information
+                                </h5>
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Add contact details for the person responsible for this circuit
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="contact_name" class="form-label">Contact Name</label>
+                                <input type="text" class="form-control" id="contact_name" 
+                                       name="contact_name" value="{{ mapping.contact_name }}">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="contact_email" class="form-label">Contact Email</label>
+                                <input type="email" class="form-control" id="contact_email" 
+                                       name="contact_email" value="{{ mapping.contact_email }}">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="contact_phone" class="form-label">Contact Phone</label>
+                                <input type="text" class="form-control" id="contact_phone" 
+                                       name="contact_phone" value="{{ mapping.contact_phone }}">
+                            </div>
+                            
+                            <div class="col-md-12 mb-3">
+                                <label for="contact_notes" class="form-label">Contact Notes</label>
+                                <textarea class="form-control" id="contact_notes" name="contact_notes" 
+                                          rows="2">{{ mapping.contact_notes }}</textarea>
+                            </div>
+                            
+                            <div class="col-12 d-flex justify-content-between mt-4">
+                                <a href="{{ url_for('equipment_list') }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i> Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
