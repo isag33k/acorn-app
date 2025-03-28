@@ -61,6 +61,17 @@ csrf.init_app(app)
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+# Register the nl2br filter
+@app.template_filter('nl2br')
+def nl2br_filter(value):
+    """Convert newlines to <br> tags for text display"""
+    if value:
+        value = str(value)
+        from markupsafe import Markup
+        import re
+        return Markup(re.sub(r'\r\n|\r|\n', '<br>', value))
+    return ""
+
 @app.context_processor
 def utility_processor():
     """Add utility functions to Jinja templates"""
