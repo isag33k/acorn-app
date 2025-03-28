@@ -44,6 +44,12 @@ class UserCredentialForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(max=50)])
     password = PasswordField('Password', validators=[DataRequired(), Length(max=100)])
     submit = SubmitField('Save Credentials')
+    
+# TACACS credentials form
+class TacacsCredentialForm(FlaskForm):
+    tacacs_username = StringField('TACACS Username', validators=[DataRequired(), Length(max=50)])
+    tacacs_password = PasswordField('TACACS Password', validators=[DataRequired(), Length(max=100)])
+    submit = SubmitField('Save TACACS Credentials')
 
 @app.route('/')
 @login_required
@@ -195,14 +201,29 @@ def user_credentials():
     # Create a form for delete operations
     csrf_form = FlaskForm()
     
+    # Create a form for TACACS credentials
+    tacacs_form = TacacsCredentialForm()
+    
+    # Check if user has TACACS credentials set
+    has_tacacs_credentials = current_user.tacacs_username is not None and current_user.tacacs_password is not None
+    
+    # Count how many equipment use TACACS authentication
+    tacacs_equipment_count = Equipment.query.filter_by(username='TACACS').count()
+    
     # Debug info
     for equip in equipment:
         logger.debug(f"Equipment ID: {equip.id}, type: {type(equip.id)}")
     
     logger.debug(f"Credentials dict keys: {list(credentials_dict.keys())}")
     
-    return render_template('credentials.html', equipment=equipment, credentials=credentials_dict, 
-                          form=form, csrf_form=csrf_form)
+    return render_template('credentials.html', 
+                          equipment=equipment, 
+                          credentials=credentials_dict, 
+                          form=form, 
+                          csrf_form=csrf_form,
+                          tacacs_form=tacacs_form,
+                          has_tacacs_credentials=has_tacacs_credentials,
+                          tacacs_equipment_count=tacacs_equipment_count)
 
 @app.route('/credentials/add', methods=['POST'])
 @login_required
@@ -300,6 +321,66 @@ def delete_credential(equipment_id):
     
     return redirect(url_for('user_credentials'))
 
+@app.route('/credentials/tacacs/add', methods=['POST'])
+@login_required
+def add_tacacs_credential():
+    """Add or update user's global TACACS credentials"""
+    try:
+        # Check for CSRF token
+        form = TacacsCredentialForm()
+        if not form.validate_on_submit():
+            logger.error("TACACS form validation failed")
+            for field, errors in form.errors.items():
+                for error in errors:
+                    flash(f'{getattr(form, field).label.text}: {error}', 'danger')
+            return redirect(url_for('user_credentials'))
+        
+        # Update user's TACACS credentials
+        tacacs_username = form.tacacs_username.data
+        tacacs_password = form.tacacs_password.data
+        
+        # Update the current user
+        current_user.tacacs_username = tacacs_username
+        current_user.tacacs_password = tacacs_password
+        db.session.commit()
+        
+        logger.debug(f"Updated global TACACS credentials for user {current_user.username}")
+        flash('Global TACACS credentials updated successfully', 'success')
+        
+    except Exception as e:
+        logger.error(f"Error in add_tacacs_credential: {str(e)}")
+        flash(f'An error occurred: {str(e)}', 'danger')
+        db.session.rollback()
+    
+    return redirect(url_for('user_credentials'))
+
+@app.route('/credentials/tacacs/delete', methods=['POST'])
+@login_required
+def delete_tacacs_credential():
+    """Remove user's global TACACS credentials"""
+    try:
+        # Check for CSRF token
+        form = FlaskForm()
+        if not form.validate_on_submit():
+            logger.error("CSRF token missing or invalid")
+            flash('CSRF token missing or invalid', 'danger')
+            return redirect(url_for('user_credentials'))
+        
+        # Clear the TACACS credentials
+        current_user.tacacs_username = None
+        current_user.tacacs_password = None
+        db.session.commit()
+        
+        logger.debug(f"Deleted global TACACS credentials for user {current_user.username}")
+        flash('Global TACACS credentials removed successfully', 'success')
+        
+    except Exception as e:
+        logger.error(f"Error in delete_tacacs_credential: {str(e)}")
+        flash(f'An error occurred: {str(e)}', 'danger')
+        db.session.rollback()
+    
+    return redirect(url_for('user_credentials'))
+
 @app.route('/submit_alert', methods=['POST'])
 @login_required
 def submit_alert():
@@ -381,8 +462,16 @@ def submit_alert():
             error_message = str(e)
             logger.error(f"Credential error for equipment {equipment.name}: {error_message}")
             
-            # Add a more user-friendly message for missing TACACS credentials
-            if "requires personal credentials" in error_message:
+            # Add a more user-friendly message for missing credentials
+            if "requires TACACS credentials" in error_message:
+                results.append({
+                    'equipment_name': equipment.name,
+                    'command': mapping.command,
+                    'output': f"⚠️ TACACS authentication requires global credentials. Please set up your TACACS credentials in 'My Credentials' section.",
+                    'status': 'error',
+                    'is_tacacs_error': True
+                })
+            elif "requires personal credentials" in error_message:
                 results.append({
                     'equipment_name': equipment.name,
                     'command': mapping.command,

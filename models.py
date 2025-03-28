@@ -10,6 +10,10 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     
+    # TACACS personal credentials
+    tacacs_username = db.Column(db.String(50), nullable=True)
+    tacacs_password = db.Column(db.String(100), nullable=True)
+    
     # Relationships
     credentials = db.relationship('UserCredential', back_populates='user', cascade='all, delete-orphan')
     
@@ -63,13 +67,17 @@ class Equipment(db.Model):
         """Get equipment credentials for a specific user"""
         # Check if this equipment uses TACACS authentication
         if self.username == 'TACACS':
-            # With TACACS, we must use the user's personal credentials
+            # First check for equipment-specific TACACS overrides
             user_cred = UserCredential.query.filter_by(user_id=user.id, equipment_id=self.id).first()
             if user_cred:
                 return {'username': user_cred.username, 'password': user_cred.password}
+                
+            # If no equipment-specific credentials, use global TACACS credentials
+            if user.tacacs_username and user.tacacs_password:
+                return {'username': user.tacacs_username, 'password': user.tacacs_password}
             else:
-                # If no personal credentials are set up, raise an error
-                raise ValueError(f"Equipment '{self.name}' requires personal credentials but none are set up. Please set them in 'My Credentials' section.")
+                # If no personal TACACS credentials are set up, raise an error
+                raise ValueError(f"Equipment '{self.name}' requires TACACS credentials but none are set up. Please set up your global TACACS credentials in 'My Credentials' section.")
         
         # For non-TACACS equipment, check if user has specific credentials for this equipment
         user_cred = UserCredential.query.filter_by(user_id=user.id, equipment_id=self.id).first()
