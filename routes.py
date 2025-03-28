@@ -1,5 +1,6 @@
 import logging
 import datetime
+import traceback
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_wtf import FlaskForm
@@ -901,7 +902,16 @@ def delete_contact(id):
 @login_required
 def view_contact(id):
     """View detailed information for a single contact"""
-    contact = Contact.query.get_or_404(id)
-    # Create a basic form for CSRF protection
-    form = FlaskForm()
-    return render_template('view_contact.html', contact=contact, form=form)
+    try:
+        contact = Contact.query.get_or_404(id)
+        # Create a basic form for CSRF protection
+        form = FlaskForm()
+        logger.debug(f"Retrieved contact: {contact}")
+        logger.debug(f"Contact created_at: {contact.created_at}")
+        logger.debug(f"Contact updated_at: {contact.updated_at}")
+        return render_template('view_contact.html', contact=contact, form=form)
+    except Exception as e:
+        logger.error(f"Error in view_contact: {str(e)}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        flash(f"Error viewing contact: {str(e)}", "danger")
+        return redirect(url_for('contact_list'))
