@@ -146,6 +146,12 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
+@app.route('/fpl-outages')
+@login_required
+def fpl_outages():
+    """Display FPL Outages map in an iframe"""
+    return render_template('fpl_outages.html')
+
 @app.route('/uploads/<path:filename>')
 def serve_uploads(filename):
     """Serve files from the uploads directory"""
@@ -1199,6 +1205,12 @@ def view_contact(id):
         logger.error(f"Traceback: {traceback.format_exc()}")
         flash(f"Error viewing contact: {str(e)}", "danger")
         return redirect(url_for('contact_list'))
+
+@app.route('/fpl-outages')
+@login_required
+def fpl_outages():
+    """Display FPL Outages map in an iframe"""
+    return render_template('fpl_outages.html')
 
 @app.route('/ssh_test', methods=['GET', 'POST'])
 @login_required

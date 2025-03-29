@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary bg-opacity-25">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-bolt me-2"></i>FPL Power Outage Map - Northwest Florida
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="embed-responsive">
+                    <iframe id="fpl-outage-map" src="https://www.fplmaps.com/northwest" 
+                            class="w-100 border-0" style="height: 80vh; min-height: 600px;"
+                            allow="fullscreen" title="FPL Outage Map">
+                    </iframe>
+                </div>
+            </div>
+            <div class="card-footer bg-light text-muted">
+                <small>
+                    <i class="fas fa-info-circle me-1"></i>
+                    Real-time power outage information from Florida Power &amp; Light. 
+                    Map shows current outages, estimated restoration times, and affected areas.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Responsive height adjustment for iframe
+    function adjustIframeHeight() {
+        const viewport = window.innerHeight;
+        const header = document.querySelector('nav').offsetHeight;
+        const footer = document.querySelector('footer').offsetHeight;
+        const cardHeader = document.querySelector('.card-header').offsetHeight;
+        const cardFooter = document.querySelector('.card-footer').offsetHeight;
+        const padding = 40; // Account for margins and paddings
+        
+        const availableHeight = viewport - header - footer - cardHeader - cardFooter - padding;
+        const iframe = document.getElementById('fpl-outage-map');
+        
+        // Set a minimum height of 500px or the calculated available height
+        iframe.style.height = Math.max(500, availableHeight) + 'px';
+    }
+    
+    // Adjust height on page load and window resize
+    window.addEventListener('load', adjustIframeHeight);
+    window.addEventListener('resize', adjustIframeHeight);
+</script>
+{% endblock %}
