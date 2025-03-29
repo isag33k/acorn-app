@@ -146,12 +146,6 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route('/fpl-outages')
-@login_required
-def fpl_outages():
-    """Display FPL Outages map in an iframe"""
-    return render_template('fpl_outages.html')
-
 @app.route('/uploads/<path:filename>')
 def serve_uploads(filename):
     """Serve files from the uploads directory"""
