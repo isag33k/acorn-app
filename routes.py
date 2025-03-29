@@ -12,7 +12,6 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, Email
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
 from sqlalchemy import or_
 from werkzeug.utils import secure_filename
-
 from app import app, db
 from models import Equipment, CircuitMapping, User, UserCredential, Contact
 from utils.ssh_client import SSHClient
@@ -20,12 +19,21 @@ from utils.ssh_client import SSHClient
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
+class SomeClass(FlaskForm):
+    # Properly indented class body
+    field = StringField('Label', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+
 # Login form
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
+
+
+
 
 # Registration form
 class RegistrationForm(FlaskForm):

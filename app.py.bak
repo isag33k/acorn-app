@@ -1,0 +1,39 @@
+import os
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import DeclarativeBase
+
+class Base(DeclarativeBase):
+    pass
+
+db = SQLAlchemy(model_class=Base)
+# create the app
+app = Flask(__name__)
+# setup a secret key, required by sessions
+app.secret_key = os.environ.get("SESSION_SECRET", "a secret key")
+
+# configure the database, relative to the app instance folder
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
+
+# initialize the app with the extension
+db.init_app(app)
+
+with app.app_context():
+    # Import models here so tables will be created
+    import models  # noqa: F401
+
+    # Use raw SQL to set the schema before creating tables
+    from sqlalchemy import text
+    try:
+        db.session.execute(text("CREATE SCHEMA IF NOT EXISTS acorn_schema"))
+        db.session.commit()
+        db.session.execute(text("SET search_path TO acorn_schema"))
+        db.session.commit()
+        # Now create tables in the set schema
+        db.create_all()
+    except Exception as e:
+        app.logger.error(f"Database setup error: {str(e)}")
