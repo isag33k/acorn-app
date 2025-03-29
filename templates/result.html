@@ -10,9 +10,16 @@
                         <i class="fas fa-terminal me-2"></i>
                         Circuit Status: {{ circuit_id }}
                     </h4>
-                    <a href="{{ url_for('index') }}" class="btn btn-sm btn-light">
-                        <i class="fas fa-search me-1"></i> New Query
-                    </a>
+                    <div>
+                        {% if total_time is defined %}
+                        <span class="badge bg-light text-dark me-2">
+                            <i class="fas fa-tachometer-alt me-1"></i> Total time: {{ total_time }}ms
+                        </span>
+                        {% endif %}
+                        <a href="{{ url_for('index') }}" class="btn btn-sm btn-light">
+                            <i class="fas fa-search me-1"></i> New Query
+                        </a>
+                    </div>
                 </div>
                 {% if contact_info %}
                 <div class="mt-2 d-flex align-items-center">
@@ -57,7 +64,14 @@
                                     <i class="fas fa-server me-2"></i>
                                     {{ result.equipment_name }}
                                 </h5>
-                                <span class="badge bg-dark">Command: <code>{{ result.command }}</code></span>
+                                <div>
+                                    {% if result.execution_time is defined %}
+                                    <span class="badge bg-info me-2">
+                                        <i class="fas fa-clock me-1"></i> {{ result.execution_time }}ms
+                                    </span>
+                                    {% endif %}
+                                    <span class="badge bg-dark">Command: <code>{{ result.command }}</code></span>
+                                </div>
                             </div>
                         </div>
                         <div class="card-body">

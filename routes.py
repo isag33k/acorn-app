@@ -607,6 +607,10 @@ def submit_alert():
         flash('Please enter a circuit ID', 'danger')
         return redirect(url_for('index'))
     
+    # Start timer to measure overall performance
+    import time
+    start_total_time = time.time()
+    
     # Find circuit mappings for the given circuit ID
     mappings = CircuitMapping.query.filter_by(circuit_id=circuit_id).all()
     
@@ -643,41 +647,65 @@ def submit_alert():
             # Get user-specific credentials for this equipment
             credentials = equipment.get_credentials_for_user(current_user)
             
-            ssh_client = SSHClient(
-                hostname=equipment.ip_address,
-                port=equipment.ssh_port,
-                username=credentials['username'],
-                password=credentials['password']
-            )
-            
-            # Connect to the equipment
-            ssh_client.connect()
-            
-            # Execute each command and collect outputs - with truncation for very large outputs
+            # Simplified approach (similar to SSH test page)
             for cmd in commands_list:
-                success, output = ssh_client.execute_command(cmd)
+                # Measure time for this specific command
+                start_cmd_time = time.time()
                 
-                # Handle extremely large outputs
-                if success and isinstance(output, str) and len(output) > 500000:  # ~500KB limit
-                    logger.warning(f"Very large output ({len(output)} bytes) from {equipment.name}. Truncating for display.")
-                    truncated_output = output[:250000] + "\n\n[... Output truncated due to size (showing first 250KB) ...]\n\n" + output[-250000:]
-                    output_to_display = truncated_output
-                    status = 'success'
-                else:
-                    output_to_display = output
-                    status = 'success' if success else 'error'
-                
-                results.append({
-                    'equipment_name': equipment.name,
-                    'command': cmd,
-                    'output': output_to_display,
-                    'status': status,
-                    'truncated': len(output) > 500000 if isinstance(output, str) else False
-                })
-            
-            # Disconnect after all commands are executed
-            ssh_client.disconnect()
-            
+                try:
+                    # Create new SSH client for each command (like the test page)
+                    ssh_client = SSHClient(
+                        hostname=equipment.ip_address,
+                        port=equipment.ssh_port,
+                        username=credentials['username'],
+                        password=credentials['password']
+                    )
+                    
+                    # Connect to the equipment
+                    ssh_client.connect()
+                    
+                    # Execute command (one at a time)
+                    success, output = ssh_client.execute_command(cmd)
+                    
+                    # Handle extremely large outputs, limit to 200KB instead of 500KB
+                    # for faster page rendering
+                    if success and isinstance(output, str) and len(output) > 200000:
+                        logger.warning(f"Large output ({len(output)} bytes) from {equipment.name}. Truncating for display.")
+                        truncated_output = output[:100000] + "\n\n[... Output truncated due to size (showing first 100KB) ...]\n\n" + output[-100000:]
+                        output_to_display = truncated_output
+                        status = 'success'
+                        is_truncated = True
+                    else:
+                        output_to_display = output
+                        status = 'success' if success else 'error'
+                        is_truncated = False
+                    
+                    # Disconnect immediately after command
+                    ssh_client.disconnect()
+                    
+                    # Calculate performance metrics
+                    cmd_time = int((time.time() - start_cmd_time) * 1000)  # ms
+                    
+                    results.append({
+                        'equipment_name': equipment.name,
+                        'command': cmd,
+                        'output': output_to_display,
+                        'status': status,
+                        'execution_time': cmd_time,
+                        'truncated': is_truncated
+                    })
+                    
+                except Exception as inner_e:
+                    # Handle command-specific errors
+                    logger.error(f"Command error for {equipment.name}, cmd: {cmd}: {str(inner_e)}")
+                    results.append({
+                        'equipment_name': equipment.name,
+                        'command': cmd,
+                        'output': f"ERROR: {str(inner_e)}",
+                        'status': 'error',
+                        'execution_time': int((time.time() - start_cmd_time) * 1000)
+                    })
+                    
         except ValueError as e:
             # This is specific to the TACACS credential error we're raising in get_credentials_for_user
             error_message = str(e)
@@ -717,7 +745,15 @@ def submit_alert():
                 'status': 'error'
             })
     
-    return render_template('result.html', circuit_id=circuit_id, results=results, contact_info=contact_info)
+    # Calculate total execution time
+    total_time = int((time.time() - start_total_time) * 1000)
+    logger.info(f"Total execution time for circuit {circuit_id}: {total_time}ms")
+    
+    return render_template('result.html', 
+                          circuit_id=circuit_id, 
+                          results=results, 
+                          contact_info=contact_info,
+                          total_time=total_time)
 
 @app.route('/equipment')
 @login_required
