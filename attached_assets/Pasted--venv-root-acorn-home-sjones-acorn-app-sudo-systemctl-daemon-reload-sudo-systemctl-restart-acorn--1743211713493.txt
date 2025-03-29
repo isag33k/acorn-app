@@ -1,0 +1,65 @@
+(venv) root@acorn:/home/sjones/acorn-app# sudo systemctl daemon-reload
+sudo systemctl restart acorn
+sudo systemctl status acorn
+● acorn.service - ACORN Application
+     Loaded: loaded (/etc/systemd/system/acorn.service; enabled; preset: enabled)
+     Active: active (running) since Fri 2025-03-28 20:27:53 CDT; 32ms ago
+   Main PID: 5973 (gunicorn)
+      Tasks: 1 (limit: 19134)
+     Memory: 3.9M
+        CPU: 24ms
+     CGroup: /system.slice/acorn.service
+             └─5973 /home/sjones/acorn-app/venv/bin/python3 /home/sjones/acorn-app/venv/bin/gunicorn --bind 127.0.0.1:5000 main:app
+
+Mar 28 20:27:53 acorn systemd[1]: Started acorn.service - ACORN Application.
+(venv) root@acorn:/home/sjones/acorn-app# sudo journalctl -u acorn.service -n 50
+Mar 28 20:27:55 acorn start_app.sh[5987]: [2025-03-28 20:27:55 -0500] [5987] [INFO] Starting gunicorn 23.0.0
+Mar 28 20:27:55 acorn start_app.sh[5987]: [2025-03-28 20:27:55 -0500] [5987] [INFO] Listening at: http://127.0.0.1:5000 (5987)
+Mar 28 20:27:55 acorn start_app.sh[5987]: [2025-03-28 20:27:55 -0500] [5987] [INFO] Using worker: sync
+Mar 28 20:27:55 acorn start_app.sh[5988]: [2025-03-28 20:27:55 -0500] [5988] [INFO] Booting worker with pid: 5988
+Mar 28 20:27:55 acorn start_app.sh[5988]: [2025-03-28 20:27:55 -0500] [5988] [ERROR] Exception in worker process
+Mar 28 20:27:55 acorn start_app.sh[5988]: Traceback (most recent call last):
+Mar 28 20:27:55 acorn start_app.sh[5988]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/arbiter.py", line 608>
+Mar 28 20:27:55 acorn start_app.sh[5988]:     worker.init_process()
+Mar 28 20:27:55 acorn start_app.sh[5988]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/workers/base.py", lin>
+Mar 28 20:27:55 acorn start_app.sh[5988]:     self.load_wsgi()
+Mar 28 20:27:55 acorn start_app.sh[5988]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/workers/base.py", lin>
+Mar 28 20:27:55 acorn start_app.sh[5988]:     self.wsgi = self.app.wsgi()
+Mar 28 20:27:55 acorn start_app.sh[5988]:                 ^^^^^^^^^^^^^^^
+Mar 28 20:27:55 acorn start_app.sh[5988]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/app/base.py", line 66>
+Mar 28 20:27:55 acorn start_app.sh[5988]:     self.callable = self.load()
+Mar 28 20:27:55 acorn start_app.sh[5988]:                     ^^^^^^^^^^^
+Mar 28 20:27:55 acorn start_app.sh[5988]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line>
+Mar 28 20:27:55 acorn start_app.sh[5988]:     return self.load_wsgiapp()
+Mar 28 20:27:55 acorn start_app.sh[5988]:            ^^^^^^^^^^^^^^^^^^^
+Mar 28 20:27:55 acorn start_app.sh[5988]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line>
+Mar 28 20:27:55 acorn start_app.sh[5988]:     return util.import_app(self.app_uri)
+Mar 28 20:27:55 acorn start_app.sh[5988]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 20:27:55 acorn start_app.sh[5988]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/util.py", line 370, i>
+Mar 28 20:27:55 acorn start_app.sh[5988]:     mod = importlib.import_module(module)
+Mar 28 20:27:55 acorn start_app.sh[5988]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 20:27:55 acorn start_app.sh[5988]:   File "/usr/lib/python3.11/importlib/__init__.py", line 126, in import_module
+Mar 28 20:27:55 acorn start_app.sh[5988]:     return _bootstrap._gcd_import(name[level:], package, level)
+Mar 28 20:27:55 acorn start_app.sh[5988]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 20:27:55 acorn start_app.sh[5988]:   File "<frozen importlib._bootstrap>", line 1206, in _gcd_import
+Mar 28 20:27:55 acorn start_app.sh[5988]:   File "<frozen importlib._bootstrap>", line 1178, in _find_and_load
+Mar 28 20:27:55 acorn start_app.sh[5988]:   File "<frozen importlib._bootstrap>", line 1149, in _find_and_load_unlocked
+Mar 28 20:27:55 acorn start_app.sh[5988]:   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Mar 28 20:27:55 acorn start_app.sh[5988]:   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Mar 28 20:27:55 acorn start_app.sh[5988]:   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Mar 28 20:27:55 acorn start_app.sh[5988]:   File "/home/sjones/acorn-app/main.py", line 1, in <module>
+Mar 28 20:27:55 acorn start_app.sh[5988]:     from app import app
+Mar 28 20:27:55 acorn start_app.sh[5988]:   File "/home/sjones/acorn-app/app.py", line 7, in <module>
+Mar 28 20:27:55 acorn start_app.sh[5988]:     from dotenv import load_dotenv
+Mar 28 20:27:55 acorn start_app.sh[5988]: ModuleNotFoundError: No module named 'dotenv'
+Mar 28 20:27:55 acorn start_app.sh[5988]: [2025-03-28 20:27:55 -0500] [5988] [INFO] Worker exiting (pid: 5988)
+Mar 28 20:27:55 acorn start_app.sh[5987]: [2025-03-28 20:27:55 -0500] [5987] [ERROR] Worker (pid:5988) exited with code 3
+Mar 28 20:27:55 acorn start_app.sh[5987]: [2025-03-28 20:27:55 -0500] [5987] [ERROR] Shutting down: Master
+Mar 28 20:27:55 acorn start_app.sh[5987]: [2025-03-28 20:27:55 -0500] [5987] [ERROR] Reason: Worker failed to boot.
+Mar 28 20:27:55 acorn systemd[1]: acorn.service: Main process exited, code=exited, status=3/NOTIMPLEMENTED
+Mar 28 20:27:55 acorn systemd[1]: acorn.service: Failed with result 'exit-code'.
+Mar 28 20:27:56 acorn systemd[1]: acorn.service: Scheduled restart job, restart counter is at 5.
+Mar 28 20:27:56 acorn systemd[1]: Stopped acorn.service - ACORN Application.
+Mar 28 20:27:56 acorn systemd[1]: acorn.service: Start request repeated too quickly.
+Mar 28 20:27:56 acorn systemd[1]: acorn.service: Failed with result 'exit-code'.
+Mar 28 20:27:56 acorn systemd[1]: Failed to start acorn.service - ACORN Application.

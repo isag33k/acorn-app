@@ -1,0 +1,51 @@
+(venv) root@acorn:/home/sjones/acorn-app# sudo journalctl -u acorn.service -n 50
+Mar 28 20:52:13 acorn gunicorn[6666]: [2025-03-28 20:52:13 -0500] [6666] [INFO] Shutting down: Master
+Mar 28 20:52:13 acorn systemd[1]: acorn.service: Deactivated successfully.
+Mar 28 20:52:13 acorn systemd[1]: Stopped acorn.service - ACORN Simple Test Application.
+Mar 28 20:52:13 acorn systemd[1]: Started acorn.service - ACORN Simple Test Application.
+Mar 28 20:52:13 acorn gunicorn[6713]: [2025-03-28 20:52:13 -0500] [6713] [INFO] Starting gunicorn 23.0.0
+Mar 28 20:52:13 acorn gunicorn[6713]: [2025-03-28 20:52:13 -0500] [6713] [INFO] Listening at: http://0.0.0.0:5000 (6713)
+Mar 28 20:52:13 acorn gunicorn[6713]: [2025-03-28 20:52:13 -0500] [6713] [INFO] Using worker: sync
+Mar 28 20:52:13 acorn gunicorn[6715]: [2025-03-28 20:52:13 -0500] [6715] [INFO] Booting worker with pid: 6715
+Mar 28 20:52:47 acorn gunicorn[6713]: [2025-03-28 20:52:47 -0500] [6713] [CRITICAL] WORKER TIMEOUT (pid:6715)
+Mar 28 20:52:47 acorn gunicorn[6715]: [2025-03-28 20:52:47 -0500] [6715] [ERROR] Error handling request (no URI read)
+Mar 28 20:52:47 acorn gunicorn[6715]: Traceback (most recent call last):
+Mar 28 20:52:47 acorn gunicorn[6715]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/workers/sync.py", line 13>
+Mar 28 20:52:47 acorn gunicorn[6715]:     req = next(parser)
+Mar 28 20:52:47 acorn gunicorn[6715]:           ^^^^^^^^^^^^
+Mar 28 20:52:47 acorn gunicorn[6715]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/parser.py", line 41,>
+Mar 28 20:52:47 acorn gunicorn[6715]:     self.mesg = self.mesg_class(self.cfg, self.unreader, self.source_addr, self.req_count)
+Mar 28 20:52:47 acorn gunicorn[6715]:                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 20:52:47 acorn gunicorn[6715]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/message.py", line 25>
+Mar 28 20:52:47 acorn gunicorn[6715]:     super().__init__(cfg, unreader, peer_addr)
+Mar 28 20:52:47 acorn gunicorn[6715]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/message.py", line 60>
+Mar 28 20:52:47 acorn gunicorn[6715]:     unused = self.parse(self.unreader)
+Mar 28 20:52:47 acorn gunicorn[6715]:              ^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 20:52:47 acorn gunicorn[6715]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/message.py", line 27>
+Mar 28 20:52:47 acorn gunicorn[6715]:     self.get_data(unreader, buf, stop=True)
+Mar 28 20:52:47 acorn gunicorn[6715]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/message.py", line 26>
+Mar 28 20:52:47 acorn gunicorn[6715]:     data = unreader.read()
+Mar 28 20:52:47 acorn gunicorn[6715]:            ^^^^^^^^^^^^^^^
+Mar 28 20:52:47 acorn gunicorn[6715]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/unreader.py", line 3>
+Mar 28 20:52:47 acorn gunicorn[6715]:     d = self.chunk()
+Mar 28 20:52:47 acorn gunicorn[6715]:         ^^^^^^^^^^^^
+Mar 28 20:52:47 acorn gunicorn[6715]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/unreader.py", line 6>
+Mar 28 20:52:47 acorn gunicorn[6715]:     return self.sock.recv(self.mxchunk)
+Mar 28 20:52:47 acorn gunicorn[6715]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 20:52:47 acorn gunicorn[6715]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/workers/base.py", line 20>
+Mar 28 20:52:47 acorn gunicorn[6715]:     sys.exit(1)
+Mar 28 20:52:47 acorn gunicorn[6715]: SystemExit: 1
+Mar 28 20:52:47 acorn gunicorn[6715]: [2025-03-28 20:52:47 -0500] [6715] [INFO] Worker exiting (pid: 6715)
+Mar 28 20:52:47 acorn gunicorn[6719]: [2025-03-28 20:52:47 -0500] [6719] [INFO] Booting worker with pid: 6719
+Mar 28 20:54:46 acorn systemd[1]: Stopping acorn.service - ACORN Application...
+Mar 28 20:54:46 acorn gunicorn[6719]: [2025-03-28 20:54:46 -0500] [6719] [INFO] Worker exiting (pid: 6719)
+Mar 28 20:54:46 acorn gunicorn[6713]: [2025-03-28 20:54:46 -0500] [6713] [INFO] Handling signal: term
+Mar 28 20:54:46 acorn gunicorn[6713]: [2025-03-28 20:54:46 -0500] [6713] [ERROR] Worker (pid:6719) was sent SIGTERM!
+Mar 28 20:54:46 acorn gunicorn[6713]: [2025-03-28 20:54:46 -0500] [6713] [INFO] Shutting down: Master
+Mar 28 20:54:46 acorn systemd[1]: acorn.service: Deactivated successfully.
+Mar 28 20:54:46 acorn systemd[1]: Stopped acorn.service - ACORN Application.
+Mar 28 20:54:46 acorn systemd[1]: Started acorn.service - ACORN Application.
+Mar 28 20:54:47 acorn gunicorn[6756]: [2025-03-28 20:54:47 -0500] [6756] [INFO] Starting gunicorn 23.0.0
+Mar 28 20:54:47 acorn gunicorn[6756]: [2025-03-28 20:54:47 -0500] [6756] [INFO] Listening at: http://0.0.0.0:5000 (6756)
+Mar 28 20:54:47 acorn gunicorn[6756]: [2025-03-28 20:54:47 -0500] [6756] [INFO] Using worker: sync
+Mar 28 20:54:47 acorn gunicorn[6762]: [2025-03-28 20:54:47 -0500] [6762] [INFO] Booting worker with pid: 6762

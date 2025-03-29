@@ -1,0 +1,51 @@
+(venv) root@acorn:/home/sjones/acorn-app#udo journalctl -u acorn.service -n 50
+Mar 28 21:10:33 acorn systemd[1]: acorn.service: Consumed 1.306s CPU time.
+Mar 28 21:10:33 acorn systemd[1]: Started acorn.service - ACORN Application.
+Mar 28 21:10:33 acorn gunicorn[6931]: [2025-03-28 21:10:33 -0500] [6931] [INFO] Starting gunicorn 23.0.0
+Mar 28 21:10:33 acorn gunicorn[6931]: [2025-03-28 21:10:33 -0500] [6931] [INFO] Listening at: http://0.0.0.0:5000 (6931)
+Mar 28 21:10:33 acorn gunicorn[6931]: [2025-03-28 21:10:33 -0500] [6931] [INFO] Using worker: sync
+Mar 28 21:10:33 acorn gunicorn[6934]: [2025-03-28 21:10:33 -0500] [6934] [INFO] Booting worker with pid: 6934
+Mar 28 21:12:17 acorn systemd[1]: Stopping acorn.service - ACORN Application...
+Mar 28 21:12:17 acorn gunicorn[6934]: [2025-03-28 21:12:17 -0500] [6934] [INFO] Worker exiting (pid: 6934)
+Mar 28 21:12:17 acorn gunicorn[6934]: Database tables created successfully in acorn_schema.
+Mar 28 21:12:17 acorn gunicorn[6931]: [2025-03-28 21:12:17 -0500] [6931] [INFO] Handling signal: term
+Mar 28 21:12:17 acorn gunicorn[6931]: [2025-03-28 21:12:17 -0500] [6931] [ERROR] Worker (pid:6934) was sent SIGTERM!
+Mar 28 21:12:17 acorn gunicorn[6931]: [2025-03-28 21:12:17 -0500] [6931] [INFO] Shutting down: Master
+Mar 28 21:12:17 acorn systemd[1]: acorn.service: Deactivated successfully.
+Mar 28 21:12:17 acorn systemd[1]: Stopped acorn.service - ACORN Application.
+Mar 28 21:20:56 acorn systemd[1]: Started acorn.service - ACORN Application.
+Mar 28 21:20:57 acorn gunicorn[7037]: [2025-03-28 21:20:57 -0500] [7037] [INFO] Starting gunicorn 23.0.0
+Mar 28 21:20:57 acorn gunicorn[7037]: [2025-03-28 21:20:57 -0500] [7037] [ERROR] Connection in use: ('0.0.0.0', 5000)
+Mar 28 21:20:57 acorn gunicorn[7037]: [2025-03-28 21:20:57 -0500] [7037] [ERROR] connection to ('0.0.0.0', 5000) failed: [Errno 98] Addre>
+Mar 28 21:20:58 acorn gunicorn[7037]: [2025-03-28 21:20:58 -0500] [7037] [ERROR] Connection in use: ('0.0.0.0', 5000)
+Mar 28 21:20:58 acorn gunicorn[7037]: [2025-03-28 21:20:58 -0500] [7037] [ERROR] connection to ('0.0.0.0', 5000) failed: [Errno 98] Addre>
+Mar 28 21:20:59 acorn gunicorn[7037]: [2025-03-28 21:20:59 -0500] [7037] [ERROR] Connection in use: ('0.0.0.0', 5000)
+Mar 28 21:20:59 acorn gunicorn[7037]: [2025-03-28 21:20:59 -0500] [7037] [ERROR] connection to ('0.0.0.0', 5000) failed: [Errno 98] Addre>
+Mar 28 21:21:00 acorn gunicorn[7037]: [2025-03-28 21:21:00 -0500] [7037] [ERROR] Connection in use: ('0.0.0.0', 5000)
+Mar 28 21:21:00 acorn gunicorn[7037]: [2025-03-28 21:21:00 -0500] [7037] [ERROR] connection to ('0.0.0.0', 5000) failed: [Errno 98] Addre>
+Mar 28 21:21:01 acorn gunicorn[7037]: [2025-03-28 21:21:01 -0500] [7037] [ERROR] Connection in use: ('0.0.0.0', 5000)
+Mar 28 21:21:01 acorn gunicorn[7037]: [2025-03-28 21:21:01 -0500] [7037] [ERROR] connection to ('0.0.0.0', 5000) failed: [Errno 98] Addre>
+Mar 28 21:21:02 acorn gunicorn[7037]: [2025-03-28 21:21:02 -0500] [7037] [ERROR] Can't connect to ('0.0.0.0', 5000)
+Mar 28 21:21:02 acorn systemd[1]: acorn.service: Main process exited, code=exited, status=1/FAILURE
+Mar 28 21:21:02 acorn systemd[1]: acorn.service: Failed with result 'exit-code'.
+Mar 28 21:21:02 acorn systemd[1]: acorn.service: Scheduled restart job, restart counter is at 1.
+Mar 28 21:21:02 acorn systemd[1]: Stopped acorn.service - ACORN Application.
+Mar 28 21:21:02 acorn systemd[1]: Started acorn.service - ACORN Application.
+Mar 28 21:21:02 acorn gunicorn[7040]: [2025-03-28 21:21:02 -0500] [7040] [INFO] Starting gunicorn 23.0.0
+Mar 28 21:21:02 acorn gunicorn[7040]: [2025-03-28 21:21:02 -0500] [7040] [ERROR] Connection in use: ('0.0.0.0', 5000)
+Mar 28 21:21:02 acorn gunicorn[7040]: [2025-03-28 21:21:02 -0500] [7040] [ERROR] connection to ('0.0.0.0', 5000) failed: [Errno 98] Addre>
+Mar 28 21:21:03 acorn gunicorn[7040]: [2025-03-28 21:21:03 -0500] [7040] [INFO] Listening at: http://0.0.0.0:5000 (7040)
+Mar 28 21:21:03 acorn gunicorn[7040]: [2025-03-28 21:21:03 -0500] [7040] [INFO] Using worker: sync
+Mar 28 21:21:03 acorn gunicorn[7041]: [2025-03-28 21:21:03 -0500] [7041] [INFO] Booting worker with pid: 7041
+Mar 28 21:21:08 acorn systemd[1]: Stopping acorn.service - ACORN Application...
+Mar 28 21:21:08 acorn gunicorn[7041]: [2025-03-28 21:21:08 -0500] [7041] [INFO] Worker exiting (pid: 7041)
+Mar 28 21:21:08 acorn gunicorn[7040]: [2025-03-28 21:21:08 -0500] [7040] [INFO] Handling signal: term
+Mar 28 21:21:08 acorn gunicorn[7041]: Database tables created successfully in acorn_schema.
+Mar 28 21:21:08 acorn gunicorn[7040]: [2025-03-28 21:21:08 -0500] [7040] [INFO] Shutting down: Master
+Mar 28 21:21:08 acorn systemd[1]: acorn.service: Deactivated successfully.
+Mar 28 21:21:08 acorn systemd[1]: Stopped acorn.service - ACORN Application.
+Mar 28 21:21:08 acorn systemd[1]: Started acorn.service - ACORN Application.
+Mar 28 21:21:08 acorn gunicorn[7047]: [2025-03-28 21:21:08 -0500] [7047] [INFO] Starting gunicorn 23.0.0
+Mar 28 21:21:08 acorn gunicorn[7047]: [2025-03-28 21:21:08 -0500] [7047] [INFO] Listening at: http://0.0.0.0:5000 (7047)
+Mar 28 21:21:08 acorn gunicorn[7047]: [2025-03-28 21:21:08 -0500] [7047] [INFO] Using worker: sync
+Mar 28 21:21:08 acorn gunicorn[7049]: [2025-03-28 21:21:08 -0500] [7049] [INFO] Booting worker with pid: 7049

@@ -1,0 +1,51 @@
+(venv) root@acorn:/home/sjones/acorn-app# sudo journalctl -u acorn.service -n 50
+Mar 28 20:20:28 acorn gunicorn[5902]: [2025-03-28 20:20:28 -0500] [5902] [INFO] Listening at: http://127.0.0.1:5000 (5902)
+Mar 28 20:20:28 acorn gunicorn[5902]: [2025-03-28 20:20:28 -0500] [5902] [INFO] Using worker: sync
+Mar 28 20:20:28 acorn gunicorn[5903]: [2025-03-28 20:20:28 -0500] [5903] [INFO] Booting worker with pid: 5903
+Mar 28 20:20:28 acorn gunicorn[5903]: [2025-03-28 20:20:28 -0500] [5903] [ERROR] Exception in worker process
+Mar 28 20:20:28 acorn gunicorn[5903]: Traceback (most recent call last):
+Mar 28 20:20:28 acorn gunicorn[5903]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/arbiter.py", line 608, in>
+Mar 28 20:20:28 acorn gunicorn[5903]:     worker.init_process()
+Mar 28 20:20:28 acorn gunicorn[5903]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/workers/base.py", line 13>
+Mar 28 20:20:28 acorn gunicorn[5903]:     self.load_wsgi()
+Mar 28 20:20:28 acorn gunicorn[5903]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/workers/base.py", line 14>
+Mar 28 20:20:28 acorn gunicorn[5903]:     self.wsgi = self.app.wsgi()
+Mar 28 20:20:28 acorn gunicorn[5903]:                 ^^^^^^^^^^^^^^^
+Mar 28 20:20:28 acorn gunicorn[5903]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/app/base.py", line 66, in>
+Mar 28 20:20:28 acorn gunicorn[5903]:     self.callable = self.load()
+Mar 28 20:20:28 acorn gunicorn[5903]:                     ^^^^^^^^^^^
+Mar 28 20:20:28 acorn gunicorn[5903]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 57,>
+Mar 28 20:20:28 acorn gunicorn[5903]:     return self.load_wsgiapp()
+Mar 28 20:20:28 acorn gunicorn[5903]:            ^^^^^^^^^^^^^^^^^^^
+Mar 28 20:20:28 acorn gunicorn[5903]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 47,>
+Mar 28 20:20:28 acorn gunicorn[5903]:     return util.import_app(self.app_uri)
+Mar 28 20:20:28 acorn gunicorn[5903]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 20:20:28 acorn gunicorn[5903]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/util.py", line 370, in im>
+Mar 28 20:20:28 acorn gunicorn[5903]:     mod = importlib.import_module(module)
+Mar 28 20:20:28 acorn gunicorn[5903]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 20:20:28 acorn gunicorn[5903]:   File "/usr/lib/python3.11/importlib/__init__.py", line 126, in import_module
+Mar 28 20:20:28 acorn gunicorn[5903]:     return _bootstrap._gcd_import(name[level:], package, level)
+Mar 28 20:20:28 acorn gunicorn[5903]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 20:20:28 acorn gunicorn[5903]:   File "<frozen importlib._bootstrap>", line 1206, in _gcd_import
+Mar 28 20:20:28 acorn gunicorn[5903]:   File "<frozen importlib._bootstrap>", line 1178, in _find_and_load
+Mar 28 20:20:28 acorn gunicorn[5903]:   File "<frozen importlib._bootstrap>", line 1149, in _find_and_load_unlocked
+Mar 28 20:20:28 acorn gunicorn[5903]:   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Mar 28 20:20:28 acorn gunicorn[5903]:   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Mar 28 20:20:28 acorn gunicorn[5903]:   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Mar 28 20:20:28 acorn gunicorn[5903]:   File "/home/sjones/acorn-app/main.py", line 1, in <module>
+Mar 28 20:20:28 acorn gunicorn[5903]:     from app import app
+Mar 28 20:20:28 acorn gunicorn[5903]:   File "/home/sjones/acorn-app/app.py", line 5, in <module>
+Mar 28 20:20:28 acorn gunicorn[5903]:     load_dotenv()
+Mar 28 20:20:28 acorn gunicorn[5903]:     ^^^^^^^^^^^
+Mar 28 20:20:28 acorn gunicorn[5903]: NameError: name 'load_dotenv' is not defined
+Mar 28 20:20:28 acorn gunicorn[5903]: [2025-03-28 20:20:28 -0500] [5903] [INFO] Worker exiting (pid: 5903)
+Mar 28 20:20:28 acorn gunicorn[5902]: [2025-03-28 20:20:28 -0500] [5902] [ERROR] Worker (pid:5903) exited with code 3
+Mar 28 20:20:28 acorn gunicorn[5902]: [2025-03-28 20:20:28 -0500] [5902] [ERROR] Shutting down: Master
+Mar 28 20:20:28 acorn gunicorn[5902]: [2025-03-28 20:20:28 -0500] [5902] [ERROR] Reason: Worker failed to boot.
+Mar 28 20:20:28 acorn systemd[1]: acorn.service: Main process exited, code=exited, status=3/NOTIMPLEMENTED
+Mar 28 20:20:28 acorn systemd[1]: acorn.service: Failed with result 'exit-code'.
+Mar 28 20:20:29 acorn systemd[1]: acorn.service: Scheduled restart job, restart counter is at 5.
+Mar 28 20:20:29 acorn systemd[1]: Stopped acorn.service - ACORN Application.
+Mar 28 20:20:29 acorn systemd[1]: acorn.service: Start request repeated too quickly.
+Mar 28 20:20:29 acorn systemd[1]: acorn.service: Failed with result 'exit-code'.
+Mar 28 20:20:29 acorn systemd[1]: Failed to start acorn.service - ACORN Application.
