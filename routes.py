@@ -3,7 +3,7 @@ import datetime
 import traceback
 import os
 import uuid
-from flask import render_template, request, redirect, url_for, flash, jsonify, send_from_directory
+from flask import render_template, request, redirect, url_for, flash, jsonify, send_from_directory, Response
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
@@ -1205,6 +1205,86 @@ def view_contact(id):
 def fpl_outages():
     """Display FPL Outages map in an iframe"""
     return render_template('fpl_outages.html')
+
+@app.route('/fpl-proxy')
+@login_required
+def fpl_proxy():
+    """Proxy for FPL outage map"""
+    import requests
+    try:
+        # Use a browser-like User-Agent to avoid being blocked
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Referer': request.host_url,
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'Cache-Control': 'max-age=0'
+        }
+        
+        # Get the FPL website content
+        response = requests.get('https://www.fplmaps.com/northwest', headers=headers, timeout=10)
+        
+        # Log the status code for debugging
+        logger.debug(f"FPL proxy request status: {response.status_code}")
+        
+        if response.status_code == 200:
+            # Modify the response to make it work in our context
+            content = response.text
+            
+            # Replace absolute URLs with our proxy URLs
+            content = content.replace('href="/', 'href="/fpl-proxy-resource/')
+            content = content.replace('src="/', 'src="/fpl-proxy-resource/')
+            
+            # Allow embedding in iframe
+            response_headers = {
+                'Content-Type': 'text/html',
+                'X-Frame-Options': 'ALLOWALL',
+                'Content-Security-Policy': "frame-ancestors 'self';"
+            }
+            
+            return Response(content, headers=response_headers)
+        else:
+            # If we couldn't get the page, show an error
+            return render_template('fpl_proxy_error.html', 
+                                  status_code=response.status_code, 
+                                  error_message="Unable to load FPL outage map")
+    
+    except Exception as e:
+        logger.error(f"Error in FPL proxy: {str(e)}")
+        return render_template('fpl_proxy_error.html', 
+                              status_code=500, 
+                              error_message=f"Error: {str(e)}")
+
+@app.route('/fpl-proxy-resource/<path:resource_path>')
+@login_required
+def fpl_proxy_resource(resource_path):
+    """Proxy for FPL outage map resources (CSS, JS, images, etc.)"""
+    import requests
+    try:
+        # Use a browser-like User-Agent to avoid being blocked
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Accept': '*/*',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Referer': request.host_url + 'fpl-proxy',
+            'Connection': 'keep-alive',
+            'Cache-Control': 'max-age=0'
+        }
+        
+        # Get the resource from FPL website
+        url = f'https://www.fplmaps.com/{resource_path}'
+        response = requests.get(url, headers=headers, timeout=10)
+        
+        # Return the response with appropriate content type
+        content_type = response.headers.get('Content-Type', 'text/plain')
+        
+        return Response(response.content, content_type=content_type)
+        
+    except Exception as e:
+        logger.error(f"Error in FPL proxy resource: {str(e)}")
+        return Response(f"Error loading resource: {str(e)}", content_type='text/plain', status=500)
 
 @app.route('/ssh_test', methods=['GET', 'POST'])
 @login_required
