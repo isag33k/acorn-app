@@ -740,21 +740,12 @@ def equipment_list():
 @login_required
 def add_equipment():
     """Add new equipment"""
-    # Manual CSRF token check with exception handling
-    try:
-        csrf_token = request.form.get('csrf_token')
-        if not csrf_token:
-            app.logger.error("Missing CSRF token on add equipment form")
-            flash('Security validation failed: CSRF token missing.', 'danger')
-            return redirect(url_for('equipment_list'))
-            
-        if not validate_csrf_token(csrf_token):
-            app.logger.error(f"CSRF validation failed on add equipment form. Token: {csrf_token}")
-            flash('Security validation failed: Invalid CSRF token.', 'danger')
-            return redirect(url_for('equipment_list'))
-    except Exception as e:
-        app.logger.error(f"CSRF validation error: {str(e)}")
-        flash('Security validation error. Please try again.', 'danger')
+    # Simple form validation approach
+    form = FlaskForm()
+    if not form.validate_on_submit():
+        app.logger.error("CSRF validation failed on add equipment form")
+        app.logger.error(f"Form data: {request.form}")
+        flash('Security validation failed. Please try again.', 'danger')
         return redirect(url_for('equipment_list'))
         
     name = request.form.get('name')
