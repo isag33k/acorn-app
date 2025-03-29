@@ -7,6 +7,7 @@ from flask import render_template, request, redirect, url_for, flash, jsonify, s
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
+from flask_wtf.csrf import validate_csrf as validate_csrf_token
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, EmailField, TextAreaField, SelectField, HiddenField, SearchField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
 from sqlalchemy import or_
@@ -739,11 +740,21 @@ def equipment_list():
 @login_required
 def add_equipment():
     """Add new equipment"""
-    # CSRF Validation
-    form = FlaskForm()
-    if not form.validate_on_submit():
-        app.logger.error("CSRF validation failed on add equipment form")
-        flash('Security validation failed. Please try again.', 'danger')
+    # Manual CSRF token check with exception handling
+    try:
+        csrf_token = request.form.get('csrf_token')
+        if not csrf_token:
+            app.logger.error("Missing CSRF token on add equipment form")
+            flash('Security validation failed: CSRF token missing.', 'danger')
+            return redirect(url_for('equipment_list'))
+            
+        if not validate_csrf_token(csrf_token):
+            app.logger.error(f"CSRF validation failed on add equipment form. Token: {csrf_token}")
+            flash('Security validation failed: Invalid CSRF token.', 'danger')
+            return redirect(url_for('equipment_list'))
+    except Exception as e:
+        app.logger.error(f"CSRF validation error: {str(e)}")
+        flash('Security validation error. Please try again.', 'danger')
         return redirect(url_for('equipment_list'))
         
     name = request.form.get('name')
