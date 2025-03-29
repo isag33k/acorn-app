@@ -739,6 +739,13 @@ def equipment_list():
 @login_required
 def add_equipment():
     """Add new equipment"""
+    # CSRF Validation
+    form = FlaskForm()
+    if not form.validate_on_submit():
+        app.logger.error("CSRF validation failed on add equipment form")
+        flash('Security validation failed. Please try again.', 'danger')
+        return redirect(url_for('equipment_list'))
+        
     name = request.form.get('name')
     ip_address = request.form.get('ip_address')
     ssh_port = request.form.get('ssh_port', 22, type=int)
@@ -782,6 +789,13 @@ def add_equipment():
 @login_required
 def delete_equipment(id):
     """Delete equipment and its circuit mappings"""
+    # CSRF Validation
+    form = FlaskForm()
+    if not form.validate_on_submit():
+        app.logger.error("CSRF validation failed on delete equipment form")
+        flash('Security validation failed. Please try again.', 'danger')
+        return redirect(url_for('equipment_list'))
+    
     equipment = Equipment.query.get_or_404(id)
     
     # Delete equipment (cascade will delete mappings)
@@ -802,6 +816,13 @@ def edit_equipment(id):
         return render_template('edit_equipment.html', equipment=equipment)
     
     # POST request - process the form submission
+    # CSRF Validation
+    form = FlaskForm()
+    if not form.validate_on_submit():
+        app.logger.error("CSRF validation failed on edit equipment form")
+        flash('Security validation failed. Please try again.', 'danger')
+        return redirect(url_for('edit_equipment', id=id))
+        
     equipment.name = request.form.get('name')
     equipment.ip_address = request.form.get('ip_address')
     equipment.ssh_port = request.form.get('ssh_port', 22, type=int)
@@ -837,6 +858,13 @@ def edit_equipment(id):
 @login_required
 def add_mapping():
     """Add new circuit mapping"""
+    # CSRF Validation
+    form = FlaskForm()
+    if not form.validate_on_submit():
+        app.logger.error("CSRF validation failed on add mapping form")
+        flash('Security validation failed. Please try again.', 'danger')
+        return redirect(url_for('equipment_list'))
+        
     circuit_id = request.form.get('circuit_id')
     equipment_id = request.form.get('equipment_id', type=int)
     command = request.form.get('command')
@@ -874,6 +902,13 @@ def add_mapping():
 @login_required
 def delete_mapping(id):
     """Delete circuit mapping"""
+    # CSRF Validation
+    form = FlaskForm()
+    if not form.validate_on_submit():
+        app.logger.error("CSRF validation failed on delete mapping form")
+        flash('Security validation failed. Please try again.', 'danger')
+        return redirect(url_for('equipment_list'))
+        
     mapping = CircuitMapping.query.get_or_404(id)
     
     db.session.delete(mapping)
@@ -891,6 +926,13 @@ def edit_mapping(id):
     
     # If this is a POST request, process the form data
     if request.method == 'POST':
+        # CSRF Validation
+        form = FlaskForm()
+        if not form.validate_on_submit():
+            app.logger.error("CSRF validation failed on edit mapping form")
+            flash('Security validation failed. Please try again.', 'danger')
+            return redirect(url_for('edit_mapping', id=id))
+            
         mapping.circuit_id = request.form.get('circuit_id')
         mapping.equipment_id = request.form.get('equipment_id', type=int)
         mapping.command = request.form.get('command')
