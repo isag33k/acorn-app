@@ -142,8 +142,8 @@ class SSHClient:
         try:
             logger.debug(f"Executing command on {self.hostname}: {command}")
             
-            # Execute with 2-minute timeout (reduced from 3 minutes)
-            stdin, stdout, stderr = self.client.exec_command(command, timeout=120)
+            # Execute with 1-minute timeout (reduced from 2 minutes)
+            stdin, stdout, stderr = self.client.exec_command(command, timeout=60)
             
             # Read the output with timeout tracking and chunking for large outputs
             start_time = time.time()
@@ -154,8 +154,8 @@ class SSHClient:
             stderr_chunks = []
             chunk_count = 0
             
-            # Set the channel timeout to 2 minutes (reduced from 4 minutes)
-            stdout.channel.settimeout(120)  # 2-minute timeout for channel operations
+            # Set the channel timeout to 1 minute (reduced from 2 minutes)
+            stdout.channel.settimeout(60)  # 1-minute timeout for channel operations
             
             # Read stdout in chunks
             while not stdout.channel.exit_status_ready() or stdout.channel.recv_ready():
@@ -168,9 +168,9 @@ class SSHClient:
                 else:
                     time.sleep(0.1)  # Small sleep to prevent CPU spinning
                     
-                # Safety check - abort if taking too long (2 minutes max)
-                if time.time() - start_time > 120:
-                    logger.warning(f"Command execution taking too long (>2 min), forcing completion: {command}")
+                # Safety check - abort if taking too long (1 minute max)
+                if time.time() - start_time > 60:
+                    logger.warning(f"Command execution taking too long (>1 min), forcing completion: {command}")
                     break
             
             # Read stderr if available
