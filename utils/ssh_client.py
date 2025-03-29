@@ -41,7 +41,7 @@ class SSHClient:
         try:
             logger.debug(f"Testing socket connection to {self.hostname}:{self.port}")
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(15)  # increased from 5 to 15 seconds
+            sock.settimeout(10)  # reduced from 15 to 10 seconds
             result = sock.connect_ex((self.hostname, self.port))
             sock.close()
             
@@ -80,17 +80,17 @@ class SSHClient:
                     paramiko_logger = logging.getLogger("paramiko")
                     paramiko_logger.setLevel(logging.DEBUG)
                 
-                # Connect with tolerant settings
+                # Connect with faster timeouts
                 self.client.connect(
                     hostname=self.hostname,
                     port=self.port,
                     username=self.username,
                     password=self.password,
-                    timeout=20,  # increased from 10 to 20 seconds
+                    timeout=15,  # reduced from 20 to 15 seconds
                     allow_agent=False,
                     look_for_keys=False,
-                    banner_timeout=20,  # increased from 10 to 20 seconds
-                    auth_timeout=20,  # increased from 10 to 20 seconds
+                    banner_timeout=15,  # reduced from 20 to 15 seconds
+                    auth_timeout=15,  # reduced from 20 to 15 seconds
                     disabled_algorithms=dict(pubkeys=["rsa-sha2-256", "rsa-sha2-512"])
                 )
                 
@@ -142,20 +142,20 @@ class SSHClient:
         try:
             logger.debug(f"Executing command on {self.hostname}: {command}")
             
-            # Execute with extended timeout (180 seconds instead of 120)
-            stdin, stdout, stderr = self.client.exec_command(command, timeout=180)
+            # Execute with 2-minute timeout (reduced from 3 minutes)
+            stdin, stdout, stderr = self.client.exec_command(command, timeout=120)
             
             # Read the output with timeout tracking and chunking for large outputs
             start_time = time.time()
             
             # Use chunked reading approach for very large outputs
-            buffer_size = 32768  # Doubled buffer for faster reading (32KB chunks)
+            buffer_size = 32768  # 32KB chunks for faster reading
             stdout_chunks = []
             stderr_chunks = []
             chunk_count = 0
             
-            # Set the channel timeout separately (even higher for large outputs)
-            stdout.channel.settimeout(240)  # 4 minutes for channel operations
+            # Set the channel timeout to 2 minutes (reduced from 4 minutes)
+            stdout.channel.settimeout(120)  # 2-minute timeout for channel operations
             
             # Read stdout in chunks
             while not stdout.channel.exit_status_ready() or stdout.channel.recv_ready():
@@ -168,9 +168,9 @@ class SSHClient:
                 else:
                     time.sleep(0.1)  # Small sleep to prevent CPU spinning
                     
-                # Safety check - abort if taking too long (5 minutes max)
-                if time.time() - start_time > 300:
-                    logger.warning(f"Command execution taking very long (>5 min), forcing completion: {command}")
+                # Safety check - abort if taking too long (2 minutes max)
+                if time.time() - start_time > 120:
+                    logger.warning(f"Command execution taking too long (>2 min), forcing completion: {command}")
                     break
             
             # Read stderr if available
