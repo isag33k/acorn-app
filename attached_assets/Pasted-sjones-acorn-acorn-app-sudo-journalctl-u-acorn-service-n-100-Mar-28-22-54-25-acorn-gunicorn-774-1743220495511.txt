@@ -1,0 +1,58 @@
+sjones@acorn:~/acorn-app$ sudo journalctl -u acorn.service -n 100
+Mar 28 22:54:25 acorn gunicorn[7740]:     self.callable = self.load()
+Mar 28 22:54:25 acorn gunicorn[7740]:                     ^^^^^^^^^^^
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 57,>
+Mar 28 22:54:25 acorn gunicorn[7740]:     return self.load_wsgiapp()
+Mar 28 22:54:25 acorn gunicorn[7740]:            ^^^^^^^^^^^^^^^^^^^
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 47,>
+Mar 28 22:54:25 acorn gunicorn[7740]:     return util.import_app(self.app_uri)
+Mar 28 22:54:25 acorn gunicorn[7740]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/util.py", line 370, in im>
+Mar 28 22:54:25 acorn gunicorn[7740]:     mod = importlib.import_module(module)
+Mar 28 22:54:25 acorn gunicorn[7740]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/usr/lib/python3.11/importlib/__init__.py", line 126, in import_module
+Mar 28 22:54:25 acorn gunicorn[7740]:     return _bootstrap._gcd_import(name[level:], package, level)
+Mar 28 22:54:25 acorn gunicorn[7740]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "<frozen importlib._bootstrap>", line 1206, in _gcd_import
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "<frozen importlib._bootstrap>", line 1178, in _find_and_load
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "<frozen importlib._bootstrap>", line 1149, in _find_and_load_unlocked
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/home/sjones/acorn-app/app.py", line 118, in <module>
+Mar 28 22:54:25 acorn gunicorn[7740]:     db.create_all()
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask_sqlalchemy/extension.py", li>
+Mar 28 22:54:25 acorn gunicorn[7740]:     self._call_for_binds(bind_key, "create_all")
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask_sqlalchemy/extension.py", li>
+Mar 28 22:54:25 acorn gunicorn[7740]:     getattr(metadata, op_name)(bind=engine)
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/sql/schema.py", line 59>
+Mar 28 22:54:25 acorn gunicorn[7740]:     bind._run_ddl_visitor(
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3>
+Mar 28 22:54:25 acorn gunicorn[7740]:     conn._run_ddl_visitor(visitorcallable, element, **kwargs)
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2>
+Mar 28 22:54:25 acorn gunicorn[7740]:     visitorcallable(self.dialect, self, **kwargs).traverse_single(element)
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/sql/visitors.py", line >
+Mar 28 22:54:25 acorn gunicorn[7740]:     return meth(obj, **kw)
+Mar 28 22:54:25 acorn gunicorn[7740]:            ^^^^^^^^^^^^^^^
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/sql/ddl.py", line 981, >
+Mar 28 22:54:25 acorn gunicorn[7740]:     self.traverse_single(
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/sql/visitors.py", line >
+Mar 28 22:54:25 acorn gunicorn[7740]:     return meth(obj, **kw)
+Mar 28 22:54:25 acorn gunicorn[7740]:            ^^^^^^^^^^^^^^^
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/sql/ddl.py", line 1019,>
+Mar 28 22:54:25 acorn gunicorn[7740]:     )._invoke_with(self.connection)
+Mar 28 22:54:25 acorn gunicorn[7740]:       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/sql/ddl.py", line 321, >
+Mar 28 22:54:25 acorn gunicorn[7740]:     return bind.execute(self)
+Mar 28 22:54:25 acorn gunicorn[7740]:            ^^^^^^^^^^^^^^^^^^
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1>
+Mar 28 22:54:25 acorn gunicorn[7740]:     return meth(
+Mar 28 22:54:25 acorn gunicorn[7740]:            ^^^^^
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/sql/ddl.py", line 187, >
+Mar 28 22:54:25 acorn gunicorn[7740]:     return connection._execute_ddl(
+Mar 28 22:54:25 acorn gunicorn[7740]:            ^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1>
+Mar 28 22:54:25 acorn gunicorn[7740]:     ret = self._execute_context(
+Mar 28 22:54:25 acorn gunicorn[7740]:           ^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 22:54:25 acorn gunicorn[7740]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1>
+lines 1-56

@@ -1,0 +1,51 @@
+sjones@acorn:~/acorn-app$ sudo journalctl -u acorn.service -n 50
+Mar 28 23:27:04 acorn gunicorn[8152]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask_sqlalchemy/extension.py", li>
+Mar 28 23:27:04 acorn gunicorn[8152]:     raise RuntimeError(
+Mar 28 23:27:04 acorn gunicorn[8152]: RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use>
+Mar 28 23:27:04 acorn gunicorn[8152]: [2025-03-28 23:27:04 -0500] [8152] [INFO] Worker exiting (pid: 8152)
+Mar 28 23:27:04 acorn gunicorn[8151]: [2025-03-28 23:27:04 -0500] [8151] [ERROR] Worker (pid:8152) exited with code 3
+Mar 28 23:27:04 acorn gunicorn[8151]: [2025-03-28 23:27:04 -0500] [8151] [ERROR] Shutting down: Master
+Mar 28 23:27:04 acorn gunicorn[8151]: [2025-03-28 23:27:04 -0500] [8151] [ERROR] Reason: Worker failed to boot.
+Mar 28 23:27:04 acorn systemd[1]: acorn.service: Main process exited, code=exited, status=3/NOTIMPLEMENTED
+Mar 28 23:27:04 acorn systemd[1]: acorn.service: Failed with result 'exit-code'.
+Mar 28 23:27:04 acorn systemd[1]: acorn.service: Scheduled restart job, restart counter is at 5.
+Mar 28 23:27:04 acorn systemd[1]: Stopped acorn.service - ACORN Application.
+Mar 28 23:27:04 acorn systemd[1]: acorn.service: Start request repeated too quickly.
+Mar 28 23:27:04 acorn systemd[1]: acorn.service: Failed with result 'exit-code'.
+Mar 28 23:27:04 acorn systemd[1]: Failed to start acorn.service - ACORN Application.
+Mar 28 23:33:25 acorn systemd[1]: /etc/systemd/system/acorn.service:8: Failed to resolve specifiers in DATABASE_URL=postgresql://acorn_us>
+Mar 28 23:33:26 acorn systemd[1]: Started acorn.service - ACORN Application.
+Mar 28 23:33:26 acorn gunicorn[8217]: [2025-03-28 23:33:26 -0500] [8217] [INFO] Starting gunicorn 23.0.0
+Mar 28 23:33:26 acorn gunicorn[8217]: [2025-03-28 23:33:26 -0500] [8217] [INFO] Listening at: http://0.0.0.0:5000 (8217)
+Mar 28 23:33:26 acorn gunicorn[8217]: [2025-03-28 23:33:26 -0500] [8217] [INFO] Using worker: sync
+Mar 28 23:33:26 acorn gunicorn[8218]: [2025-03-28 23:33:26 -0500] [8218] [INFO] Booting worker with pid: 8218
+Mar 28 23:34:01 acorn gunicorn[8217]: [2025-03-28 23:34:01 -0500] [8217] [CRITICAL] WORKER TIMEOUT (pid:8218)
+Mar 28 23:34:01 acorn gunicorn[8218]: [2025-03-28 23:34:01 -0500] [8218] [ERROR] Error handling request (no URI read)
+Mar 28 23:34:01 acorn gunicorn[8218]: Traceback (most recent call last):
+Mar 28 23:34:01 acorn gunicorn[8218]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/workers/sync.py", line 13>
+Mar 28 23:34:01 acorn gunicorn[8218]:     req = next(parser)
+Mar 28 23:34:01 acorn gunicorn[8218]:           ^^^^^^^^^^^^
+Mar 28 23:34:01 acorn gunicorn[8218]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/parser.py", line 41,>
+Mar 28 23:34:01 acorn gunicorn[8218]:     self.mesg = self.mesg_class(self.cfg, self.unreader, self.source_addr, self.req_count)
+Mar 28 23:34:01 acorn gunicorn[8218]:                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 23:34:01 acorn gunicorn[8218]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/message.py", line 25>
+Mar 28 23:34:01 acorn gunicorn[8218]:     super().__init__(cfg, unreader, peer_addr)
+Mar 28 23:34:01 acorn gunicorn[8218]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/message.py", line 60>
+Mar 28 23:34:01 acorn gunicorn[8218]:     unused = self.parse(self.unreader)
+Mar 28 23:34:01 acorn gunicorn[8218]:              ^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 23:34:01 acorn gunicorn[8218]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/message.py", line 27>
+Mar 28 23:34:01 acorn gunicorn[8218]:     self.get_data(unreader, buf, stop=True)
+Mar 28 23:34:01 acorn gunicorn[8218]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/message.py", line 26>
+Mar 28 23:34:01 acorn gunicorn[8218]:     data = unreader.read()
+Mar 28 23:34:01 acorn gunicorn[8218]:            ^^^^^^^^^^^^^^^
+Mar 28 23:34:01 acorn gunicorn[8218]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/unreader.py", line 3>
+Mar 28 23:34:01 acorn gunicorn[8218]:     d = self.chunk()
+Mar 28 23:34:01 acorn gunicorn[8218]:         ^^^^^^^^^^^^
+Mar 28 23:34:01 acorn gunicorn[8218]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/unreader.py", line 6>
+Mar 28 23:34:01 acorn gunicorn[8218]:     return self.sock.recv(self.mxchunk)
+Mar 28 23:34:01 acorn gunicorn[8218]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 23:34:01 acorn gunicorn[8218]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/workers/base.py", line 20>
+Mar 28 23:34:01 acorn gunicorn[8218]:     sys.exit(1)
+Mar 28 23:34:01 acorn gunicorn[8218]: SystemExit: 1
+Mar 28 23:34:01 acorn gunicorn[8218]: [2025-03-28 23:34:01 -0500] [8218] [INFO] Worker exiting (pid: 8218)
+Mar 28 23:34:01 acorn gunicorn[8229]: [2025-03-28 23:34:01 -0500] [8229] [INFO] Booting worker with pid: 8229

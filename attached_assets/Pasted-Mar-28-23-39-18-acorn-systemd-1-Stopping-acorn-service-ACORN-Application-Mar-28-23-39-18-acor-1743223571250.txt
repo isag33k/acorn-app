@@ -1,0 +1,42 @@
+Mar 28 23:39:18 acorn systemd[1]: Stopping acorn.service - ACORN Application...
+Mar 28 23:39:18 acorn gunicorn[8217]: [2025-03-28 23:39:18 -0500] [8217] [INFO] Handling signal: term
+Mar 28 23:39:18 acorn gunicorn[8239]: [2025-03-28 23:39:18 -0500] [8239] [INFO] Worker exiting (pid: 8239)
+Mar 28 23:39:18 acorn gunicorn[8217]: [2025-03-28 23:39:18 -0500] [8217] [INFO] Shutting down: Master
+Mar 28 23:39:18 acorn systemd[1]: acorn.service: Deactivated successfully.
+Mar 28 23:39:18 acorn systemd[1]: Stopped acorn.service - ACORN Application.
+Mar 28 23:39:18 acorn systemd[1]: acorn.service: Consumed 1.984s CPU time.
+Mar 28 23:39:18 acorn systemd[1]: Started acorn.service - ACORN Application.
+Mar 28 23:39:18 acorn gunicorn[8283]: [2025-03-28 23:39:18 -0500] [8283] [INFO] Starting gunicorn 23.0.0
+Mar 28 23:39:18 acorn gunicorn[8283]: [2025-03-28 23:39:18 -0500] [8283] [INFO] Listening at: http://0.0.0.0:5000 (8283)
+Mar 28 23:39:18 acorn gunicorn[8283]: [2025-03-28 23:39:18 -0500] [8283] [INFO] Using worker: sync
+Mar 28 23:39:18 acorn gunicorn[8285]: [2025-03-28 23:39:18 -0500] [8285] [INFO] Booting worker with pid: 8285
+Mar 28 23:40:22 acorn gunicorn[8283]: [2025-03-28 23:40:22 -0500] [8283] [CRITICAL] WORKER TIMEOUT (pid:8285)
+Mar 28 23:40:22 acorn gunicorn[8285]: [2025-03-28 23:40:22 -0500] [8285] [ERROR] Error handling request (no URI read)
+Mar 28 23:40:22 acorn gunicorn[8285]: Traceback (most recent call last):
+Mar 28 23:40:22 acorn gunicorn[8285]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/workers/sync.py", line 13>
+Mar 28 23:40:22 acorn gunicorn[8285]:     req = next(parser)
+Mar 28 23:40:22 acorn gunicorn[8285]:           ^^^^^^^^^^^^
+Mar 28 23:40:22 acorn gunicorn[8285]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/parser.py", line 41,>
+Mar 28 23:40:22 acorn gunicorn[8285]:     self.mesg = self.mesg_class(self.cfg, self.unreader, self.source_addr, self.req_count)
+Mar 28 23:40:22 acorn gunicorn[8285]:                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 23:40:22 acorn gunicorn[8285]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/message.py", line 25>
+Mar 28 23:40:22 acorn gunicorn[8285]:     super().__init__(cfg, unreader, peer_addr)
+Mar 28 23:40:22 acorn gunicorn[8285]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/message.py", line 60>
+Mar 28 23:40:22 acorn gunicorn[8285]:     unused = self.parse(self.unreader)
+Mar 28 23:40:22 acorn gunicorn[8285]:              ^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 23:40:22 acorn gunicorn[8285]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/message.py", line 27>
+Mar 28 23:40:22 acorn gunicorn[8285]:     self.get_data(unreader, buf, stop=True)
+Mar 28 23:40:22 acorn gunicorn[8285]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/message.py", line 26>
+Mar 28 23:40:22 acorn gunicorn[8285]:     data = unreader.read()
+Mar 28 23:40:22 acorn gunicorn[8285]:            ^^^^^^^^^^^^^^^
+Mar 28 23:40:22 acorn gunicorn[8285]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/unreader.py", line 3>
+Mar 28 23:40:22 acorn gunicorn[8285]:     d = self.chunk()
+Mar 28 23:40:22 acorn gunicorn[8285]:         ^^^^^^^^^^^^
+Mar 28 23:40:22 acorn gunicorn[8285]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/http/unreader.py", line 6>
+Mar 28 23:40:22 acorn gunicorn[8285]:     return self.sock.recv(self.mxchunk)
+Mar 28 23:40:22 acorn gunicorn[8285]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 23:40:22 acorn gunicorn[8285]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/workers/base.py", line 20>
+Mar 28 23:40:22 acorn gunicorn[8285]:     sys.exit(1)
+Mar 28 23:40:22 acorn gunicorn[8285]: SystemExit: 1
+Mar 28 23:40:22 acorn gunicorn[8285]: [2025-03-28 23:40:22 -0500] [8285] [INFO] Worker exiting (pid: 8285)
+Mar 28 23:40:22 acorn gunicorn[8298]: [2025-03-28 23:40:22 -0500] [8298] [INFO] Booting worker with pid: 8298

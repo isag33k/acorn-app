@@ -1,0 +1,43 @@
+Mar 29 00:03:38 acorn systemd[1]: Stopping acorn.service - ACORN Application...
+Mar 29 00:03:38 acorn gunicorn[8549]: [2025-03-29 00:03:38 -0500] [8549] [INFO] Handling signal: term
+Mar 29 00:03:38 acorn gunicorn[8559]: [2025-03-29 00:03:38 -0500] [8559] [INFO] Worker exiting (pid: 8559)
+Mar 29 00:03:38 acorn gunicorn[8559]: Database tables created successfully
+Mar 29 00:03:38 acorn gunicorn[8559]: Routes imported successfully
+Mar 29 00:03:38 acorn gunicorn[8549]: [2025-03-29 00:03:38 -0500] [8549] [INFO] Shutting down: Master
+Mar 29 00:03:38 acorn systemd[1]: acorn.service: Deactivated successfully.
+Mar 29 00:03:38 acorn systemd[1]: Stopped acorn.service - ACORN Application.
+Mar 29 00:03:38 acorn systemd[1]: acorn.service: Consumed 1.587s CPU time.
+Mar 29 00:03:38 acorn systemd[1]: Started acorn.service - ACORN Application.
+Mar 29 00:03:38 acorn gunicorn[8577]: [2025-03-29 00:03:38 -0500] [8577] [INFO] Starting gunicorn 23.0.0
+Mar 29 00:03:38 acorn gunicorn[8577]: [2025-03-29 00:03:38 -0500] [8577] [INFO] Listening at: http://0.0.0.0:5000 (8577)
+Mar 29 00:03:38 acorn gunicorn[8577]: [2025-03-29 00:03:38 -0500] [8577] [INFO] Using worker: sync
+Mar 29 00:03:38 acorn gunicorn[8579]: [2025-03-29 00:03:38 -0500] [8579] [INFO] Booting worker with pid: 8579
+Mar 29 00:03:48 acorn gunicorn[8579]: DEBUG:app:Equipment list view: Retrieved equipment and circuits, created form instances
+Mar 29 00:03:54 acorn gunicorn[8579]: DEBUG:app:Equipment list view: Retrieved equipment and circuits, created form instances
+Mar 29 00:03:54 acorn gunicorn[8579]: ERROR:app:Error in equipment_list route: 'csrf_token' is undefined
+Mar 29 00:03:54 acorn gunicorn[8579]: ERROR:app:Traceback (most recent call last):
+Mar 29 00:03:54 acorn gunicorn[8579]:   File "/home/sjones/acorn-app/routes.py", line 723, in equipment_list
+Mar 29 00:03:54 acorn gunicorn[8579]:     return render_template('equipment.html',
+Mar 29 00:03:54 acorn gunicorn[8579]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 00:03:54 acorn gunicorn[8579]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/templating.py", line 150, in>
+Mar 29 00:03:54 acorn gunicorn[8579]:     return _render(app, template, context)
+Mar 29 00:03:54 acorn gunicorn[8579]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 00:03:54 acorn gunicorn[8579]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/templating.py", line 131, in>
+Mar 29 00:03:54 acorn gunicorn[8579]:     rv = template.render(context)
+Mar 29 00:03:54 acorn gunicorn[8579]:          ^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 00:03:54 acorn gunicorn[8579]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1295,>
+Mar 29 00:03:54 acorn gunicorn[8579]:     self.environment.handle_exception()
+Mar 29 00:03:54 acorn gunicorn[8579]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/jinja2/environment.py", line 942, >
+Mar 29 00:03:54 acorn gunicorn[8579]:     raise rewrite_traceback_stack(source=source)
+Mar 29 00:03:54 acorn gunicorn[8579]:   File "/home/sjones/acorn-app/templates/equipment.html", line 1, in top-level template code
+Mar 29 00:03:54 acorn gunicorn[8579]:     {% extends 'base.html' %}
+Mar 29 00:03:54 acorn gunicorn[8579]:   File "/home/sjones/acorn-app/templates/base.html", line 127, in top-level template code
+Mar 29 00:03:54 acorn gunicorn[8579]:     {% block content %}{% endblock %}
+Mar 29 00:03:54 acorn gunicorn[8579]:     ^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 00:03:54 acorn gunicorn[8579]:   File "/home/sjones/acorn-app/templates/equipment.html", line 127, in block 'content'
+Mar 29 00:03:54 acorn gunicorn[8579]:     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+Mar 29 00:03:54 acorn gunicorn[8579]:     ^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 00:03:54 acorn gunicorn[8579]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/jinja2/utils.py", line 92, in from>
+Mar 29 00:03:54 acorn gunicorn[8579]:     if hasattr(obj, "jinja_pass_arg"):
+Mar 29 00:03:54 acorn gunicorn[8579]:        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 00:03:54 acorn gunicorn[8579]: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined

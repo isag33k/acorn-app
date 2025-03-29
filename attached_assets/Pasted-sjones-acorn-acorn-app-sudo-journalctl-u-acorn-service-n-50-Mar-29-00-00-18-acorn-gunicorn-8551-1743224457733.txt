@@ -1,0 +1,52 @@
+sjones@acorn:~/acorn-app$ sudo journalctl -u acorn.service -n 50
+Mar 29 00:00:18 acorn gunicorn[8551]:     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any>
+Mar 29 00:00:18 acorn gunicorn[8551]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 00:00:18 acorn gunicorn[8551]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask_login/utils.py", line 284, i>
+Mar 29 00:00:18 acorn gunicorn[8551]:     elif not current_user.is_authenticated:
+Mar 29 00:00:18 acorn gunicorn[8551]:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 00:00:18 acorn gunicorn[8551]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/werkzeug/local.py", line 318, in _>
+Mar 29 00:00:18 acorn gunicorn[8551]:     obj = instance._get_current_object()
+Mar 29 00:00:18 acorn gunicorn[8551]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 00:00:18 acorn gunicorn[8551]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/werkzeug/local.py", line 526, in _>
+Mar 29 00:00:18 acorn gunicorn[8551]:     return get_name(local())
+Mar 29 00:00:18 acorn gunicorn[8551]:                     ^^^^^^^
+Mar 29 00:00:18 acorn gunicorn[8551]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask_login/utils.py", line 25, in>
+Mar 29 00:00:18 acorn gunicorn[8551]:     current_user = LocalProxy(lambda: _get_user())
+Mar 29 00:00:18 acorn gunicorn[8551]:                                       ^^^^^^^^^^^
+Mar 29 00:00:18 acorn gunicorn[8551]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask_login/utils.py", line 370, i>
+Mar 29 00:00:18 acorn gunicorn[8551]:     current_app.login_manager._load_user()
+Mar 29 00:00:18 acorn gunicorn[8551]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask_login/login_manager.py", lin>
+Mar 29 00:00:18 acorn gunicorn[8551]:     raise Exception(
+Mar 29 00:00:18 acorn gunicorn[8551]: Exception: Missing user_loader or request_loader. Refer to http://flask-login.readthedocs.io/#how-i>
+Mar 29 00:00:19 acorn gunicorn[8551]: ERROR:app:Exception on / [GET]
+Mar 29 00:00:19 acorn gunicorn[8551]: Traceback (most recent call last):
+Mar 29 00:00:19 acorn gunicorn[8551]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_>
+Mar 29 00:00:19 acorn gunicorn[8551]:     response = self.full_dispatch_request()
+Mar 29 00:00:19 acorn gunicorn[8551]:                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 00:00:19 acorn gunicorn[8551]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_d>
+Mar 29 00:00:19 acorn gunicorn[8551]:     rv = self.handle_user_exception(e)
+Mar 29 00:00:19 acorn gunicorn[8551]:          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 00:00:19 acorn gunicorn[8551]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_d>
+Mar 29 00:00:19 acorn gunicorn[8551]:     rv = self.dispatch_request()
+Mar 29 00:00:19 acorn gunicorn[8551]:          ^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 00:00:19 acorn gunicorn[8551]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispat>
+Mar 29 00:00:19 acorn gunicorn[8551]:     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any>
+Mar 29 00:00:19 acorn gunicorn[8551]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 00:00:19 acorn gunicorn[8551]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask_login/utils.py", line 284, i>
+Mar 29 00:00:19 acorn gunicorn[8551]:     elif not current_user.is_authenticated:
+Mar 29 00:00:19 acorn gunicorn[8551]:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 00:00:19 acorn gunicorn[8551]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/werkzeug/local.py", line 318, in _>
+Mar 29 00:00:19 acorn gunicorn[8551]:     obj = instance._get_current_object()
+Mar 29 00:00:19 acorn gunicorn[8551]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 00:00:19 acorn gunicorn[8551]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/werkzeug/local.py", line 526, in _>
+Mar 29 00:00:19 acorn gunicorn[8551]:     return get_name(local())
+Mar 29 00:00:19 acorn gunicorn[8551]:                     ^^^^^^^
+Mar 29 00:00:19 acorn gunicorn[8551]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask_login/utils.py", line 25, in>
+Mar 29 00:00:19 acorn gunicorn[8551]:     current_user = LocalProxy(lambda: _get_user())
+Mar 29 00:00:19 acorn gunicorn[8551]:                                       ^^^^^^^^^^^
+Mar 29 00:00:19 acorn gunicorn[8551]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask_login/utils.py", line 370, i>
+Mar 29 00:00:19 acorn gunicorn[8551]:     current_app.login_manager._load_user()
+Mar 29 00:00:19 acorn gunicorn[8551]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask_login/login_manager.py", lin>
+Mar 29 00:00:19 acorn gunicorn[8551]:     raise Exception(
+Mar 29 00:00:19 acorn gunicorn[8551]: Exception: Missing user_loader or request_loader. Refer to http://flask-login.readthedocs.io/#how-i>
+lines 1-50/50 (END)

@@ -1,0 +1,58 @@
+sjones@acorn:~/acorn-app$ sudo journalctl -u acorn.service -n 200
+Mar 28 23:00:45 acorn gunicorn[7826]:     db.create_all()
+Mar 28 23:00:45 acorn gunicorn[7826]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask_sqlalchemy/extension.py", li>
+Mar 28 23:00:45 acorn gunicorn[7826]:     self._call_for_binds(bind_key, "create_all")
+Mar 28 23:00:45 acorn gunicorn[7826]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask_sqlalchemy/extension.py", li>
+Mar 28 23:00:45 acorn gunicorn[7826]:     getattr(metadata, op_name)(bind=engine)
+Mar 28 23:00:45 acorn gunicorn[7826]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/sql/schema.py", line 59>
+Mar 28 23:00:45 acorn gunicorn[7826]:     bind._run_ddl_visitor(
+Mar 28 23:00:45 acorn gunicorn[7826]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3>
+Mar 28 23:00:45 acorn gunicorn[7826]:     conn._run_ddl_visitor(visitorcallable, element, **kwargs)
+Mar 28 23:00:45 acorn gunicorn[7826]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2>
+Mar 28 23:00:45 acorn gunicorn[7826]:     visitorcallable(self.dialect, self, **kwargs).traverse_single(element)
+Mar 28 23:00:45 acorn gunicorn[7826]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/sql/visitors.py", line >
+Mar 28 23:00:45 acorn gunicorn[7826]:     return meth(obj, **kw)
+Mar 28 23:00:45 acorn gunicorn[7826]:            ^^^^^^^^^^^^^^^
+Mar 28 23:00:45 acorn gunicorn[7826]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/sql/ddl.py", line 981, >
+Mar 28 23:00:45 acorn gunicorn[7826]:     self.traverse_single(
+Mar 28 23:00:45 acorn gunicorn[7826]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/sql/visitors.py", line >
+Mar 28 23:00:45 acorn gunicorn[7826]:     return meth(obj, **kw)
+Mar 28 23:00:45 acorn gunicorn[7826]:            ^^^^^^^^^^^^^^^
+Mar 28 23:00:45 acorn gunicorn[7826]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/sql/ddl.py", line 1019,>
+Mar 28 23:00:45 acorn gunicorn[7826]:     )._invoke_with(self.connection)
+Mar 28 23:00:45 acorn gunicorn[7826]:       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 23:00:45 acorn gunicorn[7826]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/sql/ddl.py", line 321, >
+Mar 28 23:00:45 acorn gunicorn[7826]:     return bind.execute(self)
+Mar 28 23:00:45 acorn gunicorn[7826]:            ^^^^^^^^^^^^^^^^^^
+Mar 28 23:00:45 acorn gunicorn[7826]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1>
+Mar 28 23:00:45 acorn gunicorn[7826]:     return meth(
+Mar 28 23:00:45 acorn gunicorn[7826]:            ^^^^^
+Mar 28 23:00:45 acorn gunicorn[7826]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/sql/ddl.py", line 187, >
+Mar 28 23:00:45 acorn gunicorn[7826]:     return connection._execute_ddl(
+Mar 28 23:00:45 acorn gunicorn[7826]:            ^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 23:00:45 acorn gunicorn[7826]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1>
+Mar 28 23:00:45 acorn gunicorn[7826]:     ret = self._execute_context(
+Mar 28 23:00:45 acorn gunicorn[7826]:           ^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 23:00:45 acorn gunicorn[7826]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1>
+Mar 28 23:00:45 acorn gunicorn[7826]:     return self._exec_single_context(
+Mar 28 23:00:45 acorn gunicorn[7826]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 28 23:00:45 acorn gunicorn[7826]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1>
+Mar 28 23:00:45 acorn gunicorn[7826]:     self._handle_dbapi_exception(
+Mar 28 23:00:45 acorn gunicorn[7826]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2>
+Mar 28 23:00:45 acorn gunicorn[7826]:     raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+Mar 28 23:00:45 acorn gunicorn[7826]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1>
+Mar 28 23:00:45 acorn gunicorn[7826]:     self.dialect.do_execute(
+Mar 28 23:00:45 acorn gunicorn[7826]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", lin>
+Mar 28 23:00:45 acorn gunicorn[7826]:     cursor.execute(statement, parameters)
+Mar 28 23:00:45 acorn gunicorn[7826]: sqlalchemy.exc.ProgrammingError: (psycopg2.errors.InsufficientPrivilege) permission denied for sche>
+Mar 28 23:00:45 acorn gunicorn[7826]: LINE 2: CREATE TABLE "user" (
+Mar 28 23:00:45 acorn gunicorn[7826]:                      ^
+Mar 28 23:00:45 acorn gunicorn[7826]: [SQL:
+Mar 28 23:00:45 acorn gunicorn[7826]: CREATE TABLE "user" (
+Mar 28 23:00:45 acorn gunicorn[7826]:         id SERIAL NOT NULL,
+Mar 28 23:00:45 acorn gunicorn[7826]:         username VARCHAR(64) NOT NULL,
+Mar 28 23:00:45 acorn gunicorn[7826]:         email VARCHAR(120) NOT NULL,
+Mar 28 23:00:45 acorn gunicorn[7826]:         password_hash VARCHAR(256) NOT NULL,
+Mar 28 23:00:45 acorn gunicorn[7826]:         is_admin BOOLEAN,
+Mar 28 23:00:45 acorn gunicorn[7826]:         first_name VARCHAR(50),
+lines 1-56
