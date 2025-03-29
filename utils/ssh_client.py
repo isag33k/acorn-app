@@ -138,19 +138,53 @@ class SSHClient:
         try:
             logger.debug(f"Executing command on {self.hostname}: {command}")
             
-            # Execute with extended timeout (120 seconds instead of 30)
-            stdin, stdout, stderr = self.client.exec_command(command, timeout=120)
+            # Execute with extended timeout (180 seconds instead of 120)
+            stdin, stdout, stderr = self.client.exec_command(command, timeout=180)
             
-            # Read the output with timeout tracking
+            # Read the output with timeout tracking and chunking for large outputs
             start_time = time.time()
-            stdout_data = stdout.read().decode('utf-8')
-            stderr_data = stderr.read().decode('utf-8')
+            
+            # Use chunked reading approach for very large outputs
+            buffer_size = 16384  # Larger buffer for faster reading
+            stdout_chunks = []
+            stderr_chunks = []
+            
+            # Set the channel timeout separately (even higher for large outputs)
+            stdout.channel.settimeout(240)  # 4 minutes for channel operations
+            
+            # Read stdout in chunks
+            while not stdout.channel.exit_status_ready() or stdout.channel.recv_ready():
+                if stdout.channel.recv_ready():
+                    chunk = stdout.channel.recv(buffer_size)
+                    if not chunk:
+                        break
+                    stdout_chunks.append(chunk.decode('utf-8', errors='replace'))
+                else:
+                    time.sleep(0.1)  # Small sleep to prevent CPU spinning
+                    
+                # Safety check - abort if taking too long (5 minutes max)
+                if time.time() - start_time > 300:
+                    logger.warning(f"Command execution taking very long (>5 min), forcing completion: {command}")
+                    break
+            
+            # Read stderr if available
+            while stderr.channel.recv_stderr_ready():
+                chunk = stderr.channel.recv_stderr(buffer_size)
+                if not chunk:
+                    break
+                stderr_chunks.append(chunk.decode('utf-8', errors='replace'))
+            
+            # Join all the chunks
+            stdout_data = ''.join(stdout_chunks)
+            stderr_data = ''.join(stderr_chunks)
+            
             elapsed = time.time() - start_time
             
             # Get exit status if available
             exit_status = stdout.channel.recv_exit_status() if stdout.channel.exit_status_ready() else -1
             
             logger.debug(f"Command completed in {elapsed:.2f}s with status {exit_status}")
+            logger.debug(f"Output size: {len(stdout_data)} bytes")
             
             if stderr_data:
                 logger.warning(f"Command error on {self.hostname}: {stderr_data}")
@@ -162,8 +196,8 @@ class SSHClient:
                 return stdout_data
                 
         except socket.timeout:
-            logger.error(f"Command timed out after 120 seconds: {command}")
-            return "ERROR: Command timed out after 120 seconds"
+            logger.error(f"Command timed out after timeout period: {command}")
+            return "ERROR: Command execution timed out. The device may be busy or the command produces too much output."
             
         except paramiko.SSHException as e:
             logger.error(f"SSH error during command execution: {str(e)}")

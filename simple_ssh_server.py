@@ -80,10 +80,27 @@ def handle_command(command):
     command_str = command.decode('utf-8').strip() if isinstance(command, bytes) else command.strip()
     logging.info(f"Processing command: {command_str}")
     
-    # Simulate processing delay for long-running commands
+    # Simulate OLT-like processing delays for different commands
     if any(keyword in command_str for keyword in ["show run", "show configuration", "show tech-support"]):
-        logging.info("Processing long-running command - adding delay")
-        time.sleep(5)  # Simulate longer processing time
+        logging.info("Processing very long-running OLT command - adding significant delay")
+        # Simulate real OLT behavior with a much longer delay
+        time.sleep(15)  # 15 seconds delay to simulate heavy processing
+    elif any(keyword in command_str for keyword in ["show pon", "show olt", "show ont"]):
+        logging.info("Processing OLT-specific command with medium delay")
+        time.sleep(8)  # 8 seconds for medium complexity commands
+    elif "circuit id" in command_str:
+        # Add variable delay based on circuit ID for more realistic simulation
+        circuit_id = command_str.split("TEST-")[1].strip() if "TEST-" in command_str else "unknown"
+        try:
+            # Use circuit number to vary the delay - higher numbers have longer delays
+            circuit_num = int(circuit_id) if circuit_id.isdigit() else 1
+            delay = min(10, 1 + (circuit_num % 10))  # Between 1-10 seconds
+            logging.info(f"Processing circuit command with variable delay: {delay}s")
+            time.sleep(delay)
+        except (ValueError, IndexError):
+            # Default delay if parsing fails
+            logging.info("Processing circuit command with default delay")
+            time.sleep(3)
     
     if command_str.startswith("show version"):
         return """
@@ -227,7 +244,34 @@ def handle_client(client, addr):
         if hasattr(channel, '_exec_command'):
             cmd = getattr(channel, '_exec_command')
             response = handle_command(cmd)
-            channel.send(response.encode('utf-8'))
+            
+            # Detect if this might be a command that requires chunked output (large response)
+            cmd_str = cmd.decode('utf-8').strip() if isinstance(cmd, bytes) else cmd.strip()
+            is_large_output = any(keyword in cmd_str for keyword in ["show run", "show configuration", "show tech-support", "show olt"])
+            
+            if is_large_output and len(response) > 8192:
+                # For large outputs, send in chunks with delays to simulate real device behavior
+                # This helps test the client's ability to handle chunked data
+                logging.info(f"Sending large response ({len(response)} bytes) in chunks")
+                chunk_size = 4096  # 4KB chunks
+                chunks = [response[i:i+chunk_size] for i in range(0, len(response), chunk_size)]
+                
+                for i, chunk in enumerate(chunks):
+                    # Send each chunk with a small delay to simulate network latency
+                    channel.send(chunk.encode('utf-8'))
+                    if i < len(chunks) - 1:  # Don't delay after the last chunk
+                        # Vary the delay slightly to simulate real network behavior
+                        delay = 0.05 + (0.05 * (i % 5))  # 50-250ms delay between chunks
+                        time.sleep(delay)
+                        
+                        # Every 5 chunks, add a longer pause to simulate device processing
+                        if i > 0 and i % 5 == 0:
+                            logging.info(f"Adding processing delay after chunk {i}/{len(chunks)}")
+                            time.sleep(0.5)  # 500ms pause to simulate device processing
+            else:
+                # For smaller outputs, send all at once
+                channel.send(response.encode('utf-8'))
+                
             channel.send_exit_status(0)
             channel.close()
         else:
@@ -242,7 +286,19 @@ def handle_client(client, addr):
                     continue
                 
                 response = handle_command(command)
-                channel.send(response.encode('utf-8'))
+                
+                # Check if this is a large response
+                if len(response) > 4096:
+                    # Send in chunks for large responses
+                    chunk_size = 1024  # 1KB chunks for interactive mode
+                    chunks = [response[i:i+chunk_size] for i in range(0, len(response), chunk_size)]
+                    
+                    for chunk in chunks:
+                        channel.send(chunk.encode('utf-8'))
+                        time.sleep(0.1)  # 100ms delay between chunks
+                else:
+                    channel.send(response.encode('utf-8'))
+                    
                 channel.send(b"mock-router> ")
     
     except Exception as e:
