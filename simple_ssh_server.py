@@ -80,6 +80,11 @@ def handle_command(command):
     command_str = command.decode('utf-8').strip() if isinstance(command, bytes) else command.strip()
     logging.info(f"Processing command: {command_str}")
     
+    # Simulate processing delay for long-running commands
+    if any(keyword in command_str for keyword in ["show run", "show configuration", "show tech-support"]):
+        logging.info("Processing long-running command - adding delay")
+        time.sleep(5)  # Simulate longer processing time
+    
     if command_str.startswith("show version"):
         return """
 ACORN Mock Router v1.0
@@ -135,12 +140,70 @@ Circuit ID: TEST-{circuit_id}
   Last checked: Never
   Notes: This circuit is not fully configured
 """
+    elif command_str.startswith("show run") or command_str.startswith("show configuration"):
+        # Generate a very large configuration output to test timeout handling
+        output = "! ACORN Mock Router Configuration\n"
+        output += "! Generated on 2025-03-28\n"
+        output += "!\n"
+        output += "hostname mock-router\n"
+        output += "!\n"
+        
+        # Add a lot of interface configurations to make the output large
+        for i in range(1, 101):  # 100 interfaces
+            output += f"!\n"
+            output += f"interface GigabitEthernet0/{i}\n"
+            output += f" description Test Interface {i}\n"
+            output += f" ip address 10.0.{i//256}.{i%256} 255.255.255.0\n"
+            output += f" no shutdown\n"
+        
+        # Add a lot of routing configurations
+        output += "!\n! Routing Configuration\n!\n"
+        for i in range(1, 101):  # 100 routes
+            output += f"ip route 192.168.{i}.0 255.255.255.0 10.0.0.1\n"
+        
+        # Add more configuration sections
+        output += "!\n! Access Control Lists\n!\n"
+        for i in range(1, 21):  # 20 ACLs
+            output += f"ip access-list extended ACL-{i}\n"
+            for j in range(1, 11):  # 10 rules per ACL
+                output += f" permit ip host 10.1.{i}.{j} any\n"
+        
+        # SNMP configuration
+        output += "!\n! SNMP Configuration\n!\n"
+        output += "snmp-server community public RO\n"
+        output += "snmp-server community private RW\n"
+        output += "snmp-server location ACORN Test Lab\n"
+        output += "snmp-server contact admin@acorn.example.com\n"
+        
+        # User configuration
+        output += "!\n! User Configuration\n!\n"
+        output += "username admin privilege 15 secret AdminP@ss123\n"
+        output += "username operator privilege 10 secret OperP@ss456\n"
+        
+        # Add circuit configurations
+        output += "!\n! Circuit Configuration\n!\n"
+        for i in range(1, 21):  # 20 circuits
+            output += f"circuit TEST-{i:03d}\n"
+            output += f" description Customer Circuit {i}\n"
+            output += f" bandwidth 100M\n"
+            output += f" interface GigabitEthernet0/{i}\n"
+            output += f" service-level gold\n"
+        
+        # End configuration
+        output += "!\n! End of configuration\n"
+        
+        # Return the very large configuration (should trigger timeout handling if not properly configured)
+        return output
+    
     else:
-        return "Command not recognized. Try 'show version', 'show interface', or 'show circuit id TEST-001'."
+        return "Command not recognized. Try 'show version', 'show interface', 'show run', or 'show circuit id TEST-001'."
 
 def handle_client(client, addr):
     """Handle a client connection"""
     logging.info(f"Connection from {addr}")
+    
+    # Initialize transport to None to ensure it's defined for finally block
+    transport = None
     
     try:
         # Set up the transport
@@ -183,16 +246,22 @@ def handle_client(client, addr):
                 channel.send(b"mock-router> ")
     
     except Exception as e:
-        logging.error(f"Error: {str(e)}")
+        logging.error(f"Error in client handler: {str(e)}")
     finally:
-        try:
-            transport.close()
-        except:
-            pass
+        # Clean up transport
+        if transport:
+            try:
+                transport.close()
+            except Exception as e:
+                logging.error(f"Error closing transport: {str(e)}")
+        
         logging.info(f"Connection from {addr} closed")
 
 def start_server(port=2222, bind='0.0.0.0'):
     """Start the SSH server"""
+    # Initialize socket to None to ensure it's defined for finally block
+    sock = None
+    
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -209,12 +278,15 @@ def start_server(port=2222, bind='0.0.0.0'):
     except KeyboardInterrupt:
         logging.info("Server shutting down")
     except Exception as e:
-        logging.error(f"Error: {str(e)}")
+        logging.error(f"Error in server: {str(e)}")
     finally:
-        try:
-            sock.close()
-        except:
-            pass
+        # Clean up socket
+        if sock:
+            try:
+                sock.close()
+                logging.info("Server socket closed")
+            except Exception as e:
+                logging.error(f"Error closing socket: {str(e)}")
 
 if __name__ == "__main__":
     logging.info("Starting Simple SSH Server")

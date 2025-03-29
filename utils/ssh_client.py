@@ -33,15 +33,15 @@ class SSHClient:
         self.password = password
         self.client = None
         self.connected = False
-        self.reconnect_attempts = 3
-        self.reconnect_delay = 2  # seconds
+        self.reconnect_attempts = 5  # increased from 3 to 5 attempts
+        self.reconnect_delay = 5  # seconds (increased from 2 to 5 seconds)
     
     def check_socket(self):
         """Check if the SSH port is open before attempting to connect"""
         try:
             logger.debug(f"Testing socket connection to {self.hostname}:{self.port}")
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(5)
+            sock.settimeout(15)  # increased from 5 to 15 seconds
             result = sock.connect_ex((self.hostname, self.port))
             sock.close()
             
@@ -86,18 +86,18 @@ class SSHClient:
                     port=self.port,
                     username=self.username,
                     password=self.password,
-                    timeout=10,  # shorter timeout to fail faster
+                    timeout=20,  # increased from 10 to 20 seconds
                     allow_agent=False,
                     look_for_keys=False,
-                    banner_timeout=10,
-                    auth_timeout=10,
+                    banner_timeout=20,  # increased from 10 to 20 seconds
+                    auth_timeout=20,  # increased from 10 to 20 seconds
                     disabled_algorithms=dict(pubkeys=["rsa-sha2-256", "rsa-sha2-512"])
                 )
                 
                 # Test the connection with a simple command
                 transport = self.client.get_transport()
                 if transport:
-                    transport.set_keepalive(30)  # 30 second keepalive
+                    transport.set_keepalive(15)  # 15 second keepalive (reduced from 30 for more frequent keepalives)
                 
                 logger.info(f"Successfully connected to {self.hostname}")
                 self.connected = True
@@ -128,7 +128,7 @@ class SSHClient:
                 time.sleep(self.reconnect_delay)
         
         # If we get here, all attempts failed
-        raise ConnectionError(f"Failed to connect to {self.hostname} after {self.reconnect_attempts} attempts")
+        raise ConnectionError(f"Failed to connect to {self.hostname} on port {self.port} after {self.reconnect_attempts} attempts. Please check network connectivity and SSH server availability.")
     
     def execute_command(self, command):
         """Execute a command on the connected equipment with timeout handling"""
@@ -138,8 +138,8 @@ class SSHClient:
         try:
             logger.debug(f"Executing command on {self.hostname}: {command}")
             
-            # Execute with timeout
-            stdin, stdout, stderr = self.client.exec_command(command, timeout=30)
+            # Execute with extended timeout (120 seconds instead of 30)
+            stdin, stdout, stderr = self.client.exec_command(command, timeout=120)
             
             # Read the output with timeout tracking
             start_time = time.time()
@@ -162,8 +162,8 @@ class SSHClient:
                 return stdout_data
                 
         except socket.timeout:
-            logger.error(f"Command timed out after 30 seconds: {command}")
-            return "ERROR: Command timed out"
+            logger.error(f"Command timed out after 120 seconds: {command}")
+            return "ERROR: Command timed out after 120 seconds"
             
         except paramiko.SSHException as e:
             logger.error(f"SSH error during command execution: {str(e)}")
