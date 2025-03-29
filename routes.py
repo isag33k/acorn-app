@@ -653,15 +653,26 @@ def submit_alert():
             # Connect to the equipment
             ssh_client.connect()
             
-            # Execute each command and collect outputs
+            # Execute each command and collect outputs - with truncation for very large outputs
             for cmd in commands_list:
-                output = ssh_client.execute_command(cmd)
+                success, output = ssh_client.execute_command(cmd)
+                
+                # Handle extremely large outputs
+                if success and isinstance(output, str) and len(output) > 500000:  # ~500KB limit
+                    logger.warning(f"Very large output ({len(output)} bytes) from {equipment.name}. Truncating for display.")
+                    truncated_output = output[:250000] + "\n\n[... Output truncated due to size (showing first 250KB) ...]\n\n" + output[-250000:]
+                    output_to_display = truncated_output
+                    status = 'success'
+                else:
+                    output_to_display = output
+                    status = 'success' if success else 'error'
                 
                 results.append({
                     'equipment_name': equipment.name,
                     'command': cmd,
-                    'output': output,
-                    'status': 'success'
+                    'output': output_to_display,
+                    'status': status,
+                    'truncated': len(output) > 500000 if isinstance(output, str) else False
                 })
             
             # Disconnect after all commands are executed
@@ -1201,14 +1212,14 @@ def test_ssh_connection():
             connection_time = int((time.time() - start_time) * 1000)  # Convert to ms
             
             # Execute command
-            output = ssh_client.execute_command(command)
+            success, output = ssh_client.execute_command(command)
             
             # Disconnect
             ssh_client.disconnect()
             
             # Set results
             result = output
-            success = True
+            # success variable is already set by the execute_command return value
             
         except Exception as e:
             logger.error(f"SSH test error: {str(e)}")

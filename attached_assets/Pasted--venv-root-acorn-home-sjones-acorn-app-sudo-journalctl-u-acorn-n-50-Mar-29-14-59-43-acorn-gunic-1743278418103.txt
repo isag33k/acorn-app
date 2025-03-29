@@ -1,0 +1,52 @@
+(venv) root@acorn:/home/sjones/acorn-app# sudo journalctl -u acorn -n 50
+Mar 29 14:59:43 acorn gunicorn[12596]: DEBUG:ssh_client:Received chunk 275: 1957 bytes
+Mar 29 14:59:43 acorn gunicorn[12596]: DEBUG:ssh_client:Received chunk 276: 1793 bytes
+Mar 29 14:59:43 acorn gunicorn[12596]: DEBUG:ssh_client:Received chunk 277: 2090 bytes
+Mar 29 14:59:43 acorn gunicorn[12596]: DEBUG:ssh_client:Received chunk 278: 2062 bytes
+Mar 29 14:59:43 acorn gunicorn[12596]: DEBUG:ssh_client:Received chunk 279: 2007 bytes
+Mar 29 14:59:43 acorn gunicorn[12596]: DEBUG:ssh_client:Received chunk 280: 2604 bytes
+Mar 29 14:59:44 acorn gunicorn[12596]: DEBUG:ssh_client:Received chunk 281: 1963 bytes
+Mar 29 14:59:44 acorn gunicorn[12596]: DEBUG:ssh_client:Received chunk 282: 2007 bytes
+Mar 29 14:59:44 acorn gunicorn[12596]: DEBUG:ssh_client:Received chunk 283: 2062 bytes
+Mar 29 14:59:44 acorn gunicorn[12596]: DEBUG:ssh_client:Received chunk 284: 2106 bytes
+Mar 29 14:59:44 acorn gunicorn[12596]: DEBUG:ssh_client:Received chunk 285: 2024 bytes
+Mar 29 14:59:44 acorn gunicorn[12596]: DEBUG:ssh_client:Received chunk 286: 1940 bytes
+Mar 29 14:59:44 acorn gunicorn[12596]: DEBUG:ssh_client:Received chunk 287: 2052 bytes
+Mar 29 14:59:44 acorn gunicorn[12596]: DEBUG:ssh_client:Received chunk 288: 2106 bytes
+Mar 29 14:59:44 acorn gunicorn[12579]: [2025-03-29 14:59:44 -0500] [12579] [CRITICAL] WORKER TIMEOUT (pid:12596)
+Mar 29 14:59:44 acorn gunicorn[12596]: DEBUG:paramiko.transport:[chan 0] EOF sent (0)
+Mar 29 14:59:44 acorn gunicorn[12596]: [2025-03-29 14:59:44 -0500] [12596] [ERROR] Error handling request /submit_alert
+Mar 29 14:59:44 acorn gunicorn[12596]: Traceback (most recent call last):
+Mar 29 14:59:44 acorn gunicorn[12596]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/workers/sync.py", line 1>
+Mar 29 14:59:44 acorn gunicorn[12596]:     self.handle_request(listener, req, client, addr)
+Mar 29 14:59:44 acorn gunicorn[12596]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/workers/sync.py", line 1>
+Mar 29 14:59:44 acorn gunicorn[12596]:     respiter = self.wsgi(environ, resp.start_response)
+Mar 29 14:59:44 acorn gunicorn[12596]:                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 14:59:44 acorn gunicorn[12596]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 1536, in __ca>
+Mar 29 14:59:44 acorn gunicorn[12596]:     return self.wsgi_app(environ, start_response)
+Mar 29 14:59:44 acorn gunicorn[12596]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 14:59:44 acorn gunicorn[12596]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi>
+Mar 29 14:59:44 acorn gunicorn[12596]:     response = self.full_dispatch_request()
+Mar 29 14:59:44 acorn gunicorn[12596]:                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 14:59:44 acorn gunicorn[12596]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_>
+Mar 29 14:59:44 acorn gunicorn[12596]:     rv = self.dispatch_request()
+Mar 29 14:59:44 acorn gunicorn[12596]:          ^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 14:59:44 acorn gunicorn[12596]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispa>
+Mar 29 14:59:44 acorn gunicorn[12596]:     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-an>
+Mar 29 14:59:44 acorn gunicorn[12596]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 14:59:44 acorn gunicorn[12596]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask_login/utils.py", line 290, >
+Mar 29 14:59:44 acorn gunicorn[12596]:     return current_app.ensure_sync(func)(*args, **kwargs)
+Mar 29 14:59:44 acorn gunicorn[12596]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 14:59:44 acorn gunicorn[12596]:   File "/home/sjones/acorn-app/routes.py", line 658, in submit_alert
+Mar 29 14:59:44 acorn gunicorn[12596]:     output = ssh_client.execute_command(cmd)
+Mar 29 14:59:44 acorn gunicorn[12596]:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 29 14:59:44 acorn gunicorn[12596]:   File "/home/sjones/acorn-app/utils/ssh_client.py", line 199, in execute_command
+Mar 29 14:59:44 acorn gunicorn[12596]:     time.sleep(0.1)
+Mar 29 14:59:44 acorn gunicorn[12596]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/gunicorn/workers/base.py", line 2>
+Mar 29 14:59:44 acorn gunicorn[12596]:     sys.exit(1)
+Mar 29 14:59:44 acorn gunicorn[12596]: SystemExit: 1
+Mar 29 14:59:44 acorn gunicorn[12596]: [2025-03-29 14:59:44 -0500] [12596] [INFO] Worker exiting (pid: 12596)
+Mar 29 14:59:44 acorn gunicorn[12596]: Database tables created successfully
+Mar 29 14:59:44 acorn gunicorn[12596]: Routes imported successfully
+Mar 29 14:59:45 acorn gunicorn[12607]: [2025-03-29 14:59:45 -0500] [12607] [INFO] Booting worker with pid: 12607
+lines 1-50/50 (END)

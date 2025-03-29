@@ -131,7 +131,11 @@ class SSHClient:
         raise ConnectionError(f"Failed to connect to {self.hostname} on port {self.port} after {self.reconnect_attempts} attempts. Please check network connectivity and SSH server availability.")
     
     def execute_command(self, command):
-        """Execute a command on the connected equipment with timeout handling"""
+        """Execute a command on the connected equipment with timeout handling
+        
+        Returns:
+            tuple: (success, output) where success is a boolean and output is the command output
+        """
         if not self.connected or not self.client:
             raise RuntimeError("Not connected. Call connect() first.")
         
@@ -145,9 +149,10 @@ class SSHClient:
             start_time = time.time()
             
             # Use chunked reading approach for very large outputs
-            buffer_size = 16384  # Larger buffer for faster reading
+            buffer_size = 32768  # Doubled buffer for faster reading (32KB chunks)
             stdout_chunks = []
             stderr_chunks = []
+            chunk_count = 0
             
             # Set the channel timeout separately (even higher for large outputs)
             stdout.channel.settimeout(240)  # 4 minutes for channel operations
@@ -159,6 +164,7 @@ class SSHClient:
                     if not chunk:
                         break
                     stdout_chunks.append(chunk.decode('utf-8', errors='replace'))
+                    chunk_count += 1
                 else:
                     time.sleep(0.1)  # Small sleep to prevent CPU spinning
                     
@@ -184,31 +190,31 @@ class SSHClient:
             exit_status = stdout.channel.recv_exit_status() if stdout.channel.exit_status_ready() else -1
             
             logger.debug(f"Command completed in {elapsed:.2f}s with status {exit_status}")
-            logger.debug(f"Output size: {len(stdout_data)} bytes")
+            logger.debug(f"Output size: {len(stdout_data)} bytes in {chunk_count} chunks")
             
             if stderr_data:
                 logger.warning(f"Command error on {self.hostname}: {stderr_data}")
             
-            # Return formatted output
+            # Return success=True and formatted output
             if stderr_data:
-                return f"OUTPUT:\n{stdout_data}\n\nERROR:\n{stderr_data}"
+                return (True, f"OUTPUT:\n{stdout_data}\n\nERROR:\n{stderr_data}")
             else:
-                return stdout_data
+                return (True, stdout_data)
                 
         except socket.timeout:
             logger.error(f"Command timed out after timeout period: {command}")
-            return "ERROR: Command execution timed out. The device may be busy or the command produces too much output."
+            return (False, "ERROR: Command execution timed out. The device may be busy or the command produces too much output.")
             
         except paramiko.SSHException as e:
             logger.error(f"SSH error during command execution: {str(e)}")
             # Connection may be broken, mark as disconnected
             self.connected = False
-            return f"SSH ERROR: {str(e)}"
+            return (False, f"SSH ERROR: {str(e)}")
             
         except Exception as e:
             logger.error(f"Error executing command: {str(e)}")
             logger.error(traceback.format_exc())
-            return f"ERROR: {str(e)}"
+            return (False, f"ERROR: {str(e)}")
     
     def disconnect(self):
         """Close the SSH connection"""
