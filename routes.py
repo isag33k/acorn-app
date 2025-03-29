@@ -1104,7 +1104,7 @@ def view_contact(id):
 @app.route('/ssh_test', methods=['GET', 'POST'])
 @login_required
 def test_ssh_connection():
-    """Test SSH connection to the mock server"""
+    """Test SSH connection to a real SSH server"""
     # Create a form for CSRF protection
     form = FlaskForm()
     result = None
@@ -1112,23 +1112,34 @@ def test_ssh_connection():
     connection_time = None
     error = None
     
-    if request.method == 'POST' and form.validate_on_submit():
-        command = request.form.get('command', 'show version').strip()
-        
+    # Get parameters from previous form submission if available
+    hostname = request.form.get('hostname', '')
+    port = request.form.get('port', '22')
+    username = request.form.get('username', '')
+    password = request.form.get('password', '')
+    command = request.form.get('command', 'show version')
+    
+    if request.method == 'POST' and form.validate_on_submit() and hostname and username and password:
         try:
             # Import the SSH client from utils
             from utils.ssh_client import SSHClient
             import time
             
+            # Ensure port is an integer
+            try:
+                port = int(port)
+            except ValueError:
+                port = 22
+                
             # Measure connection time
             start_time = time.time()
             
-            # Connect to mock SSH server
+            # Connect to the specified SSH server
             ssh_client = SSHClient(
-                hostname="127.0.0.1",
-                port=2222,
-                username="test",
-                password="Ac0rN$"
+                hostname=hostname,
+                port=port,
+                username=username,
+                password=password
             )
             
             # Connect
@@ -1155,5 +1166,17 @@ def test_ssh_connection():
             error = str(e)
             success = False
     
-    return render_template('ssh_test.html', form=form, result=result, 
-                          success=success, connection_time=connection_time, error=error)
+    # Pass all form values back to template
+    return render_template(
+        'ssh_test.html', 
+        form=form, 
+        result=result, 
+        success=success, 
+        connection_time=connection_time, 
+        error=error,
+        hostname=hostname,
+        port=port,
+        username=username,
+        password=password,
+        command=command
+    )

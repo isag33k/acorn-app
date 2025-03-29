@@ -17,32 +17,42 @@
                         {{ form.hidden_tag() }}
                         
                         <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i> 
-                            This page allows you to test the SSH connectivity to the mock server.
-                            It will verify that the application can connect and execute commands.
+                            <i class="fas fa-info-circle"></i> 
+                            This page allows you to test SSH connectivity to network equipment.
+                            You can verify that the application can connect and execute commands.
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label">Target Server</label>
-                            <input type="text" class="form-control" value="localhost:2222 (Mock SSH Server)" disabled>
-                            <div class="form-text">The test will use the mock SSH server running on port 2222</div>
+                            <label class="form-label">Hostname or IP Address</label>
+                            <input type="text" name="hostname" class="form-control" value="{{ hostname|default('') }}" required>
+                            <div class="form-text">The hostname or IP address of the SSH server</div>
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label">Test Credentials</label>
-                            <input type="text" class="form-control" value="test / Ac0rN$" disabled>
-                            <div class="form-text">The test uses hardcoded credentials for the mock server</div>
+                            <label class="form-label">Port</label>
+                            <input type="number" name="port" class="form-control" value="{{ port|default('22') }}" min="1" max="65535">
+                            <div class="form-text">The SSH port (default: 22)</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" name="username" class="form-control" value="{{ username|default('') }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" name="password" class="form-control" value="{{ password|default('') }}" required>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label">Test Command</label>
-                            <select name="command" class="form-select">
-                                <option value="show version">show version</option>
-                                <option value="show interface ge-0/0/0">show interface ge-0/0/0</option>
-                                <option value="show circuit id TEST-001">show circuit id TEST-001</option>
-                                <option value="show circuit id TEST-002">show circuit id TEST-002</option>
-                                <option value="show circuit id TEST-999">show circuit id TEST-999</option>
-                            </select>
+                            <label class="form-label">Command</label>
+                            <input type="text" name="command" class="form-control" value="{{ command|default('show version') }}">
+                            <div class="form-text">The command to execute on the remote system</div>
                         </div>
                         
                         <button type="submit" class="btn btn-primary">Run Test</button>
@@ -84,16 +94,17 @@
                 <div class="card-body">
                     <p>If you encounter issues with the SSH connection, try the following:</p>
                     <ol>
-                        <li>Ensure the SSH server is running (check the "SSH Server" workflow)</li>
-                        <li>Verify that port 2222 is open and accessible</li>
-                        <li>Check that the mock SSH server has the correct credentials</li>
+                        <li>Verify that the hostname/IP address is correct and reachable</li>
+                        <li>Ensure the SSH port is open and not blocked by firewalls</li>
+                        <li>Check that your credentials are correct for the target system</li>
                         <li>Review the logs for detailed error messages</li>
                     </ol>
                     
                     <div class="alert alert-warning">
-                        <i class="bi bi-exclamation-triangle"></i>
-                        Remember that in a production environment, you'll need to use real network equipment 
-                        credentials and IP addresses instead of the mock server.
+                        <i class="fas fa-exclamation-triangle"></i>
+                        For security reasons, we recommend using equipment-specific credentials 
+                        configured in the Equipment Management section rather than entering 
+                        credentials directly in this form.
                     </div>
                 </div>
             </div>
