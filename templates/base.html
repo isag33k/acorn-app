@@ -90,7 +90,7 @@
                                     <span class="badge bg-primary ms-1">Admin</span>
                                 {% endif %}
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <ul class="dropdown-menu dropdown-menu-end" style="z-index: 9999 !important;" aria-labelledby="userDropdown">
                                 <li><a class="dropdown-item" href="{{ url_for('user_profile') }}">
                                     <i class="fas fa-user me-2"></i> My Profile
                                 </a></li>
@@ -173,5 +173,37 @@
     
     <!-- Page-specific scripts -->
     {% block scripts %}{% endblock %}
+    
+    <!-- Dropdown Fix Script -->
+    <script>
+        // Ensure this script runs after page load
+        window.addEventListener('load', function() {
+            // Fix for user dropdown menu
+            const userDropdown = document.getElementById('userDropdown');
+            if (userDropdown) {
+                // When the dropdown toggle is clicked
+                userDropdown.addEventListener('click', function() {
+                    // Small delay to ensure Bootstrap has created the dropdown
+                    setTimeout(function() {
+                        // Find all dropdown menus in the document
+                        document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
+                            // Apply the highest z-index possible and force visibility
+                            menu.style.zIndex = "9999";
+                            menu.style.position = "absolute";
+                            menu.style.display = "block";
+                            
+                            // Make sure it's in the foreground
+                            document.querySelector('body').appendChild(menu);
+                        });
+                        
+                        // Lower z-index of all cards to ensure they're behind dropdowns
+                        document.querySelectorAll('.card, .container, main, .table-responsive').forEach(function(element) {
+                            element.style.zIndex = "1";
+                        });
+                    }, 10);
+                });
+            }
+        });
+    </script>
 </body>
 </html>

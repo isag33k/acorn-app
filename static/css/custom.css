@@ -161,15 +161,31 @@
 
 /* Fix for dropdown menu layering */
 .dropdown-menu {
-    z-index: 1060 !important; /* Ensure dropdown appears above all other elements */
+    z-index: 9999 !important; /* Ensure dropdown appears above all other elements */
 }
 
 /* Fix for user dropdown */
 .navbar .nav-item.dropdown {
-    position: static;
+    position: relative !important; /* Force relative positioning */
 }
 
-.navbar .dropdown-menu {
-    position: absolute;
-    right: 0;
+.navbar .dropdown-menu-end {
+    position: absolute !important;
+    right: 0 !important;
+    top: 100% !important;
+    float: none !important;
+    margin: 0 !important;
+    transform: none !important;
+}
+
+/* Ensure all page content has lower z-index than navbar */
+.card, .container, main, .table-responsive {
+    position: relative;
+    z-index: 1 !important; /* Lower z-index than navbar */
+}
+
+/* Force navbar to front */
+.navbar {
+    position: relative;
+    z-index: 1070 !important; /* Higher than other elements */
 }

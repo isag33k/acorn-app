@@ -58,6 +58,32 @@ function toggleEditCredentialFields(itemId) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM fully loaded - initializing tabs");
     
+    // Fix for dropdown menu z-index issues
+    const userDropdown = document.getElementById('userDropdown');
+    if (userDropdown) {
+        userDropdown.addEventListener('click', function() {
+            // When dropdown is clicked, make sure it appears in front
+            setTimeout(function() {
+                const dropdownMenu = document.querySelector('.dropdown-menu-end');
+                if (dropdownMenu) {
+                    // Apply inline styles to ensure visibility
+                    dropdownMenu.style.zIndex = "9999";
+                    dropdownMenu.style.position = "absolute";
+                    
+                    // Force browser to redraw the element
+                    dropdownMenu.style.display = 'none';
+                    void dropdownMenu.offsetHeight;
+                    dropdownMenu.style.display = 'block';
+                    
+                    // Set card z-indices lower
+                    document.querySelectorAll('.card').forEach(function(card) {
+                        card.style.zIndex = "1";
+                    });
+                }
+            }, 10);
+        });
+    }
+    
     // Initialize credential fields on page load
     const credentialTypeSelect = document.getElementById('credential_type');
     if (credentialTypeSelect) {
