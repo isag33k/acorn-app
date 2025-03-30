@@ -172,6 +172,18 @@ class SSHClient:
                     
                     # Store the handler for use by transport after connection
                     self._interactive_handler = interactive_handler
+                    
+                    # Special handling for known OLT devices that require keyboard-interactive auth
+                    # Check if this is one of the known OLT devices by IP address
+                    olt_devices = ['10.160.15.4', '10.160.15.5', '10.160.15.6']
+                    if self.hostname in olt_devices:
+                        logger.info(f"Detected OLT device {self.hostname}, using specialized authentication approach")
+                        
+                        # For OLT devices, skip the standard connect and use transport directly
+                        # with keyboard-interactive from the beginning
+                        self._connect_with_keyboard_interactive()
+                        return True
+                        
                 else:
                     # If no explicit auth method provided, try to use SSH agent or default keys
                     logger.info("No explicit credentials provided, trying SSH agent and default keys")
@@ -212,6 +224,16 @@ class SSHClient:
                 # Show full stack trace for SSH exceptions
                 logger.error(traceback.format_exc())
                 
+                # For authentication failures with password, try keyboard-interactive as a fallback
+                if "Authentication failed" in str(e) and self.password:
+                    logger.info(f"Password authentication failed, attempting keyboard-interactive auth...")
+                    try:
+                        success = self._connect_with_keyboard_interactive()
+                        if success:
+                            return True
+                    except Exception as ki_e:
+                        logger.error(f"Keyboard-interactive authentication also failed: {str(ki_e)}")
+                
             except socket.error as e:
                 logger.error(f"Socket error on attempt {attempt}: {str(e)}")
                 
@@ -231,6 +253,56 @@ class SSHClient:
         
         # If we get here, all attempts failed
         raise ConnectionError(f"Failed to connect to {self.hostname} on port {self.port} after {self.reconnect_attempts} attempts. Please check network connectivity and SSH server availability.")
+        
+    def _connect_with_keyboard_interactive(self):
+        """Connect using keyboard-interactive authentication directly
+        This method is specifically designed for OLT devices that require keyboard-interactive auth
+        """
+        logger.info(f"Trying direct keyboard-interactive authentication for {self.hostname}")
+        
+        try:
+            # Create a socket to the server
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(30)  # 30-second timeout
+            sock.connect((self.hostname, self.port))
+            
+            # Create transport directly
+            transport = paramiko.Transport(sock)
+            transport.start_client()
+            
+            # Function to handle interactive authentication prompts
+            def handler(title, instructions, prompt_list):
+                logger.debug(f"Interactive auth: {title}, {instructions}")
+                responses = []
+                for prompt, echo in prompt_list:
+                    logger.debug(f"Prompt: {prompt}, echo: {echo}")
+                    responses.append(self.password)
+                return responses
+            
+            # Try keyboard-interactive authentication
+            transport.auth_interactive(self.username, handler)
+            
+            if transport.is_authenticated():
+                logger.info(f"Keyboard-interactive authentication succeeded for {self.hostname}")
+                
+                # Create a client and assign the authenticated transport
+                self.client = paramiko.SSHClient()
+                self.client._transport = transport
+                self.connected = True
+                
+                # Set keepalive
+                transport.set_keepalive(15)
+                
+                return True
+            else:
+                logger.error(f"Keyboard-interactive authentication failed for {self.hostname}")
+                transport.close()
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error during keyboard-interactive authentication: {str(e)}")
+            logger.error(traceback.format_exc())
+            return False
     
     def execute_command(self, command):
         """Execute a command on the connected equipment with timeout handling
