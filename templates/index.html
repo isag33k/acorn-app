@@ -88,14 +88,14 @@
                         <div class="me-2"><span class="badge bg-info">TACACS</span></div>
                         <div>
                             <div>Equipment configured with TACACS authentication uses your personal network credentials.</div>
-                            <small class="text-muted">Set up your global TACACS credentials once in <a href="{{ url_for('user_credentials') }}" class="alert-link">My Credentials</a> section to use them with all TACACS-enabled devices.</small>
+                            <small class="text-muted">Set up your global TACACS credentials once in <a href="{{ url_for('user_credentials') }}" class="alert-link text-success fw-bold">My Credentials</a> section to use them with all TACACS-enabled devices.</small>
                         </div>
                     </div>
                     <div class="d-flex mb-2">
                         <div class="me-2"><span class="badge bg-dark">Custom</span></div>
                         <div>
                             <div>Standard equipment uses the credentials configured at the device level.</div>
-                            <small class="text-muted">You can also set personal override credentials for each device in your credentials section.</small>
+                            <small class="text-muted">You can also set personal override credentials for each device in your <a href="{{ url_for('user_credentials') }}" class="alert-link text-success fw-bold">credentials section</a>.</small>
                         </div>
                     </div>
                     <div class="mt-3">
