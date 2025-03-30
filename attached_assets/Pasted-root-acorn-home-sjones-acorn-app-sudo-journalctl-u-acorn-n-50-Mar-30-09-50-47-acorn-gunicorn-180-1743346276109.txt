@@ -1,0 +1,51 @@
+root@acorn:/home/sjones/acorn-app# sudo journalctl -u acorn -n 50
+Mar 30 09:50:47 acorn gunicorn[18059]: DEBUG:paramiko.transport:Strict kex mode: True
+Mar 30 09:50:47 acorn gunicorn[18059]: DEBUG:paramiko.transport:Kex: ecdh-sha2-nistp256
+Mar 30 09:50:47 acorn gunicorn[18059]: DEBUG:paramiko.transport:HostKey: ecdsa-sha2-nistp256
+Mar 30 09:50:47 acorn gunicorn[18059]: DEBUG:paramiko.transport:Cipher: aes128-ctr
+Mar 30 09:50:47 acorn gunicorn[18059]: DEBUG:paramiko.transport:MAC: hmac-sha2-256
+Mar 30 09:50:47 acorn gunicorn[18059]: DEBUG:paramiko.transport:Compression: none
+Mar 30 09:50:47 acorn gunicorn[18059]: DEBUG:paramiko.transport:=== End of kex handshake ===
+Mar 30 09:50:47 acorn gunicorn[18059]: DEBUG:paramiko.transport:Resetting outbound seqno after NEWKEYS due to strict mode
+Mar 30 09:50:47 acorn gunicorn[18059]: DEBUG:paramiko.transport:kex engine KexNistp256 specified hash_algo <built-in function openssl_sha256>
+Mar 30 09:50:47 acorn gunicorn[18059]: DEBUG:paramiko.transport:Switch to new keys ...
+Mar 30 09:50:47 acorn gunicorn[18059]: DEBUG:paramiko.transport:Resetting inbound seqno after NEWKEYS due to strict mode
+Mar 30 09:50:47 acorn gunicorn[18059]: DEBUG:paramiko.transport:Got EXT_INFO: {'server-sig-algs': b'ssh-ed25519,sk-ssh-ed25519@openssh.com,ssh-rsa,rsa-sha2-256,rsa-sha2-512,ssh-dss,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-s>
+Mar 30 09:50:47 acorn gunicorn[18059]: DEBUG:paramiko.transport:Adding ecdsa-sha2-nistp256 host key for 10.160.15.4: b'abe5abcb3b263020a9a8b5fa9925d67e'
+Mar 30 09:50:47 acorn gunicorn[18059]: DEBUG:paramiko.transport:userauth is OK
+Mar 30 09:50:49 acorn gunicorn[18059]: INFO:paramiko.transport:Authentication (password) failed.
+Mar 30 09:50:49 acorn gunicorn[18059]: ERROR - SSH error on attempt 5: Authentication failed.
+Mar 30 09:50:49 acorn gunicorn[18059]: ERROR:utils.ssh_client:SSH error on attempt 5: Authentication failed.
+Mar 30 09:50:49 acorn gunicorn[18059]: ERROR - Traceback (most recent call last):
+Mar 30 09:50:49 acorn gunicorn[18059]:   File "/home/sjones/acorn-app/utils/ssh_client.py", line 182, in connect
+Mar 30 09:50:49 acorn gunicorn[18059]:     self.client.connect(**connect_params)
+Mar 30 09:50:49 acorn gunicorn[18059]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/client.py", line 485, in connect
+Mar 30 09:50:49 acorn gunicorn[18059]:     self._auth(
+Mar 30 09:50:49 acorn gunicorn[18059]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/client.py", line 818, in _auth
+Mar 30 09:50:49 acorn gunicorn[18059]:     raise saved_exception
+Mar 30 09:50:49 acorn gunicorn[18059]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/client.py", line 805, in _auth
+Mar 30 09:50:49 acorn gunicorn[18059]:     self._transport.auth_password(username, password)
+Mar 30 09:50:49 acorn gunicorn[18059]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/transport.py", line 1638, in auth_password
+Mar 30 09:50:49 acorn gunicorn[18059]:     return self.auth_handler.wait_for_response(my_event)
+Mar 30 09:50:49 acorn gunicorn[18059]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 09:50:49 acorn gunicorn[18059]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/auth_handler.py", line 263, in wait_for_response
+Mar 30 09:50:49 acorn gunicorn[18059]:     raise e
+Mar 30 09:50:49 acorn gunicorn[18059]: paramiko.ssh_exception.AuthenticationException: Authentication failed.
+Mar 30 09:50:49 acorn gunicorn[18059]: ERROR:utils.ssh_client:Traceback (most recent call last):
+Mar 30 09:50:49 acorn gunicorn[18059]:   File "/home/sjones/acorn-app/utils/ssh_client.py", line 182, in connect
+Mar 30 09:50:49 acorn gunicorn[18059]:     self.client.connect(**connect_params)
+Mar 30 09:50:49 acorn gunicorn[18059]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/client.py", line 485, in connect
+Mar 30 09:50:49 acorn gunicorn[18059]:     self._auth(
+Mar 30 09:50:49 acorn gunicorn[18059]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/client.py", line 818, in _auth
+Mar 30 09:50:49 acorn gunicorn[18059]:     raise saved_exception
+Mar 30 09:50:49 acorn gunicorn[18059]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/client.py", line 805, in _auth
+Mar 30 09:50:49 acorn gunicorn[18059]:     self._transport.auth_password(username, password)
+Mar 30 09:50:49 acorn gunicorn[18059]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/transport.py", line 1638, in auth_password
+Mar 30 09:50:49 acorn gunicorn[18059]:     return self.auth_handler.wait_for_response(my_event)
+Mar 30 09:50:49 acorn gunicorn[18059]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 09:50:49 acorn gunicorn[18059]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/auth_handler.py", line 263, in wait_for_response
+Mar 30 09:50:49 acorn gunicorn[18059]:     raise e
+Mar 30 09:50:49 acorn gunicorn[18059]: paramiko.ssh_exception.AuthenticationException: Authentication failed.
+Mar 30 09:50:49 acorn gunicorn[18059]: ERROR:routes:Command error for SHA1-FL-OLT-1, cmd: sh run: Failed to connect to 10.160.15.4 on port 22 after 5 attempts. Please check network connectivity and SSH server availability.
+Mar 30 09:50:49 acorn gunicorn[18059]: INFO:routes:Total execution time for circuit SHA1-FL-OLT-1: 30164ms
+Mar 30 09:50:49 acorn gunicorn[18059]: DEBUG:paramiko.transport:EOF in transport thread
