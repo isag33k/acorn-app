@@ -66,9 +66,18 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(function() {
                 const dropdownMenu = document.querySelector('.dropdown-menu-end');
                 if (dropdownMenu) {
-                    // Apply inline styles to ensure visibility
+                    // Get the position of the user dropdown button
+                    const rect = userDropdown.getBoundingClientRect();
+                    
+                    // Calculate the right position (align with the right edge of the dropdown toggle)
+                    const rightPosition = window.innerWidth - rect.right;
+                    
+                    // Apply the highest z-index and correct positioning
                     dropdownMenu.style.zIndex = "9999";
-                    dropdownMenu.style.position = "absolute";
+                    dropdownMenu.style.position = "fixed";
+                    dropdownMenu.style.top = rect.bottom + 'px';
+                    dropdownMenu.style.right = rightPosition + 'px';
+                    dropdownMenu.style.left = 'auto';
                     
                     // Force browser to redraw the element
                     dropdownMenu.style.display = 'none';
@@ -76,8 +85,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     dropdownMenu.style.display = 'block';
                     
                     // Set card z-indices lower
-                    document.querySelectorAll('.card').forEach(function(card) {
-                        card.style.zIndex = "1";
+                    document.querySelectorAll('.card, .container, main, .table-responsive').forEach(function(element) {
+                        element.style.zIndex = "1";
                     });
                 }
             }, 10);

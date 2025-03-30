@@ -185,21 +185,27 @@
                 userDropdown.addEventListener('click', function() {
                     // Small delay to ensure Bootstrap has created the dropdown
                     setTimeout(function() {
-                        // Find all dropdown menus in the document
-                        document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
-                            // Apply the highest z-index possible and force visibility
-                            menu.style.zIndex = "9999";
-                            menu.style.position = "absolute";
-                            menu.style.display = "block";
+                        // Target only the user dropdown menu
+                        const dropdownMenu = document.querySelector('.dropdown-menu-end');
+                        if (dropdownMenu) {
+                            // Get the position of the user dropdown button
+                            const rect = userDropdown.getBoundingClientRect();
                             
-                            // Make sure it's in the foreground
-                            document.querySelector('body').appendChild(menu);
-                        });
-                        
-                        // Lower z-index of all cards to ensure they're behind dropdowns
-                        document.querySelectorAll('.card, .container, main, .table-responsive').forEach(function(element) {
-                            element.style.zIndex = "1";
-                        });
+                            // Calculate the right position (align with the right edge of the dropdown toggle)
+                            const rightPosition = window.innerWidth - rect.right;
+                            
+                            // Apply the highest z-index and correct positioning
+                            dropdownMenu.style.zIndex = "9999";
+                            dropdownMenu.style.position = "fixed";
+                            dropdownMenu.style.top = rect.bottom + 'px';
+                            dropdownMenu.style.right = rightPosition + 'px';
+                            dropdownMenu.style.left = 'auto';
+                            
+                            // Lower z-index of all cards to ensure they're behind dropdowns
+                            document.querySelectorAll('.card, .container, main, .table-responsive').forEach(function(element) {
+                                element.style.zIndex = "1";
+                            });
+                        }
                     }, 10);
                 });
             }
