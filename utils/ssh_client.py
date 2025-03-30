@@ -37,12 +37,21 @@ paramiko_logger.addHandler(paramiko_handler)
 class SSHClient:
     """Improved utility class for SSH connections to network equipment"""
     
-    def __init__(self, hostname, port=22, username=None, password=None):
-        """Initialize the SSH client with connection parameters"""
+    def __init__(self, hostname, port=22, username=None, password=None, key_filename=None):
+        """Initialize the SSH client with connection parameters
+        
+        Args:
+            hostname (str): Host IP or hostname to connect to
+            port (int, optional): SSH port number. Defaults to 22.
+            username (str, optional): SSH username. Defaults to None.
+            password (str, optional): SSH password. Defaults to None.
+            key_filename (str, optional): Path to private key file. Defaults to None.
+        """
         self.hostname = hostname
         self.port = port
         self.username = username
         self.password = password
+        self.key_filename = key_filename
         self.client = None
         self.connected = False
         self.reconnect_attempts = 5  # increased from 3 to 5 attempts
@@ -111,19 +120,42 @@ class SSHClient:
                     paramiko_logger = logging.getLogger("paramiko")
                     paramiko_logger.setLevel(logging.DEBUG)
                 
-                # Connect with more generous timeouts for real network equipment
-                self.client.connect(
-                    hostname=self.hostname,
-                    port=self.port,
-                    username=self.username,
-                    password=self.password,
-                    timeout=30,  # increased from 15 to 30 seconds
-                    allow_agent=False,
-                    look_for_keys=False,
-                    banner_timeout=30,  # increased from 15 to 30 seconds
-                    auth_timeout=30,  # increased from 15 to 30 seconds
-                    # Removed disabled_algorithms as it may be preventing connections
-                )
+                # Set connection parameters
+                connect_params = {
+                    'hostname': self.hostname,
+                    'port': self.port,
+                    'username': self.username,
+                    'timeout': 60,  # Timeout in seconds for establishing a connection
+                    'banner_timeout': 60,  # Timeout for the SSH banner
+                    'auth_timeout': 60,  # Timeout for authentication
+                }
+                
+                # Handle authentication methods
+                if self.key_filename:
+                    # Use key-based authentication if key file is provided
+                    logger.info(f"Using key-based authentication with key file: {self.key_filename}")
+                    connect_params['key_filename'] = self.key_filename
+                    # Still include password as some keys require passphrase
+                    if self.password:
+                        connect_params['password'] = self.password
+                    
+                    # When using a key file, we don't need to look for other keys
+                    connect_params['allow_agent'] = False
+                    connect_params['look_for_keys'] = False
+                elif self.password:
+                    # Use password authentication if password is provided and no key file
+                    logger.info("Using password authentication")
+                    connect_params['password'] = self.password
+                    connect_params['allow_agent'] = False
+                    connect_params['look_for_keys'] = False
+                else:
+                    # If no explicit auth method provided, try to use SSH agent or default keys
+                    logger.info("No explicit credentials provided, trying SSH agent and default keys")
+                    connect_params['allow_agent'] = True
+                    connect_params['look_for_keys'] = True
+                
+                # Connect with our parameters
+                self.client.connect(**connect_params)
                 
                 # Test the connection with a simple command
                 transport = self.client.get_transport()

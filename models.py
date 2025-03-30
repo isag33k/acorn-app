@@ -59,6 +59,7 @@ class UserCredential(db.Model):
     # Credentials
     username = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(100), nullable=False)
+    key_filename = db.Column(db.String(255), nullable=True)  # Path to SSH private key file (optional)
     
     def __repr__(self):
         return f"<UserCredential User:{self.user.username} -> Equip:{self.equipment.name}>"
@@ -71,6 +72,7 @@ class Equipment(db.Model):
     ssh_port = db.Column(db.Integer, default=22)
     username = db.Column(db.String(50), nullable=False)  # Default username (for backward compatibility)
     password = db.Column(db.String(100), nullable=False)  # Default password (for backward compatibility)
+    key_filename = db.Column(db.String(255), nullable=True)  # Path to SSH private key file (optional)
     
     # Relationships
     circuit_mappings = db.relationship('CircuitMapping', back_populates='equipment', cascade='all, delete-orphan')
@@ -98,10 +100,16 @@ class Equipment(db.Model):
         # For non-TACACS equipment, check if user has specific credentials for this equipment
         user_cred = UserCredential.query.filter_by(user_id=user.id, equipment_id=self.id).first()
         if user_cred:
-            return {'username': user_cred.username, 'password': user_cred.password}
+            creds = {'username': user_cred.username, 'password': user_cred.password}
+            if user_cred.key_filename:
+                creds['key_filename'] = user_cred.key_filename
+            return creds
             
         # Return default credentials if no user-specific credentials found
-        return {'username': self.username, 'password': self.password}
+        creds = {'username': self.username, 'password': self.password}
+        if self.key_filename:
+            creds['key_filename'] = self.key_filename
+        return creds
 
 class CircuitMapping(db.Model):
     """Model for mapping circuit IDs to equipment and commands"""

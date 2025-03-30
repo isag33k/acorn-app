@@ -77,6 +77,16 @@
                                 <div class="col-md-6 credential-fields" style="display: none;">
                                     <label for="password" class="form-label">SSH Password</label>
                                     <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                                    <div class="form-text small text-muted">
+                                        Leave empty if using key-based authentication only
+                                    </div>
+                                </div>
+                                <div class="col-md-12 credential-fields" style="display: none;">
+                                    <label for="key_filename" class="form-label">SSH Private Key File Path (Optional)</label>
+                                    <input type="text" class="form-control" id="key_filename" name="key_filename" placeholder="/path/to/private_key">
+                                    <div class="form-text small text-muted">
+                                        Path to the SSH private key file for key-based authentication
+                                    </div>
                                 </div>
                                 <div class="col-12 text-end">
                                     <button type="submit" class="btn btn-primary">

@@ -1,0 +1,52 @@
+root@acorn:/home/sjones/acorn-app# sudo journalctl -u acorn -n 50
+Mar 30 09:00:48 acorn gunicorn[17387]: paramiko.ssh_exception.AuthenticationException: Authentication failed.
+Mar 30 09:00:48 acorn gunicorn[17387]: During handling of the above exception, another exception occurred:
+Mar 30 09:00:48 acorn gunicorn[17387]: Traceback (most recent call last):
+Mar 30 09:00:48 acorn gunicorn[17387]:   File "/home/sjones/acorn-app/utils/ssh_client.py", line 115, in connect
+Mar 30 09:00:48 acorn gunicorn[17387]:     self.client.connect(
+Mar 30 09:00:48 acorn gunicorn[17387]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/client.py", line 485, in>
+Mar 30 09:00:48 acorn gunicorn[17387]:     self._auth(
+Mar 30 09:00:48 acorn gunicorn[17387]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/client.py", line 818, in>
+Mar 30 09:00:48 acorn gunicorn[17387]:     raise saved_exception
+Mar 30 09:00:48 acorn gunicorn[17387]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/client.py", line 805, in>
+Mar 30 09:00:48 acorn gunicorn[17387]:     self._transport.auth_password(username, password)
+Mar 30 09:00:48 acorn gunicorn[17387]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/transport.py", line 1660>
+Mar 30 09:00:48 acorn gunicorn[17387]:     raise e
+Mar 30 09:00:48 acorn gunicorn[17387]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/transport.py", line 1638>
+Mar 30 09:00:48 acorn gunicorn[17387]:     return self.auth_handler.wait_for_response(my_event)
+Mar 30 09:00:48 acorn gunicorn[17387]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 09:00:48 acorn gunicorn[17387]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/auth_handler.py", line 2>
+Mar 30 09:00:48 acorn gunicorn[17387]:     raise e
+Mar 30 09:00:48 acorn gunicorn[17387]: paramiko.ssh_exception.BadAuthenticationType: Bad authentication type; allowed types: ['publickey'>
+Mar 30 09:00:48 acorn gunicorn[17387]: ERROR:utils.ssh_client:Traceback (most recent call last):
+Mar 30 09:00:48 acorn gunicorn[17387]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/transport.py", line 1657>
+Mar 30 09:00:48 acorn gunicorn[17387]:     return self.auth_interactive(username, handler)
+Mar 30 09:00:48 acorn gunicorn[17387]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 09:00:48 acorn gunicorn[17387]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/transport.py", line 1762>
+Mar 30 09:00:48 acorn gunicorn[17387]:     return self.auth_handler.wait_for_response(my_event)
+Mar 30 09:00:48 acorn gunicorn[17387]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 09:00:48 acorn gunicorn[17387]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/auth_handler.py", line 2>
+Mar 30 09:00:48 acorn gunicorn[17387]:     raise e
+Mar 30 09:00:48 acorn gunicorn[17387]: paramiko.ssh_exception.AuthenticationException: Authentication failed.
+Mar 30 09:00:48 acorn gunicorn[17387]: During handling of the above exception, another exception occurred:
+Mar 30 09:00:48 acorn gunicorn[17387]: Traceback (most recent call last):
+Mar 30 09:00:48 acorn gunicorn[17387]:   File "/home/sjones/acorn-app/utils/ssh_client.py", line 115, in connect
+Mar 30 09:00:48 acorn gunicorn[17387]:     self.client.connect(
+Mar 30 09:00:48 acorn gunicorn[17387]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/client.py", line 485, in>
+Mar 30 09:00:48 acorn gunicorn[17387]:     self._auth(
+Mar 30 09:00:48 acorn gunicorn[17387]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/client.py", line 818, in>
+Mar 30 09:00:48 acorn gunicorn[17387]:     raise saved_exception
+Mar 30 09:00:48 acorn gunicorn[17387]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/client.py", line 805, in>
+Mar 30 09:00:48 acorn gunicorn[17387]:     self._transport.auth_password(username, password)
+Mar 30 09:00:48 acorn gunicorn[17387]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/transport.py", line 1660>
+Mar 30 09:00:48 acorn gunicorn[17387]:     raise e
+Mar 30 09:00:48 acorn gunicorn[17387]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/transport.py", line 1638>
+Mar 30 09:00:48 acorn gunicorn[17387]:     return self.auth_handler.wait_for_response(my_event)
+Mar 30 09:00:48 acorn gunicorn[17387]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 09:00:48 acorn gunicorn[17387]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/paramiko/auth_handler.py", line 2>
+Mar 30 09:00:48 acorn gunicorn[17387]:     raise e
+Mar 30 09:00:48 acorn gunicorn[17387]: paramiko.ssh_exception.BadAuthenticationType: Bad authentication type; allowed types: ['publickey'>
+Mar 30 09:00:48 acorn gunicorn[17387]: ERROR:routes:Command error for SHAL-FL-CORE-A, cmd: sh run: Failed to connect to 216.150.11.2 on p>
+Mar 30 09:00:48 acorn gunicorn[17387]: INFO:routes:Total execution time for circuit SHAL-FL-CORE-A: 21154ms
+Mar 30 09:00:48 acorn gunicorn[17387]: DEBUG:paramiko.transport:EOF in transport thread
+lines 1-50/50 (END)

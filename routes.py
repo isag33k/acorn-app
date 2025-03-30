@@ -58,7 +58,8 @@ class RegistrationForm(FlaskForm):
 class UserCredentialForm(FlaskForm):
     equipment_id = HiddenField('Equipment ID', validators=[DataRequired()])
     username = StringField('Username', validators=[DataRequired(), Length(max=50)])
-    password = PasswordField('Password', validators=[DataRequired(), Length(max=100)])
+    password = PasswordField('Password', validators=[Length(max=100)])
+    key_filename = StringField('SSH Private Key File Path', validators=[Length(max=255)])
     submit = SubmitField('Save Credentials')
     
 # TACACS credentials form
@@ -311,8 +312,9 @@ def add_credential():
         equipment_id = request.form.get('equipment_id')
         username = request.form.get('username')
         password = request.form.get('password')
+        key_filename = request.form.get('key_filename')
         
-        logger.debug(f"Extracted values - csrf_token: {csrf_token}, equipment_id: {equipment_id}, username: {username}, password exists: {'yes' if password else 'no'}")
+        logger.debug(f"Extracted values - csrf_token: {csrf_token}, equipment_id: {equipment_id}, username: {username}, password exists: {'yes' if password else 'no'}, key_filename: {key_filename}")
         
         # Basic validation
         if not csrf_token:
@@ -320,11 +322,11 @@ def add_credential():
             flash('CSRF token missing', 'danger')
             return redirect(url_for('user_credentials'))
             
-        if not equipment_id or not username or not password:
+        if not equipment_id or not username or (not password and not key_filename):
             missing = []
             if not equipment_id: missing.append("Equipment ID")
             if not username: missing.append("Username") 
-            if not password: missing.append("Password")
+            if not password and not key_filename: missing.append("Password or SSH Key file")
             logger.error(f"Missing fields: {missing}")
             flash(f'Missing required fields: {", ".join(missing)}', 'danger')
             return redirect(url_for('user_credentials'))
@@ -347,6 +349,7 @@ def add_credential():
             # Update existing
             credential.username = username
             credential.password = password
+            credential.key_filename = key_filename
             logger.debug(f"Updated credential for equipment ID {equipment_id}")
             flash('Credential updated successfully', 'success')
         else:
@@ -355,7 +358,8 @@ def add_credential():
                 user_id=current_user.id,
                 equipment_id=equipment_id,
                 username=username,
-                password=password
+                password=password,
+                key_filename=key_filename
             )
             logger.debug(f"Created new credential for equipment ID {equipment_id}")
             db.session.add(credential)
@@ -698,12 +702,20 @@ def submit_alert():
                 
                 try:
                     # Create new SSH client for each command (like the test page)
-                    ssh_client = SSHClient(
-                        hostname=equipment.ip_address,
-                        port=equipment.ssh_port,
-                        username=credentials['username'],
-                        password=credentials['password']
-                    )
+                    # Handle both password and key-based authentication
+                    ssh_params = {
+                        'hostname': equipment.ip_address,
+                        'port': equipment.ssh_port,
+                        'username': credentials['username'],
+                        'password': credentials['password']
+                    }
+                    
+                    # Add key_filename if available in credentials
+                    if 'key_filename' in credentials and credentials['key_filename']:
+                        ssh_params['key_filename'] = credentials['key_filename']
+                        logger.info(f"Using key-based authentication for {equipment.name} with key file: {credentials['key_filename']}")
+                    
+                    ssh_client = SSHClient(**ssh_params)
                     
                     # Connect to the equipment
                     ssh_client.connect()
@@ -859,14 +871,19 @@ def add_equipment():
         flash('Equipment name and IP address are required', 'danger')
         return redirect(url_for('equipment_list'))
     
+    # Handle key-based authentication
+    key_filename = request.form.get('key_filename')
+    
     # Handle TACACS credential type
     if credential_type == 'tacacs' or username == 'TACACS':
         username = 'TACACS'
         password = 'TACACS_PLACEHOLDER'  # Will be replaced with user-specific credentials at runtime
-    elif not all([username, password]):
-        flash('Username and password are required for custom credentials', 'danger')
+        key_filename = None  # No key file for TACACS
+    elif not all([username]) or (not password and not key_filename):
+        flash('Username and either password or SSH key file are required for custom credentials', 'danger')
         return redirect(url_for('equipment_list'))
     
+    # Create equipment with proper key file if provided
     new_equipment = Equipment(
         name=name,
         ip_address=ip_address,
@@ -874,6 +891,10 @@ def add_equipment():
         username=username,
         password=password
     )
+    
+    # Set key filename if provided
+    if key_filename and key_filename.strip():
+        new_equipment.key_filename = key_filename.strip()
     
     db.session.add(new_equipment)
     db.session.commit()
@@ -935,6 +956,7 @@ def edit_equipment(id):
     if credential_type == 'tacacs' or username == 'TACACS':
         equipment.username = 'TACACS'
         equipment.password = 'TACACS_PLACEHOLDER'  # Will be replaced with user-specific credentials at runtime
+        equipment.key_filename = None  # Clear key file when using TACACS
     else:
         # Only update username if not using TACACS
         equipment.username = username
@@ -943,6 +965,13 @@ def edit_equipment(id):
         new_password = request.form.get('password')
         if new_password:
             equipment.password = new_password
+            
+        # Update SSH key file path
+        key_filename = request.form.get('key_filename')
+        if key_filename and key_filename.strip():
+            equipment.key_filename = key_filename.strip()
+        else:
+            equipment.key_filename = None
     
     db.session.commit()
     flash('Equipment updated successfully.', 'success')
@@ -1280,12 +1309,21 @@ def test_ssh_connection():
             start_time = time.time()
             
             # Connect to the specified SSH server
-            ssh_client = SSHClient(
-                hostname=hostname,
-                port=port,
-                username=username,
-                password=password
-            )
+            # Support both password and key-based authentication
+            ssh_params = {
+                'hostname': hostname,
+                'port': port,
+                'username': username,
+                'password': password
+            }
+            
+            # Add key file if provided
+            key_filename = request.form.get('key_filename')
+            if key_filename and key_filename.strip():
+                ssh_params['key_filename'] = key_filename.strip()
+                logger.info(f"Using key-based authentication with key file: {key_filename}")
+                
+            ssh_client = SSHClient(**ssh_params)
             
             # Connect
             ssh_client.connect()
@@ -1323,5 +1361,6 @@ def test_ssh_connection():
         port=port,
         username=username,
         password=password,
-        command=command
+        command=command,
+        key_filename=request.form.get('key_filename', '')
     )

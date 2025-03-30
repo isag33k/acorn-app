@@ -63,6 +63,16 @@
                                 Leave blank to keep existing password unchanged.
                             </div>
                         </div>
+                        
+                        <div class="col-md-12 credential-fields" {% if equipment.username == 'TACACS' %}style="display:none"{% endif %}>
+                            <label for="key_filename" class="form-label">SSH Private Key File Path (Optional)</label>
+                            <input type="text" class="form-control" id="key_filename" 
+                                   name="key_filename" value="{{ equipment.key_filename or '' }}">
+                            <div class="form-text small text-muted">
+                                <i class="fas fa-info-circle"></i> 
+                                Path to the SSH private key file for key-based authentication. Leave blank if using password authentication.
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="mt-4">

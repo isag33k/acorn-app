@@ -44,9 +44,16 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Password</label>
-                                    <input type="password" name="password" class="form-control" value="{{ password|default('') }}" required>
+                                    <input type="password" name="password" class="form-control" value="{{ password|default('') }}">
+                                    <div class="form-text">Leave empty if using key-based authentication only</div>
                                 </div>
                             </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">SSH Private Key File (Optional)</label>
+                            <input type="text" name="key_filename" class="form-control" value="{{ key_filename|default('') }}">
+                            <div class="form-text">Path to the SSH private key file for key-based authentication</div>
                         </div>
                         
                         <div class="mb-3">
