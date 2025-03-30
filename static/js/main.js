@@ -58,40 +58,8 @@ function toggleEditCredentialFields(itemId) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM fully loaded - initializing tabs");
     
-    // Fix for dropdown menu z-index issues
-    const userDropdown = document.getElementById('userDropdown');
-    if (userDropdown) {
-        userDropdown.addEventListener('click', function() {
-            // When dropdown is clicked, make sure it appears in front
-            setTimeout(function() {
-                const dropdownMenu = document.querySelector('.dropdown-menu-end');
-                if (dropdownMenu) {
-                    // Get the position of the user dropdown button
-                    const rect = userDropdown.getBoundingClientRect();
-                    
-                    // Calculate the right position (align with the right edge of the dropdown toggle)
-                    const rightPosition = window.innerWidth - rect.right;
-                    
-                    // Apply the highest z-index and correct positioning
-                    dropdownMenu.style.zIndex = "9999";
-                    dropdownMenu.style.position = "fixed";
-                    dropdownMenu.style.top = rect.bottom + 'px';
-                    dropdownMenu.style.right = rightPosition + 'px';
-                    dropdownMenu.style.left = 'auto';
-                    
-                    // Force browser to redraw the element
-                    dropdownMenu.style.display = 'none';
-                    void dropdownMenu.offsetHeight;
-                    dropdownMenu.style.display = 'block';
-                    
-                    // Set card z-indices lower
-                    document.querySelectorAll('.card, .container, main, .table-responsive').forEach(function(element) {
-                        element.style.zIndex = "1";
-                    });
-                }
-            }, 10);
-        });
-    }
+    // This functionality has been moved to base.html for global application
+    // Keeping this block empty to avoid conflicts with the implementation in base.html
     
     // Initialize credential fields on page load
     const credentialTypeSelect = document.getElementById('credential_type');

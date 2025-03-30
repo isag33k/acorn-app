@@ -178,35 +178,75 @@
     <script>
         // Ensure this script runs after page load
         window.addEventListener('load', function() {
+            // Flag to track dropdown state
+            let isDropdownOpen = false;
+            let dropdownMenu = null;
+            
             // Fix for user dropdown menu
             const userDropdown = document.getElementById('userDropdown');
             if (userDropdown) {
                 // When the dropdown toggle is clicked
-                userDropdown.addEventListener('click', function() {
+                userDropdown.addEventListener('click', function(e) {
+                    // Prevent event bubbling up to document
+                    e.stopPropagation();
+                    
                     // Small delay to ensure Bootstrap has created the dropdown
                     setTimeout(function() {
                         // Target only the user dropdown menu
-                        const dropdownMenu = document.querySelector('.dropdown-menu-end');
+                        dropdownMenu = document.querySelector('.dropdown-menu-end');
                         if (dropdownMenu) {
-                            // Get the position of the user dropdown button
-                            const rect = userDropdown.getBoundingClientRect();
+                            // Toggle dropdown state
+                            isDropdownOpen = !isDropdownOpen;
                             
-                            // Calculate the right position (align with the right edge of the dropdown toggle)
-                            const rightPosition = window.innerWidth - rect.right;
-                            
-                            // Apply the highest z-index and correct positioning
-                            dropdownMenu.style.zIndex = "9999";
-                            dropdownMenu.style.position = "fixed";
-                            dropdownMenu.style.top = rect.bottom + 'px';
-                            dropdownMenu.style.right = rightPosition + 'px';
-                            dropdownMenu.style.left = 'auto';
-                            
-                            // Lower z-index of all cards to ensure they're behind dropdowns
-                            document.querySelectorAll('.card, .container, main, .table-responsive').forEach(function(element) {
-                                element.style.zIndex = "1";
-                            });
+                            if (isDropdownOpen) {
+                                // Get the position of the user dropdown button
+                                const rect = userDropdown.getBoundingClientRect();
+                                
+                                // Calculate the right position (align with the right edge of the dropdown toggle)
+                                const rightPosition = window.innerWidth - rect.right;
+                                
+                                // Apply the highest z-index and correct positioning
+                                dropdownMenu.style.zIndex = "9999";
+                                dropdownMenu.style.position = "fixed";
+                                dropdownMenu.style.top = rect.bottom + 'px';
+                                dropdownMenu.style.right = rightPosition + 'px';
+                                dropdownMenu.style.left = 'auto';
+                                dropdownMenu.style.display = 'block';
+                                
+                                // Lower z-index of all cards to ensure they're behind dropdowns
+                                document.querySelectorAll('.card, .container, main, .table-responsive').forEach(function(element) {
+                                    element.style.zIndex = "1";
+                                });
+                            } else {
+                                // Hide the dropdown
+                                dropdownMenu.style.display = 'none';
+                            }
                         }
                     }, 10);
+                });
+                
+                // Prevent clicks inside dropdown from closing it
+                document.addEventListener('click', function(e) {
+                    const clickedDropdown = e.target.closest('.dropdown-menu-end');
+                    if (!clickedDropdown && isDropdownOpen && dropdownMenu) {
+                        // Hide the dropdown when clicking outside
+                        dropdownMenu.style.display = 'none';
+                        isDropdownOpen = false;
+                    }
+                });
+                
+                // Handle dropdown menu item clicks
+                document.addEventListener('click', function(e) {
+                    // Check if clicked element is a dropdown menu item
+                    if (e.target.closest('.dropdown-item') && isDropdownOpen) {
+                        // Let the menu item action execute then close the dropdown
+                        setTimeout(function() {
+                            if (dropdownMenu) {
+                                dropdownMenu.style.display = 'none';
+                                isDropdownOpen = false;
+                            }
+                        }, 100);
+                    }
                 });
             }
         });
