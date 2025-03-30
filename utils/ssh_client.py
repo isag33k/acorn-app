@@ -6,12 +6,12 @@ import socket
 import time
 import traceback
 
-# Configure basic logging
+# Configure enhanced logging
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     filename='ssh_client.log',
-    filemode='w'  # Overwrite for clean logs
+    filemode='a'  # Append to log file instead of overwriting
 )
 
 # Add console handler
@@ -21,6 +21,18 @@ console.setLevel(logging.INFO)
 formatter = logging.Formatter('%(levelname)s - %(message)s')
 console.setFormatter(formatter)
 logger.addHandler(console)
+
+# Add timestamp to log header
+logger.info("=" * 80)
+logger.info(f"SSH Client Initialized at {time.strftime('%Y-%m-%d %H:%M:%S')}")
+logger.info("=" * 80)
+
+# Enable paramiko detailed logging
+paramiko_logger = logging.getLogger("paramiko")
+paramiko_logger.setLevel(logging.DEBUG)
+paramiko_handler = logging.FileHandler('paramiko_debug.log', mode='a')
+paramiko_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+paramiko_logger.addHandler(paramiko_handler)
 
 class SSHClient:
     """Improved utility class for SSH connections to network equipment"""
@@ -38,22 +50,41 @@ class SSHClient:
     
     def check_socket(self):
         """Check if the SSH port is open before attempting to connect"""
-        try:
-            logger.debug(f"Testing socket connection to {self.hostname}:{self.port}")
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(10)  # reduced from 15 to 10 seconds
-            result = sock.connect_ex((self.hostname, self.port))
-            sock.close()
-            
-            if result == 0:
-                logger.debug(f"Socket connection to {self.hostname}:{self.port} successful")
-                return True
-            else:
-                logger.error(f"Socket connection to {self.hostname}:{self.port} failed with code {result}")
-                return False
-        except Exception as e:
-            logger.error(f"Socket test error: {str(e)}")
-            return False
+        max_attempts = 3  # Try up to 3 times
+        retry_delay = 2   # 2 seconds between attempts
+        
+        for attempt in range(1, max_attempts + 1):
+            try:
+                logger.debug(f"Testing socket connection to {self.hostname}:{self.port} (attempt {attempt}/{max_attempts})")
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.settimeout(20)  # increased from 10 to 20 seconds for real network equipment
+                result = sock.connect_ex((self.hostname, self.port))
+                sock.close()
+                
+                if result == 0:
+                    logger.debug(f"Socket connection to {self.hostname}:{self.port} successful")
+                    return True
+                else:
+                    logger.warning(f"Socket connection to {self.hostname}:{self.port} failed with code {result} (attempt {attempt}/{max_attempts})")
+                    
+                    # If not the last attempt, wait and retry
+                    if attempt < max_attempts:
+                        logger.debug(f"Retrying socket connection in {retry_delay} seconds...")
+                        time.sleep(retry_delay)
+                    else:
+                        logger.error(f"Socket connection to {self.hostname}:{self.port} failed after {max_attempts} attempts")
+                        return False
+            except Exception as e:
+                logger.error(f"Socket test error on attempt {attempt}: {str(e)}")
+                
+                # If not the last attempt, wait and retry
+                if attempt < max_attempts:
+                    logger.debug(f"Retrying socket connection in {retry_delay} seconds...")
+                    time.sleep(retry_delay)
+                else:
+                    return False
+        
+        return False  # Should never reach here, but added as a safeguard
     
     def connect(self):
         """Establish an SSH connection to the equipment with retry mechanism"""
@@ -80,18 +111,18 @@ class SSHClient:
                     paramiko_logger = logging.getLogger("paramiko")
                     paramiko_logger.setLevel(logging.DEBUG)
                 
-                # Connect with faster timeouts
+                # Connect with more generous timeouts for real network equipment
                 self.client.connect(
                     hostname=self.hostname,
                     port=self.port,
                     username=self.username,
                     password=self.password,
-                    timeout=15,  # reduced from 20 to 15 seconds
+                    timeout=30,  # increased from 15 to 30 seconds
                     allow_agent=False,
                     look_for_keys=False,
-                    banner_timeout=15,  # reduced from 20 to 15 seconds
-                    auth_timeout=15,  # reduced from 20 to 15 seconds
-                    disabled_algorithms=dict(pubkeys=["rsa-sha2-256", "rsa-sha2-512"])
+                    banner_timeout=30,  # increased from 15 to 30 seconds
+                    auth_timeout=30,  # increased from 15 to 30 seconds
+                    # Removed disabled_algorithms as it may be preventing connections
                 )
                 
                 # Test the connection with a simple command
@@ -142,8 +173,8 @@ class SSHClient:
         try:
             logger.debug(f"Executing command on {self.hostname}: {command}")
             
-            # Execute with 30-second timeout (reduced from 1 minute)
-            stdin, stdout, stderr = self.client.exec_command(command, timeout=30)
+            # Execute with 60-second timeout for real network equipment
+            stdin, stdout, stderr = self.client.exec_command(command, timeout=60)
             
             # Read the output with timeout tracking and chunking for large outputs
             start_time = time.time()
@@ -154,8 +185,8 @@ class SSHClient:
             stderr_chunks = []
             chunk_count = 0
             
-            # Set the channel timeout to 30 seconds (reduced from 1 minute)
-            stdout.channel.settimeout(30)  # 30-second timeout for channel operations
+            # Set the channel timeout to 60 seconds for real network equipment
+            stdout.channel.settimeout(60)  # 60-second timeout for channel operations
             
             # Read stdout in chunks
             while not stdout.channel.exit_status_ready() or stdout.channel.recv_ready():
@@ -168,9 +199,9 @@ class SSHClient:
                 else:
                     time.sleep(0.1)  # Small sleep to prevent CPU spinning
                     
-                # Safety check - abort if taking too long (30 seconds max)
-                if time.time() - start_time > 30:
-                    logger.warning(f"Command execution taking too long (>30 sec), forcing completion: {command}")
+                # Safety check - abort if taking too long (60 seconds max for real network equipment)
+                if time.time() - start_time > 60:
+                    logger.warning(f"Command execution taking too long (>60 sec), forcing completion: {command}")
                     break
             
             # Read stderr if available
