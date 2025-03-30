@@ -35,7 +35,23 @@ paramiko_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %
 paramiko_logger.addHandler(paramiko_handler)
 
 class SSHClient:
-    """Improved utility class for SSH connections to network equipment"""
+    """Improved utility class for SSH connections to network equipment
+    
+    Features:
+    1. Universal keyboard-interactive authentication support for all network devices
+    2. Smart authentication fallback that tries keyboard-interactive when regular auth fails
+    3. Retry mechanism for connection failures (5 attempts with 5 second delay)
+    4. Socket pre-checking to avoid timeouts
+    5. Improved error handling and logging
+    6. Support for key-based authentication
+    7. Better timeout handling for commands (60 second timeouts)
+    8. Chunked output reading for large responses (32KB chunks)
+    
+    IMPORTANT: For optimal compatibility with network equipment such as OLTs, routers, and
+    switches that require keyboard-interactive authentication, this client now tries
+    keyboard-interactive auth first by default, before falling back to password auth if needed.
+    This helps connect to many OLT devices and network equipment without special handling.
+    """
     
     def __init__(self, hostname, port=22, username=None, password=None, key_filename=None):
         """Initialize the SSH client with connection parameters
@@ -173,16 +189,20 @@ class SSHClient:
                     # Store the handler for use by transport after connection
                     self._interactive_handler = interactive_handler
                     
-                    # Special handling for known OLT devices that require keyboard-interactive auth
-                    # Check if this is one of the known OLT devices by IP address
-                    olt_devices = ['10.160.15.4', '10.160.15.5', '10.160.15.6']
-                    if self.hostname in olt_devices:
-                        logger.info(f"Detected OLT device {self.hostname}, using specialized authentication approach")
+                    # Try keyboard-interactive authentication first for all network equipment
+                    # Many devices like OLTs, certain switches, and routers prefer this method
+                    if self.username:  # Only try if we have a username
+                        logger.info(f"Trying keyboard-interactive authentication first for {self.hostname}")
                         
-                        # For OLT devices, skip the standard connect and use transport directly
-                        # with keyboard-interactive from the beginning
-                        self._connect_with_keyboard_interactive()
-                        return True
+                        # Try direct keyboard-interactive authentication
+                        ki_result = self._connect_with_keyboard_interactive()
+                        if ki_result:
+                            logger.info(f"Keyboard-interactive authentication successful for {self.hostname}")
+                            return True
+                        else:
+                            logger.info(f"Keyboard-interactive authentication failed, falling back to password for {self.hostname}")
+                    else:
+                        logger.info("No username provided, skipping keyboard-interactive authentication")
                         
                 else:
                     # If no explicit auth method provided, try to use SSH agent or default keys
@@ -200,11 +220,13 @@ class SSHClient:
                     transport.set_keepalive(15)  # 15 second keepalive (reduced from 30 for more frequent keepalives)
                     
                     # Try keyboard-interactive auth if we have a handler and password auth failed
-                    if hasattr(self, '_interactive_handler') and not transport.is_authenticated():
+                    if hasattr(self, '_interactive_handler') and not transport.is_authenticated() and self.username:
                         logger.info("Trying keyboard-interactive authentication as fallback")
                         try:
+                            # Make sure username is string
+                            username = str(self.username) if self.username is not None else ""
                             transport.auth_interactive(
-                                username=self.username,
+                                username=username,
                                 handler=self._interactive_handler
                             )
                             if transport.is_authenticated():
@@ -256,10 +278,16 @@ class SSHClient:
         
     def _connect_with_keyboard_interactive(self):
         """Connect using keyboard-interactive authentication directly
-        This method is specifically designed for OLT devices that require keyboard-interactive auth
+        This method is designed for network devices that require or prefer keyboard-interactive auth
+        Many network equipment types including OLTs, certain switches, and routers use this method
         """
         logger.info(f"Trying direct keyboard-interactive authentication for {self.hostname}")
         
+        # Ensure we have a valid username
+        if not self.username:
+            logger.error("Username is required for keyboard-interactive authentication")
+            return False
+            
         try:
             # Create a socket to the server
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -280,14 +308,19 @@ class SSHClient:
                 return responses
             
             # Try keyboard-interactive authentication
-            transport.auth_interactive(self.username, handler)
+            # Make sure username is string
+            username = str(self.username) if self.username is not None else ""
+            transport.auth_interactive(username=username, handler=handler)
             
             if transport.is_authenticated():
                 logger.info(f"Keyboard-interactive authentication succeeded for {self.hostname}")
                 
-                # Create a client and assign the authenticated transport
+                # Create a client and assign the authenticated transport properly
                 self.client = paramiko.SSHClient()
-                self.client._transport = transport
+                self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                # Using a safer approach than direct _transport assignment
+                # Store the transport object to use directly for operations
+                self._transport = transport  # Store at class level instead of client._transport
                 self.connected = True
                 
                 # Set keepalive
