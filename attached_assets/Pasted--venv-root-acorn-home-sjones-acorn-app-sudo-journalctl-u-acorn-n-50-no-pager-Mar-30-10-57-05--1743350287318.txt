@@ -1,0 +1,51 @@
+(venv) root@acorn:/home/sjones/acorn-app# sudo journalctl -u acorn -n 50 --no-pager
+Mar 30 10:57:05 acorn gunicorn[18615]: [2025-03-30 10:57:05 -0500] [18615] [INFO] Worker exiting (pid: 18615)
+Mar 30 10:57:05 acorn gunicorn[18613]: Database tables created successfully
+Mar 30 10:57:05 acorn gunicorn[18613]: Routes imported successfully
+Mar 30 10:57:05 acorn gunicorn[18615]: Database tables created successfully
+Mar 30 10:57:05 acorn gunicorn[18615]: Routes imported successfully
+Mar 30 10:57:05 acorn gunicorn[18609]: [2025-03-30 10:57:05 -0500] [18609] [ERROR] Worker (pid:18614) was sent SIGTERM!
+Mar 30 10:57:05 acorn gunicorn[18609]: [2025-03-30 10:57:05 -0500] [18609] [ERROR] Worker (pid:18612) was sent SIGTERM!
+Mar 30 10:57:06 acorn gunicorn[18609]: [2025-03-30 10:57:06 -0500] [18609] [INFO] Shutting down: Master
+Mar 30 10:57:06 acorn systemd[1]: acorn.service: Deactivated successfully.
+Mar 30 10:57:06 acorn systemd[1]: Stopped acorn.service - ACORN Application.
+Mar 30 10:57:06 acorn systemd[1]: acorn.service: Consumed 3.162s CPU time.
+Mar 30 10:57:06 acorn systemd[1]: Started acorn.service - ACORN Application.
+Mar 30 10:57:06 acorn gunicorn[18762]: [2025-03-30 10:57:06 -0500] [18762] [INFO] Starting gunicorn 23.0.0
+Mar 30 10:57:06 acorn gunicorn[18762]: [2025-03-30 10:57:06 -0500] [18762] [INFO] Listening at: http://0.0.0.0:5000 (18762)
+Mar 30 10:57:06 acorn gunicorn[18762]: [2025-03-30 10:57:06 -0500] [18762] [INFO] Using worker: sync
+Mar 30 10:57:06 acorn gunicorn[18768]: [2025-03-30 10:57:06 -0500] [18768] [INFO] Booting worker with pid: 18768
+Mar 30 10:57:06 acorn gunicorn[18769]: [2025-03-30 10:57:06 -0500] [18769] [INFO] Booting worker with pid: 18769
+Mar 30 10:57:06 acorn gunicorn[18770]: [2025-03-30 10:57:06 -0500] [18770] [INFO] Booting worker with pid: 18770
+Mar 30 10:57:06 acorn gunicorn[18771]: [2025-03-30 10:57:06 -0500] [18771] [INFO] Booting worker with pid: 18771
+Mar 30 10:57:06 acorn gunicorn[18768]: INFO - ================================================================================
+Mar 30 10:57:06 acorn gunicorn[18768]: INFO:utils.ssh_client:================================================================================
+Mar 30 10:57:06 acorn gunicorn[18768]: INFO - SSH Client Initialized at 2025-03-30 10:57:06
+Mar 30 10:57:06 acorn gunicorn[18768]: INFO:utils.ssh_client:SSH Client Initialized at 2025-03-30 10:57:06
+Mar 30 10:57:06 acorn gunicorn[18768]: INFO - ================================================================================
+Mar 30 10:57:06 acorn gunicorn[18768]: INFO:utils.ssh_client:================================================================================
+Mar 30 10:57:06 acorn gunicorn[18769]: INFO - ================================================================================
+Mar 30 10:57:06 acorn gunicorn[18769]: INFO:utils.ssh_client:================================================================================
+Mar 30 10:57:06 acorn gunicorn[18769]: INFO - SSH Client Initialized at 2025-03-30 10:57:06
+Mar 30 10:57:06 acorn gunicorn[18769]: INFO:utils.ssh_client:SSH Client Initialized at 2025-03-30 10:57:06
+Mar 30 10:57:06 acorn gunicorn[18769]: INFO - ================================================================================
+Mar 30 10:57:06 acorn gunicorn[18769]: INFO:utils.ssh_client:================================================================================
+Mar 30 10:57:06 acorn gunicorn[18770]: INFO - ================================================================================
+Mar 30 10:57:06 acorn gunicorn[18770]: INFO:utils.ssh_client:================================================================================
+Mar 30 10:57:06 acorn gunicorn[18770]: INFO - SSH Client Initialized at 2025-03-30 10:57:06
+Mar 30 10:57:06 acorn gunicorn[18770]: INFO:utils.ssh_client:SSH Client Initialized at 2025-03-30 10:57:06
+Mar 30 10:57:06 acorn gunicorn[18770]: INFO - ================================================================================
+Mar 30 10:57:06 acorn gunicorn[18770]: INFO:utils.ssh_client:================================================================================
+Mar 30 10:57:06 acorn gunicorn[18771]: INFO - ================================================================================
+Mar 30 10:57:06 acorn gunicorn[18771]: INFO:utils.ssh_client:================================================================================
+Mar 30 10:57:06 acorn gunicorn[18771]: INFO - SSH Client Initialized at 2025-03-30 10:57:06
+Mar 30 10:57:06 acorn gunicorn[18771]: INFO:utils.ssh_client:SSH Client Initialized at 2025-03-30 10:57:06
+Mar 30 10:57:06 acorn gunicorn[18771]: INFO - ================================================================================
+Mar 30 10:57:06 acorn gunicorn[18771]: INFO:utils.ssh_client:================================================================================
+Mar 30 10:57:25 acorn gunicorn[18768]: DEBUG:app:Equipment list view: Retrieved equipment and circuits, created form instances
+Mar 30 10:57:39 acorn gunicorn[18769]: INFO - Using direct password authentication for 10.160.15.4 (SHA1-FL-OLT-1)
+Mar 30 10:57:39 acorn gunicorn[18769]: INFO:utils.ssh_client:Using direct password authentication for 10.160.15.4 (SHA1-FL-OLT-1)
+Mar 30 10:57:39 acorn gunicorn[18769]: ERROR - Error connecting to 10.160.15.4 (SHA1-FL-OLT-1): 'NoneType' object has no attribute 'connect'
+Mar 30 10:57:39 acorn gunicorn[18769]: ERROR:utils.ssh_client:Error connecting to 10.160.15.4 (SHA1-FL-OLT-1): 'NoneType' object has no attribute 'connect'
+Mar 30 10:57:39 acorn gunicorn[18769]: ERROR:routes:Command error for SHA1-FL-OLT-1, cmd: sh run: 'NoneType' object has no attribute 'connect'
+Mar 30 10:57:39 acorn gunicorn[18769]: INFO:routes:Total execution time for circuit SHA1-FL-OLT-1: 11ms

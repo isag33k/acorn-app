@@ -1,0 +1,51 @@
+(venv) root@acorn:/home/sjones/acorn-app# sudo journalctl -u acorn -n 50
+Mar 30 12:43:52 acorn gunicorn[19692]: DEBUG:paramiko.transport:[chan 0] Unhandled channel request "keepalive@openssh.com"
+Mar 30 12:44:07 acorn gunicorn[19692]: DEBUG:paramiko.transport:[chan 0] Unhandled channel request "keepalive@openssh.com"
+Mar 30 12:44:22 acorn gunicorn[19692]: DEBUG:paramiko.transport:[chan 0] Unhandled channel request "keepalive@openssh.com"
+Mar 30 12:44:37 acorn gunicorn[19692]: DEBUG:paramiko.transport:[chan 0] Unhandled channel request "keepalive@openssh.com"
+Mar 30 12:44:52 acorn gunicorn[19692]: DEBUG:paramiko.transport:[chan 0] Unhandled channel request "keepalive@openssh.com"
+Mar 30 12:45:07 acorn gunicorn[19692]: DEBUG:paramiko.transport:[chan 0] Unhandled channel request "keepalive@openssh.com"
+Mar 30 12:45:22 acorn gunicorn[19692]: DEBUG:paramiko.transport:[chan 0] Unhandled channel request "keepalive@openssh.com"
+Mar 30 12:45:37 acorn gunicorn[19692]: DEBUG:paramiko.transport:[chan 0] Unhandled channel request "keepalive@openssh.com"
+Mar 30 12:45:52 acorn gunicorn[19692]: DEBUG:paramiko.transport:[chan 0] Unhandled channel request "keepalive@openssh.com"
+Mar 30 12:46:07 acorn gunicorn[19692]: DEBUG:paramiko.transport:[chan 0] Unhandled channel request "keepalive@openssh.com"
+Mar 30 12:46:16 acorn gunicorn[19692]: DEBUG:paramiko.transport:[chan 0] EOF received (0)
+Mar 30 12:46:16 acorn gunicorn[19692]: DEBUG:paramiko.transport:[chan 0] EOF sent (0)
+Mar 30 12:46:16 acorn gunicorn[19692]: DEBUG:utils.ssh_client:Command executed with status 0
+Mar 30 12:46:16 acorn gunicorn[19692]: DEBUG:utils.ssh_client:Disconnected from 10.160.15.4
+Mar 30 12:46:16 acorn gunicorn[19692]: INFO:routes:Total execution time for circuit SHA1-FL-OLT-1: 324262ms
+Mar 30 12:46:16 acorn gunicorn[19692]: DEBUG:paramiko.transport:EOF in transport thread
+Mar 30 12:54:44 acorn systemd[1]: Stopping acorn.service - ACORN Application...
+Mar 30 12:54:44 acorn gunicorn[19691]: [2025-03-30 12:54:44 -0500] [19691] [INFO] Worker exiting (pid: 19691)
+Mar 30 12:54:44 acorn gunicorn[19690]: [2025-03-30 12:54:44 -0500] [19690] [INFO] Worker exiting (pid: 19690)
+Mar 30 12:54:44 acorn gunicorn[19692]: [2025-03-30 12:54:44 -0500] [19692] [INFO] Worker exiting (pid: 19692)
+Mar 30 12:54:44 acorn gunicorn[19691]: Database tables created successfully
+Mar 30 12:54:44 acorn gunicorn[19691]: Routes imported successfully
+Mar 30 12:54:44 acorn gunicorn[19690]: Database tables created successfully
+Mar 30 12:54:44 acorn gunicorn[19690]: Routes imported successfully
+Mar 30 12:54:44 acorn gunicorn[19692]: Database tables created successfully
+Mar 30 12:54:44 acorn gunicorn[19692]: Routes imported successfully
+Mar 30 12:54:44 acorn gunicorn[19693]: [2025-03-30 12:54:44 -0500] [19693] [INFO] Worker exiting (pid: 19693)
+Mar 30 12:54:44 acorn gunicorn[19693]: Database tables created successfully
+Mar 30 12:54:44 acorn gunicorn[19693]: Routes imported successfully
+Mar 30 12:54:44 acorn gunicorn[19688]: [2025-03-30 12:54:44 -0500] [19688] [INFO] Handling signal: term
+Mar 30 12:54:44 acorn gunicorn[19688]: [2025-03-30 12:54:44 -0500] [19688] [ERROR] Worker (pid:19692) was sent SIGTERM!
+Mar 30 12:54:44 acorn gunicorn[19688]: [2025-03-30 12:54:44 -0500] [19688] [ERROR] Worker (pid:19693) was sent SIGTERM!
+Mar 30 12:54:44 acorn gunicorn[19688]: [2025-03-30 12:54:44 -0500] [19688] [ERROR] Worker (pid:19691) was sent SIGTERM!
+Mar 30 12:54:44 acorn gunicorn[19688]: [2025-03-30 12:54:44 -0500] [19688] [ERROR] Worker (pid:19690) was sent SIGTERM!
+Mar 30 12:54:44 acorn gunicorn[19688]: [2025-03-30 12:54:44 -0500] [19688] [INFO] Shutting down: Master
+Mar 30 12:54:44 acorn systemd[1]: acorn.service: Deactivated successfully.
+Mar 30 12:54:44 acorn systemd[1]: Stopped acorn.service - ACORN Application.
+Mar 30 12:54:44 acorn systemd[1]: acorn.service: Consumed 6.313s CPU time.
+Mar 30 12:54:44 acorn systemd[1]: Started acorn.service - ACORN Application.
+Mar 30 12:54:44 acorn gunicorn[19838]: [2025-03-30 12:54:44 -0500] [19838] [INFO] Starting gunicorn 23.0.0
+Mar 30 12:54:44 acorn gunicorn[19838]: [2025-03-30 12:54:44 -0500] [19838] [INFO] Listening at: http://0.0.0.0:5000 (19838)
+Mar 30 12:54:44 acorn gunicorn[19838]: [2025-03-30 12:54:44 -0500] [19838] [INFO] Using worker: sync
+Mar 30 12:54:44 acorn gunicorn[19840]: [2025-03-30 12:54:44 -0500] [19840] [INFO] Booting worker with pid: 19840
+Mar 30 12:54:45 acorn gunicorn[19841]: [2025-03-30 12:54:45 -0500] [19841] [INFO] Booting worker with pid: 19841
+Mar 30 12:54:45 acorn gunicorn[19842]: [2025-03-30 12:54:45 -0500] [19842] [INFO] Booting worker with pid: 19842
+Mar 30 12:54:45 acorn gunicorn[19843]: [2025-03-30 12:54:45 -0500] [19843] [INFO] Booting worker with pid: 19843
+Mar 30 12:54:45 acorn gunicorn[19840]: ERROR:app:Routes import error: expected 'except' or 'finally' block (ssh_client.py, line 33)
+Mar 30 12:54:45 acorn gunicorn[19842]: ERROR:app:Routes import error: expected 'except' or 'finally' block (ssh_client.py, line 33)
+Mar 30 12:54:45 acorn gunicorn[19841]: ERROR:app:Routes import error: expected 'except' or 'finally' block (ssh_client.py, line 33)
+Mar 30 12:54:45 acorn gunicorn[19843]: ERROR:app:Routes import error: expected 'except' or 'finally' block (ssh_client.py, line 33)

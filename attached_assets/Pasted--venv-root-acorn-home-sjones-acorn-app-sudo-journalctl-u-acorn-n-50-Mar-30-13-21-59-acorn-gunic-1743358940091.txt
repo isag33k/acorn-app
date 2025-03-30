@@ -1,0 +1,51 @@
+(venv) root@acorn:/home/sjones/acorn-app# sudo journalctl -u acorn -n 50
+Mar 30 13:21:59 acorn gunicorn[20282]: DEBUG:paramiko.transport:[chan 0] Max packet in: 32768 bytes
+Mar 30 13:21:59 acorn gunicorn[20282]: DEBUG:paramiko.transport:Received global request "hostkeys-00@openssh.com"
+Mar 30 13:21:59 acorn gunicorn[20282]: DEBUG:paramiko.transport:Rejecting "hostkeys-00@openssh.com" global request from server.
+Mar 30 13:21:59 acorn gunicorn[20282]: DEBUG:paramiko.transport:[chan 0] Max packet out: 32768 bytes
+Mar 30 13:21:59 acorn gunicorn[20282]: DEBUG:paramiko.transport:Secsh channel 0 opened.
+Mar 30 13:21:59 acorn gunicorn[20282]: DEBUG:paramiko.transport:[chan 0] Sesch channel 0 request ok
+Mar 30 13:22:00 acorn gunicorn[20282]: DEBUG:paramiko.transport:[chan 0] EOF received (0)
+Mar 30 13:22:00 acorn gunicorn[20282]: DEBUG:paramiko.transport:[chan 0] EOF sent (0)
+Mar 30 13:22:00 acorn gunicorn[20282]: DEBUG:utils.ssh_client:Command executed with status 0
+Mar 30 13:22:00 acorn gunicorn[20282]: DEBUG:utils.ssh_client:Disconnected from 10.160.15.4
+Mar 30 13:22:00 acorn gunicorn[20282]: ERROR:app:Exception on /check_circuit [POST]
+Mar 30 13:22:00 acorn gunicorn[20282]: Traceback (most recent call last):
+Mar 30 13:22:00 acorn gunicorn[20282]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+Mar 30 13:22:00 acorn gunicorn[20282]:     response = self.full_dispatch_request()
+Mar 30 13:22:00 acorn gunicorn[20282]:                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:22:00 acorn gunicorn[20282]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+Mar 30 13:22:00 acorn gunicorn[20282]:     rv = self.handle_user_exception(e)
+Mar 30 13:22:00 acorn gunicorn[20282]:          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:22:00 acorn gunicorn[20282]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+Mar 30 13:22:00 acorn gunicorn[20282]:     rv = self.dispatch_request()
+Mar 30 13:22:00 acorn gunicorn[20282]:          ^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:22:00 acorn gunicorn[20282]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+Mar 30 13:22:00 acorn gunicorn[20282]:     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+Mar 30 13:22:00 acorn gunicorn[20282]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:22:00 acorn gunicorn[20282]:   File "/home/sjones/acorn-app/routes.py", line 1460, in process_circuit_check
+Mar 30 13:22:00 acorn gunicorn[20282]:     return render_template(
+Mar 30 13:22:00 acorn gunicorn[20282]:            ^^^^^^^^^^^^^^^^
+Mar 30 13:22:00 acorn gunicorn[20282]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/templating.py", line 149, in render_template
+Mar 30 13:22:00 acorn gunicorn[20282]:     template = app.jinja_env.get_or_select_template(template_name_or_list)
+Mar 30 13:22:00 acorn gunicorn[20282]:                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:22:00 acorn gunicorn[20282]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+Mar 30 13:22:00 acorn gunicorn[20282]:     return self.get_template(template_name_or_list, parent, globals)
+Mar 30 13:22:00 acorn gunicorn[20282]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:22:00 acorn gunicorn[20282]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1016, in get_template
+Mar 30 13:22:00 acorn gunicorn[20282]:     return self._load_template(name, globals)
+Mar 30 13:22:00 acorn gunicorn[20282]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:22:00 acorn gunicorn[20282]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/jinja2/environment.py", line 975, in _load_template
+Mar 30 13:22:00 acorn gunicorn[20282]:     template = self.loader.load(self, name, self.make_globals(globals))
+Mar 30 13:22:00 acorn gunicorn[20282]:                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:22:00 acorn gunicorn[20282]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/jinja2/loaders.py", line 126, in load
+Mar 30 13:22:00 acorn gunicorn[20282]:     source, filename, uptodate = self.get_source(environment, name)
+Mar 30 13:22:00 acorn gunicorn[20282]:                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:22:00 acorn gunicorn[20282]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/templating.py", line 65, in get_source
+Mar 30 13:22:00 acorn gunicorn[20282]:     return self._get_source_fast(environment, template)
+Mar 30 13:22:00 acorn gunicorn[20282]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:22:00 acorn gunicorn[20282]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/templating.py", line 99, in _get_source_fast
+Mar 30 13:22:00 acorn gunicorn[20282]:     raise TemplateNotFound(template)
+Mar 30 13:22:00 acorn gunicorn[20282]: jinja2.exceptions.TemplateNotFound: results.html
+Mar 30 13:22:00 acorn gunicorn[20282]: DEBUG:paramiko.transport:EOF in transport thread
+Mar 30 13:22:02 acorn gunicorn[20284]: DEBUG:paramiko.transport:[chan 0] Unhandled channel request "keepalive@openssh.com"

@@ -1,0 +1,51 @@
+(venv) root@acorn:/home/sjones/acorn-app# sudo journalctl -u acorn -n 50
+Mar 30 13:11:56 acorn gunicorn[20120]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/werkzeug/routing/map.py", line 924, in build
+Mar 30 13:11:56 acorn gunicorn[20120]:     raise BuildError(endpoint, values, method, self)
+Mar 30 13:11:56 acorn gunicorn[20120]: werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'check_circuit'. Did you mean 'change_password' instead?
+Mar 30 13:11:56 acorn gunicorn[20121]: ERROR:app:Exception on / [GET]
+Mar 30 13:11:56 acorn gunicorn[20121]: Traceback (most recent call last):
+Mar 30 13:11:56 acorn gunicorn[20121]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+Mar 30 13:11:56 acorn gunicorn[20121]:     response = self.full_dispatch_request()
+Mar 30 13:11:56 acorn gunicorn[20121]:                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:11:56 acorn gunicorn[20121]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+Mar 30 13:11:56 acorn gunicorn[20121]:     rv = self.handle_user_exception(e)
+Mar 30 13:11:56 acorn gunicorn[20121]:          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:11:56 acorn gunicorn[20121]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+Mar 30 13:11:56 acorn gunicorn[20121]:     rv = self.dispatch_request()
+Mar 30 13:11:56 acorn gunicorn[20121]:          ^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:11:56 acorn gunicorn[20121]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+Mar 30 13:11:56 acorn gunicorn[20121]:     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+Mar 30 13:11:56 acorn gunicorn[20121]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:11:56 acorn gunicorn[20121]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask_login/utils.py", line 290, in decorated_view
+Mar 30 13:11:56 acorn gunicorn[20121]:     return current_app.ensure_sync(func)(*args, **kwargs)
+Mar 30 13:11:56 acorn gunicorn[20121]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:11:56 acorn gunicorn[20121]:   File "/home/sjones/acorn-app/routes.py", line 130, in index
+Mar 30 13:11:56 acorn gunicorn[20121]:     return render_template('index.html', form=form)
+Mar 30 13:11:56 acorn gunicorn[20121]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:11:56 acorn gunicorn[20121]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/templating.py", line 150, in render_template
+Mar 30 13:11:56 acorn gunicorn[20121]:     return _render(app, template, context)
+Mar 30 13:11:56 acorn gunicorn[20121]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:11:56 acorn gunicorn[20121]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/templating.py", line 131, in _render
+Mar 30 13:11:56 acorn gunicorn[20121]:     rv = template.render(context)
+Mar 30 13:11:56 acorn gunicorn[20121]:          ^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:11:56 acorn gunicorn[20121]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+Mar 30 13:11:56 acorn gunicorn[20121]:     self.environment.handle_exception()
+Mar 30 13:11:56 acorn gunicorn[20121]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+Mar 30 13:11:56 acorn gunicorn[20121]:     raise rewrite_traceback_stack(source=source)
+Mar 30 13:11:56 acorn gunicorn[20121]:   File "/home/sjones/acorn-app/templates/index.html", line 1, in top-level template code
+Mar 30 13:11:56 acorn gunicorn[20121]:     {% extends 'base.html' %}
+Mar 30 13:11:56 acorn gunicorn[20121]:   File "/home/sjones/acorn-app/templates/base.html", line 147, in top-level template code
+Mar 30 13:11:56 acorn gunicorn[20121]:     {% block content %}{% endblock %}
+Mar 30 13:11:56 acorn gunicorn[20121]:     ^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:11:56 acorn gunicorn[20121]:   File "/home/sjones/acorn-app/templates/index.html", line 18, in block 'content'
+Mar 30 13:11:56 acorn gunicorn[20121]:     <form action="{{ url_for('check_circuit') }}" method="POST">
+Mar 30 13:11:56 acorn gunicorn[20121]:     ^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:11:56 acorn gunicorn[20121]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 1121, in url_for
+Mar 30 13:11:56 acorn gunicorn[20121]:     return self.handle_url_build_error(error, endpoint, values)
+Mar 30 13:11:56 acorn gunicorn[20121]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:11:56 acorn gunicorn[20121]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 1110, in url_for
+Mar 30 13:11:56 acorn gunicorn[20121]:     rv = url_adapter.build(  # type: ignore[union-attr]
+Mar 30 13:11:56 acorn gunicorn[20121]:          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 13:11:56 acorn gunicorn[20121]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/werkzeug/routing/map.py", line 924, in build
+Mar 30 13:11:56 acorn gunicorn[20121]:     raise BuildError(endpoint, values, method, self)
+Mar 30 13:11:56 acorn gunicorn[20121]: werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'check_circuit'. Did you mean 'change_password' instead?
