@@ -1,247 +1,218 @@
-/* 
- * Dark Modern Theme for ACORN Application
- * Based on modern blue/dark color schemes
- */
-
+/* Dark Modern Theme for ACORN Application */
 :root {
-  /* Base color palette */
-  --acorn-primary: #3b82f6;       /* Bright blue */
-  --acorn-secondary: #64748b;     /* Slate gray */
-  --acorn-success: #10b981;       /* Emerald green */
-  --acorn-danger: #ef4444;        /* Red */
-  --acorn-warning: #f59e0b;       /* Amber */
-  --acorn-info: #06b6d4;          /* Cyan */
-  --acorn-light: #f8fafc;         /* Slate 50 */
-  --acorn-dark: #0f172a;          /* Slate 900 */
-  --acorn-gray: #94a3b8;          /* Slate 400 */
-  
-  /* Application specific colors */
-  --acorn-body-bg: #0f1824;       /* Darker slate */
-  --acorn-body-color: #e2e8f0;    /* Slate 200 */
-  --acorn-border-color: #334155;  /* Slate 700 */
-  
-  --acorn-navbar-bg: #1a2332;     /* Dark navy blue */
-  --acorn-navbar-color: #f1f5f9;  /* Slate 100 */
-  
-  --acorn-card-bg: #1a2332;       /* Dark navy blue */
-  --acorn-card-border: #334155;   /* Slate 700 */
-  
-  --acorn-input-bg: #1e293b;      /* Slate 800 */
-  --acorn-input-color: #e2e8f0;   /* Slate 200 */
-  --acorn-input-border: #475569;  /* Slate 600 */
-  
-  --acorn-table-bg: #1e293b;      /* Slate 800 */
-  --acorn-table-border: #334155;  /* Slate 700 */
-  
-  /* Gradient definitions */
-  --acorn-gradient-blue: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-  --acorn-gradient-green: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
-  --acorn-gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+    --acorn-primary: #4287f5;
+    --acorn-secondary: #6c757d;
+    --acorn-success: #28a745;
+    --acorn-danger: #dc3545;
+    --acorn-warning: #ffc107;
+    --acorn-info: #17a2b8;
+    --acorn-light: #495057;
+    --acorn-dark: #e9ecef;
+    
+    --acorn-body-bg: #121212;
+    --acorn-body-color: #e9ecef;
+    
+    --acorn-navbar-bg: #1e1e1e;
+    --acorn-navbar-color: #e9ecef;
+    
+    --acorn-card-bg: #1e1e1e;
+    --acorn-card-border: rgba(255, 255, 255, 0.125);
+    
+    --acorn-input-bg: #333333;
+    --acorn-input-color: #e9ecef;
+    --acorn-input-border: #495057;
+    
+    --acorn-header-bg: #0e0e0e;
+    --acorn-footer-bg: #0e0e0e;
+    
+    --acorn-output-bg: #242424;
+    --acorn-output-color: #e9ecef;
+    --acorn-output-border: rgba(255, 255, 255, 0.125);
+    --acorn-output-font: 'Consolas', 'Monaco', 'Courier New', monospace;
 }
 
-/* Global styles */
+/* Apply dark theme to body */
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background-color: var(--acorn-body-bg);
-  color: var(--acorn-body-color);
-  line-height: 1.6;
+    background-color: var(--acorn-body-bg);
+    color: var(--acorn-body-color);
 }
 
-/* Navbar styling with gradient and glow */
+/* Navbar styling */
 .navbar {
-  background-color: var(--acorn-navbar-bg) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  border-bottom: 1px solid var(--acorn-border-color);
+    background-color: var(--acorn-navbar-bg) !important;
 }
 
-.navbar-brand {
-  font-weight: 700;
-  color: var(--acorn-navbar-color);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.navbar-light {
+    --bs-navbar-color: var(--acorn-navbar-color);
+    --bs-navbar-hover-color: var(--acorn-primary);
+    --bs-navbar-active-color: var(--acorn-primary);
 }
 
-/* Card styling with modern shadows and rounded corners */
+.navbar-light .navbar-brand,
+.navbar-light .navbar-nav .nav-link {
+    color: var(--acorn-navbar-color);
+}
+
+.navbar-light .navbar-toggler-icon {
+    filter: invert(1);
+}
+
+/* Card styling */
 .card {
-  background-color: var(--acorn-card-bg);
-  border-color: var(--acorn-card-border);
-  border-radius: 0.75rem;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  margin-bottom: 1.75rem;
-  overflow: hidden;
+    background-color: var(--acorn-card-bg);
+    border-color: var(--acorn-card-border);
 }
 
 .card-header {
-  background-color: rgba(0, 0, 0, 0.15);
-  border-bottom: 1px solid var(--acorn-card-border);
-  font-weight: 600;
-  padding: 1rem 1.25rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-bottom-color: var(--acorn-card-border);
 }
 
-/* Form controls with smooth transitions */
+.card-footer {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-top-color: var(--acorn-card-border);
+}
+
+/* Form controls */
 .form-control, .form-select {
-  background-color: var(--acorn-input-bg);
-  border-color: var(--acorn-input-border);
-  color: var(--acorn-input-color);
-  border-radius: 0.5rem;
-  transition: all 0.2s ease;
+    background-color: var(--acorn-input-bg);
+    color: var(--acorn-input-color);
+    border-color: var(--acorn-input-border);
 }
 
 .form-control:focus, .form-select:focus {
-  background-color: var(--acorn-input-bg);
-  color: var(--acorn-input-color);
-  border-color: var(--acorn-primary);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    background-color: var(--acorn-input-bg);
+    color: var(--acorn-input-color);
+    border-color: var(--acorn-primary);
+    box-shadow: 0 0 0 0.25rem rgba(66, 135, 245, 0.25);
 }
 
-/* Table styling with modern aesthetics */
+.form-control::placeholder {
+    color: #6c757d;
+}
+
+/* Table styling */
 .table {
-  color: var(--acorn-body-color);
-  border-color: var(--acorn-table-border);
-  border-radius: 0.5rem;
-  overflow: hidden;
+    --bs-table-bg: var(--acorn-card-bg);
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.05);
+    --bs-table-striped-color: var(--acorn-body-color);
+    --bs-table-active-bg: rgba(255, 255, 255, 0.1);
+    --bs-table-active-color: var(--acorn-body-color);
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.075);
+    --bs-table-hover-color: var(--acorn-body-color);
+    color: var(--acorn-body-color);
+    border-color: var(--acorn-card-border);
 }
 
-.table-dark {
-  --bs-table-bg: var(--acorn-table-bg);
-  --bs-table-striped-bg: rgba(255, 255, 255, 0.03);
-  --bs-table-active-bg: rgba(59, 130, 246, 0.1);
-  --bs-table-hover-bg: rgba(59, 130, 246, 0.05);
+/* Modal styling */
+.modal-content {
+    background-color: var(--acorn-card-bg);
+    border-color: var(--acorn-card-border);
 }
 
-.table th {
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-size: 0.85rem;
+.modal-header {
+    border-bottom-color: var(--acorn-card-border);
 }
 
-/* Button styling with gradients and hover effects */
-.btn-primary {
-  background: var(--acorn-gradient-blue);
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.5rem 1.25rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+.modal-footer {
+    border-top-color: var(--acorn-card-border);
 }
 
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
+/* Output panel */
+.acorn-output-panel {
+    background-color: var(--acorn-output-bg);
+    color: var(--acorn-output-color);
+    border-color: var(--acorn-output-border);
+    font-family: var(--acorn-output-font);
+    padding: 1rem;
+    border-radius: 0.25rem;
+    overflow-x: auto;
+    white-space: pre-wrap;
 }
 
-.btn-secondary {
-  background-color: var(--acorn-secondary);
-  border: none;
-  border-radius: 0.5rem;
+/* Header and footer */
+.acorn-header {
+    background-color: var(--acorn-header-bg);
+    padding: 1rem 0;
 }
 
-.btn-success {
-  background: var(--acorn-gradient-green);
-  border: none;
-  border-radius: 0.5rem;
+.acorn-footer {
+    background-color: var(--acorn-footer-bg);
+    padding: 1rem 0;
+    margin-top: 2rem;
 }
 
-/* Custom code block styling with enhanced typography and scrollbar */
-.code-output {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  background-color: #172033;
-  color: #e2e8f0;
-  border: 1px solid #334155;
-  border-radius: 0.5rem;
-  padding: 1.25rem;
-  white-space: pre-wrap;
-  word-break: break-word;
-  max-height: 450px;
-  overflow-y: auto;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.2);
+/* Dropdown styling */
+.dropdown-menu {
+    background-color: var(--acorn-card-bg);
+    border-color: var(--acorn-card-border);
 }
 
-/* Customize scrollbars for all elements */
+.dropdown-item {
+    color: var(--acorn-body-color);
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+    background-color: rgba(66, 135, 245, 0.15);
+    color: var(--acorn-primary);
+}
+
+.dropdown-divider {
+    border-top-color: var(--acorn-card-border);
+}
+
+/* Circuit result styling */
+.circuit-success {
+    color: var(--acorn-success);
+}
+
+.circuit-error {
+    color: var(--acorn-danger);
+}
+
+.circuit-warning {
+    color: var(--acorn-warning);
+}
+
+/* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+    width: 12px;
+    height: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--acorn-input-bg);
-  border-radius: 4px;
+    background: #0e0e0e;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--acorn-secondary);
-  border-radius: 4px;
+    background: #333333;
+    border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--acorn-primary);
+    background: #555555;
 }
 
-/* Alert command output styling */
-.alert-output {
-  max-height: 600px;
-  overflow-y: auto;
-  border-radius: 0.5rem;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+/* Badge styling */
+.badge.bg-light {
+    color: #212529;
 }
 
-/* Footer styling */
-footer {
-  background-color: var(--acorn-navbar-bg);
-  color: var(--acorn-navbar-color);
-  padding: 2rem 0;
-  margin-top: 3rem;
-  border-top: 1px solid var(--acorn-border-color);
+/* Make code blocks more readable */
+code {
+    color: #ff79c6;
 }
 
-/* Circuit status indicators with enhanced visual feedback */
-.status-success {
-  color: var(--acorn-success);
-  text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
-}
-
-.status-error {
-  color: var(--acorn-danger);
-  text-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
-}
-
-/* Utility classes */
-.text-card-title {
-  color: #f1f5f9;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-}
-
+/* Border utilities */
 .border-subtle {
-  border-color: var(--acorn-border-color) !important;
+    border-color: var(--acorn-card-border) !important;
 }
 
-/* Badges with vibrant colors */
-.badge {
-  border-radius: 0.375rem;
-  padding: 0.35em 0.65em;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-size: 0.75em;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .container {
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-  
-  .code-output, .alert-output {
-    max-height: 320px;
-  }
-  
-  .card {
-    border-radius: 0.5rem;
-  }
+/* Notification badge */
+.notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 0.7rem;
+    transform: translate(50%, -50%);
 }
