@@ -656,6 +656,14 @@ pre {
     text-shadow: 0 0 10px rgba(0, 222, 136, 0.3);
 }
 
+/* Crystal header for tables */
+.crystal-header {
+    background-color: rgba(5, 39, 53, 0.7) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(5, 216, 227, 0.1);
+}
+
 /* Utility classes for glow effects */
 .text-glow-primary {
     text-shadow: 0 0 10px rgba(0, 222, 136, 0.5);

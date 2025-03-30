@@ -17,6 +17,7 @@
     
     --acorn-card-bg: #1e1e1e;
     --acorn-card-border: rgba(255, 255, 255, 0.125);
+    --acorn-card-header: #181818;
     
     --acorn-input-bg: #333333;
     --acorn-input-color: #e9ecef;
@@ -215,4 +216,9 @@ code {
     right: 0;
     font-size: 0.7rem;
     transform: translate(50%, -50%);
+}
+
+/* Crystal header for tables (Dark Modern theme version) */
+.crystal-header {
+    background-color: var(--acorn-card-header);
 }
