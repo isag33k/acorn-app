@@ -43,9 +43,13 @@ task = "shell.exec"
 args = "python3 mock_ssh_server.py"
 
 [[ports]]
-localPort = 5000
-externalPort = 80
-
-[[ports]]
 localPort = 2222
 externalPort = 2222
+
+[[ports]]
+localPort = 2223
+externalPort = 3000
+
+[[ports]]
+localPort = 5000
+externalPort = 80

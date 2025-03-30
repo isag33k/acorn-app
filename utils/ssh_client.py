@@ -143,21 +143,35 @@ class SSHClient:
                     connect_params['allow_agent'] = False
                     connect_params['look_for_keys'] = False
                 elif self.password:
-                    # Use both password and keyboard-interactive authentication methods
-                    logger.info("Using password and keyboard-interactive authentication")
+                    # Use password authentication if password is provided and no key file
+                    logger.info("Using password authentication")
                     connect_params['password'] = self.password
                     connect_params['allow_agent'] = False
                     connect_params['look_for_keys'] = False
                     
-                    # Add keyboard-interactive handler that returns the password
-                    def handler(title, instructions, prompt_list):
-                        logger.info(f"Keyboard interactive auth: {title} - {instructions}")
-                        for prompt in prompt_list:
-                            logger.info(f"Prompt: {prompt[0]}")
-                        # Always return the password for any prompt
-                        return [self.password]
+                    # Use custom auth_timeout for slow equipment
+                    connect_params['auth_timeout'] = 60
                     
-                    connect_params['auth_handler'] = handler
+                    # Disable certain pubkey algorithms that might not be supported
+                    connect_params['disabled_algorithms'] = dict(pubkeys=["rsa-sha2-256", "rsa-sha2-512"])
+                    
+                    # Set up a custom keyboard-interactive handler for servers that require it
+                    def interactive_handler(title, instructions, fields):
+                        logger.debug(f"Keyboard-interactive auth request: {title}")
+                        if instructions:
+                            logger.debug(f"Instructions: {instructions}")
+                        
+                        responses = []
+                        for field in fields:
+                            prompt, echo = field
+                            logger.debug(f"Prompt: {prompt}, echo: {echo}")
+                            # Always return the password for any prompt
+                            responses.append(self.password)
+                        
+                        return responses
+                    
+                    # Store the handler for use by transport after connection
+                    self._interactive_handler = interactive_handler
                 else:
                     # If no explicit auth method provided, try to use SSH agent or default keys
                     logger.info("No explicit credentials provided, trying SSH agent and default keys")
@@ -167,10 +181,25 @@ class SSHClient:
                 # Connect with our parameters
                 self.client.connect(**connect_params)
                 
-                # Test the connection with a simple command
+                # Get the transport
                 transport = self.client.get_transport()
                 if transport:
+                    # Set keepalive for long-running connections
                     transport.set_keepalive(15)  # 15 second keepalive (reduced from 30 for more frequent keepalives)
+                    
+                    # Try keyboard-interactive auth if we have a handler and password auth failed
+                    if hasattr(self, '_interactive_handler') and not transport.is_authenticated():
+                        logger.info("Trying keyboard-interactive authentication as fallback")
+                        try:
+                            transport.auth_interactive(
+                                username=self.username,
+                                handler=self._interactive_handler
+                            )
+                            if transport.is_authenticated():
+                                logger.info("Keyboard-interactive authentication succeeded")
+                        except Exception as e:
+                            logger.error(f"Keyboard-interactive authentication failed: {str(e)}")
+                            # Continue anyway - we'll catch connection failures later if auth didn't work
                 
                 logger.info(f"Successfully connected to {self.hostname}")
                 self.connected = True
