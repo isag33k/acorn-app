@@ -701,19 +701,32 @@ def submit_alert():
                 start_cmd_time = time.time()
                 
                 try:
-                    # Create new SSH client for each command (like the test page)
-                    # Handle both password and key-based authentication
-                    ssh_params = {
-                        'hostname': equipment.ip_address,
-                        'port': equipment.ssh_port,
-                        'username': credentials['username'],
-                        'password': credentials['password']
-                    }
-                    
-                    # Add key_filename if available in credentials
-                    if 'key_filename' in credentials and credentials['key_filename']:
-                        ssh_params['key_filename'] = credentials['key_filename']
-                        logger.info(f"Using key-based authentication for {equipment.name} with key file: {credentials['key_filename']}")
+                    # Check if user has TACACS credentials - these are preferred
+                    if hasattr(current_user, 'tacacs_username') and current_user.tacacs_username and current_user.tacacs_password:
+                        logger.info(f"Using TACACS credentials for user {current_user.username}")
+                        username = current_user.tacacs_username
+                        password = current_user.tacacs_password
+                        # No key file with TACACS
+                        ssh_params = {
+                            'hostname': equipment.ip_address,
+                            'port': equipment.ssh_port,
+                            'username': username,
+                            'password': password
+                        }
+                    else:
+                        # Use equipment-specific or user-specific credentials
+                        logger.info(f"Using equipment-specific credentials for {equipment.name}")
+                        ssh_params = {
+                            'hostname': equipment.ip_address,
+                            'port': equipment.ssh_port,
+                            'username': credentials['username'],
+                            'password': credentials['password']
+                        }
+                        
+                        # Add key_filename if available in credentials
+                        if 'key_filename' in credentials and credentials['key_filename']:
+                            ssh_params['key_filename'] = credentials['key_filename']
+                            logger.info(f"Using key-based authentication for {equipment.name} with key file: {credentials['key_filename']}")
                     
                     ssh_client = SSHClient(**ssh_params)
                     
@@ -1345,8 +1358,24 @@ def test_ssh_connection():
             logger.error(f"SSH test error: {str(e)}")
             logger.error(traceback.format_exc())
             
-            result = f"Failed to execute command: {command}"
-            error = str(e)
+            # More detailed and user-friendly error messages
+            error_str = str(e).lower()
+            if "authentication failed" in error_str or "auth fail" in error_str:
+                error = "Authentication failed. The username or password was rejected by the device."
+                result = "CONNECTION ERROR: Authentication failed. Please check your credentials."
+            elif "connection refused" in error_str:
+                error = f"Connection refused to {hostname}:{port}. The SSH service may not be running or a firewall may be blocking access."
+                result = "CONNECTION ERROR: Connection refused. The SSH service may not be running."
+            elif "timed out" in error_str:
+                error = f"Connection timed out to {hostname}:{port}. The device may be unreachable or network congestion is occurring."
+                result = "CONNECTION ERROR: Connection timed out. The device may be unreachable."
+            elif "no such file" in error_str and "key_filename" in error_str:
+                error = f"SSH key file not found: {request.form.get('key_filename', '')}. Please check the file path."
+                result = "KEY ERROR: SSH key file not found. Please check the file path."
+            else:
+                error = str(e)
+                result = f"Failed to execute command: {command}"
+            
             success = False
     
     # Pass all form values back to template

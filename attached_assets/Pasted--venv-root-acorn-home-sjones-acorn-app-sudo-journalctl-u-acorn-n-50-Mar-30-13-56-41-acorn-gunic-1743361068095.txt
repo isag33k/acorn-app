@@ -1,0 +1,51 @@
+(venv) root@acorn:/home/sjones/acorn-app# sudo journalctl -u acorn -n 50
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:Cipher: aes128-ctr
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:MAC: hmac-sha2-256
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:Compression: none
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:=== End of kex handshake ===
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:kex engine KexCurve25519 specified hash_algo <built-in function openssl_sha256>
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:Switch to new keys ...
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:Got EXT_INFO: {'server-sig-algs': b'ssh-ed25519,ssh-rsa,rsa-sha2-256,rsa-sha2-512,ssh-dss,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,null'}
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:Adding ssh-ed25519 host key for 64.239.43.6: b'fbafab3560ee4d3813f6b013c39698f8'
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:userauth is OK
+Mar 30 13:56:41 acorn gunicorn[20859]: INFO:paramiko.transport:Auth banner: b'+---------------------------------------------------------+\n|=========================================================|\n|       !!WARNING!!         >
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:Authentication type (password) not permitted.
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:Allowed methods: ['publickey', 'keyboard-interactive']
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:userauth is OK
+Mar 30 13:56:41 acorn gunicorn[20859]: INFO:paramiko.transport:Authentication (keyboard-interactive) failed.
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:utils.ssh_client:Bad authentication type; allowed types: ['publickey', 'keyboard-interactive']
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:utils.ssh_client:Trying keyboard-interactive authentication
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:starting thread (client mode): 0xcdf78a10
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:Local version/idstring: SSH-2.0-paramiko_3.5.1
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:Remote version/idstring: SSH-2.0-OpenSSH_7.8
+Mar 30 13:56:41 acorn gunicorn[20859]: INFO:paramiko.transport:Connected (version 2.0, client OpenSSH_7.8)
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:=== Key exchange possibilities ===
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:kex algos: curve25519-sha256@libssh.org, ecdh-sha2-nistp521, ecdh-sha2-nistp256, ecdh-sha2-nistp384, diffie-hellman-group14-sha1
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:server key: rsa-sha2-512, rsa-sha2-256, ssh-rsa, ecdsa-sha2-nistp521, ssh-ed25519
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:client encrypt: aes256-gcm@openssh.com, aes128-gcm@openssh.com, aes256-ctr, aes192-ctr, aes128-ctr
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:server encrypt: aes256-gcm@openssh.com, aes128-gcm@openssh.com, aes256-ctr, aes192-ctr, aes128-ctr
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:client mac: hmac-sha2-512-etm@openssh.com, hmac-sha2-256-etm@openssh.com, hmac-sha1-etm@openssh.com, hmac-sha2-512, hmac-sha2-256, hmac-sha1
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:server mac: hmac-sha2-512-etm@openssh.com, hmac-sha2-256-etm@openssh.com, hmac-sha1-etm@openssh.com, hmac-sha2-512, hmac-sha2-256, hmac-sha1
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:client compress: none, zlib@openssh.com
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:server compress: none, zlib@openssh.com
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:client lang: <none>
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:server lang: <none>
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:kex follows: False
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:=== Key exchange agreements ===
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:Kex: curve25519-sha256@libssh.org
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:HostKey: ssh-ed25519
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:Cipher: aes128-ctr
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:MAC: hmac-sha2-256
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:Compression: none
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:=== End of kex handshake ===
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:kex engine KexCurve25519 specified hash_algo <built-in function openssl_sha256>
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:Switch to new keys ...
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:Got EXT_INFO: {'server-sig-algs': b'ssh-ed25519,ssh-rsa,rsa-sha2-256,rsa-sha2-512,ssh-dss,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,null'}
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:EOF in transport thread
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:userauth is OK
+Mar 30 13:56:41 acorn gunicorn[20859]: INFO:paramiko.transport:Auth banner: b'+---------------------------------------------------------+\n|=========================================================|\n|       !!WARNING!!         >
+Mar 30 13:56:41 acorn gunicorn[20859]: INFO:paramiko.transport:Authentication (keyboard-interactive) failed.
+Mar 30 13:56:41 acorn gunicorn[20859]: WARNING:utils.ssh_client:Keyboard-interactive auth failed: Authentication failed.
+Mar 30 13:56:41 acorn gunicorn[20859]: WARNING:utils.ssh_client:Connection attempt 2 failed: Authentication failed.
+Mar 30 13:56:41 acorn gunicorn[20859]: ERROR:utils.ssh_client:Failed to connect after 2 attempts
+Mar 30 13:56:41 acorn gunicorn[20859]: DEBUG:paramiko.transport:EOF in transport thread

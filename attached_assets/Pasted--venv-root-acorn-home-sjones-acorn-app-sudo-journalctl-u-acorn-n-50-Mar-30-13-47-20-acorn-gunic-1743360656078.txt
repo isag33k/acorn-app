@@ -1,0 +1,51 @@
+(venv) root@acorn:/home/sjones/acorn-app# sudo journalctl -u acorn -n 50
+Mar 30 13:47:20 acorn gunicorn[20751]: DEBUG:paramiko.transport:=== End of kex handshake ===
+Mar 30 13:47:20 acorn gunicorn[20751]: DEBUG:paramiko.transport:kex engine KexCurve25519 specified hash_algo <built-in function openssl_sha256>
+Mar 30 13:47:20 acorn gunicorn[20751]: DEBUG:paramiko.transport:Switch to new keys ...
+Mar 30 13:47:20 acorn gunicorn[20751]: DEBUG:paramiko.transport:Got EXT_INFO: {'server-sig-algs': b'ssh-ed25519,ssh-rsa,rsa-sha2-256,rsa-sha2-512,ssh-dss,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,null'}
+Mar 30 13:47:20 acorn gunicorn[20751]: DEBUG:paramiko.transport:Adding ssh-ed25519 host key for 64.239.43.6: b'fbafab3560ee4d3813f6b013c39698f8'
+Mar 30 13:47:20 acorn gunicorn[20751]: DEBUG:paramiko.transport:userauth is OK
+Mar 30 13:47:20 acorn gunicorn[20751]: INFO:paramiko.transport:Auth banner: b'+---------------------------------------------------------+\n|=========================================================|\n|       !!WARNING!!         >
+Mar 30 13:47:20 acorn gunicorn[20751]: DEBUG:paramiko.transport:Authentication type (password) not permitted.
+Mar 30 13:47:20 acorn gunicorn[20751]: DEBUG:paramiko.transport:Allowed methods: ['publickey', 'keyboard-interactive']
+Mar 30 13:47:20 acorn gunicorn[20751]: DEBUG:paramiko.transport:userauth is OK
+Mar 30 13:47:21 acorn gunicorn[20751]: INFO:paramiko.transport:Authentication (keyboard-interactive) failed.
+Mar 30 13:47:21 acorn gunicorn[20751]: WARNING:utils.ssh_client:Connection attempt 2 failed: Bad authentication type; allowed types: ['publickey', 'keyboard-interactive']
+Mar 30 13:47:21 acorn gunicorn[20751]: ERROR:utils.ssh_client:Failed to connect after 2 attempts
+Mar 30 13:47:21 acorn gunicorn[20751]: DEBUG:paramiko.transport:EOF in transport thread
+Mar 30 13:49:18 acorn gunicorn[20751]: DEBUG:paramiko.transport:EOF in transport thread
+Mar 30 13:49:20 acorn gunicorn[20751]: DEBUG:paramiko.transport:EOF in transport thread
+Mar 30 13:50:34 acorn gunicorn[20751]: [2025-03-30 13:50:34 -0500] [20751] [INFO] Worker exiting (pid: 20751)
+Mar 30 13:50:34 acorn gunicorn[20751]: Database tables created successfully
+Mar 30 13:50:34 acorn gunicorn[20751]: Routes imported successfully
+Mar 30 13:50:34 acorn systemd[1]: Stopping acorn.service - ACORN Application...
+Mar 30 13:50:34 acorn gunicorn[20752]: [2025-03-30 13:50:34 -0500] [20752] [INFO] Worker exiting (pid: 20752)
+Mar 30 13:50:34 acorn gunicorn[20752]: Database tables created successfully
+Mar 30 13:50:34 acorn gunicorn[20752]: Routes imported successfully
+Mar 30 13:50:34 acorn gunicorn[20749]: [2025-03-30 13:50:34 -0500] [20749] [INFO] Worker exiting (pid: 20749)
+Mar 30 13:50:34 acorn gunicorn[20749]: Database tables created successfully
+Mar 30 13:50:34 acorn gunicorn[20749]: Routes imported successfully
+Mar 30 13:50:34 acorn gunicorn[20750]: [2025-03-30 13:50:34 -0500] [20750] [INFO] Worker exiting (pid: 20750)
+Mar 30 13:50:34 acorn gunicorn[20750]: Database tables created successfully
+Mar 30 13:50:34 acorn gunicorn[20750]: Routes imported successfully
+Mar 30 13:50:34 acorn gunicorn[20746]: [2025-03-30 13:50:34 -0500] [20746] [INFO] Handling signal: term
+Mar 30 13:50:34 acorn gunicorn[20746]: [2025-03-30 13:50:34 -0500] [20746] [ERROR] Worker (pid:20752) was sent SIGTERM!
+Mar 30 13:50:34 acorn gunicorn[20746]: [2025-03-30 13:50:34 -0500] [20746] [ERROR] Worker (pid:20751) was sent SIGTERM!
+Mar 30 13:50:34 acorn gunicorn[20746]: [2025-03-30 13:50:34 -0500] [20746] [ERROR] Worker (pid:20750) was sent SIGTERM!
+Mar 30 13:50:34 acorn gunicorn[20746]: [2025-03-30 13:50:34 -0500] [20746] [ERROR] Worker (pid:20749) was sent SIGTERM!
+Mar 30 13:50:34 acorn gunicorn[20746]: [2025-03-30 13:50:34 -0500] [20746] [INFO] Shutting down: Master
+Mar 30 13:50:34 acorn systemd[1]: acorn.service: Deactivated successfully.
+Mar 30 13:50:34 acorn systemd[1]: Stopped acorn.service - ACORN Application.
+Mar 30 13:50:34 acorn systemd[1]: acorn.service: Consumed 3.397s CPU time.
+Mar 30 13:50:34 acorn systemd[1]: Started acorn.service - ACORN Application.
+Mar 30 13:50:34 acorn gunicorn[20804]: [2025-03-30 13:50:34 -0500] [20804] [INFO] Starting gunicorn 23.0.0
+Mar 30 13:50:34 acorn gunicorn[20804]: [2025-03-30 13:50:34 -0500] [20804] [INFO] Listening at: http://0.0.0.0:5000 (20804)
+Mar 30 13:50:34 acorn gunicorn[20804]: [2025-03-30 13:50:34 -0500] [20804] [INFO] Using worker: sync
+Mar 30 13:50:34 acorn gunicorn[20805]: [2025-03-30 13:50:34 -0500] [20805] [INFO] Booting worker with pid: 20805
+Mar 30 13:50:34 acorn gunicorn[20806]: [2025-03-30 13:50:34 -0500] [20806] [INFO] Booting worker with pid: 20806
+Mar 30 13:50:34 acorn gunicorn[20807]: [2025-03-30 13:50:34 -0500] [20807] [INFO] Booting worker with pid: 20807
+Mar 30 13:50:35 acorn gunicorn[20808]: [2025-03-30 13:50:35 -0500] [20808] [INFO] Booting worker with pid: 20808
+Mar 30 13:50:35 acorn gunicorn[20805]: ERROR:app:Routes import error: unterminated string literal (detected at line 188) (ssh_client.py, line 188)
+Mar 30 13:50:35 acorn gunicorn[20806]: ERROR:app:Routes import error: unterminated string literal (detected at line 188) (ssh_client.py, line 188)
+Mar 30 13:50:35 acorn gunicorn[20807]: ERROR:app:Routes import error: unterminated string literal (detected at line 188) (ssh_client.py, line 188)
+Mar 30 13:50:35 acorn gunicorn[20808]: ERROR:app:Routes import error: unterminated string literal (detected at line 188) (ssh_client.py, line 188)

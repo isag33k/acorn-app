@@ -416,12 +416,29 @@ class SSHClient:
             logger.error(f"SSH error during command execution: {str(e)}")
             # Connection may be broken, mark as disconnected
             self.connected = False
-            return (False, f"SSH ERROR: {str(e)}")
+            
+            # Provide more detailed and user-friendly error messages
+            if "Authentication failed" in str(e):
+                return (False, "AUTHENTICATION ERROR: The username or password was rejected by the device. Please check your TACACS credentials in your user profile.")
+            elif "No authentication methods available" in str(e):
+                return (False, "AUTHENTICATION ERROR: No suitable authentication methods available. Please check your credentials.")
+            elif "not a valid RSA private key file" in str(e):
+                return (False, "KEY ERROR: The SSH key file is invalid or corrupted. Please check your key file.")
+            else:
+                return (False, f"SSH ERROR: {str(e)}")
             
         except Exception as e:
             logger.error(f"Error executing command: {str(e)}")
             logger.error(traceback.format_exc())
-            return (False, f"ERROR: {str(e)}")
+            # Provide more detailed error messages for common issues
+            if "Authentication failed" in str(e) or "auth fail" in str(e).lower():
+                return (False, "AUTHENTICATION ERROR: The username or password was rejected by the device. Please check your TACACS credentials in your user profile.")
+            elif "timed out" in str(e).lower():
+                return (False, "CONNECTION TIMEOUT: The device did not respond in time. The network may be congested or the device may be unreachable.")
+            elif "Connection refused" in str(e):
+                return (False, "CONNECTION REFUSED: The device actively refused the connection. The SSH service may not be running or a firewall may be blocking access.")
+            else:
+                return (False, f"ERROR: {str(e)}")
     
     def disconnect(self):
         """Close the SSH connection"""
