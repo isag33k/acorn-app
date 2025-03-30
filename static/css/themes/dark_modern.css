@@ -147,6 +147,7 @@ body {
 .dropdown-menu {
     background-color: var(--acorn-card-bg);
     border-color: var(--acorn-card-border);
+    z-index: 1060; /* Ensure dropdown appears above all other elements */
 }
 
 .dropdown-item {

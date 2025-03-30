@@ -158,3 +158,18 @@
 .liveoak-logo {
     height: 40px;
 }
+
+/* Fix for dropdown menu layering */
+.dropdown-menu {
+    z-index: 1060 !important; /* Ensure dropdown appears above all other elements */
+}
+
+/* Fix for user dropdown */
+.navbar .nav-item.dropdown {
+    position: static;
+}
+
+.navbar .dropdown-menu {
+    position: absolute;
+    right: 0;
+}
