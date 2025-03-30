@@ -122,21 +122,27 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 }
 
 .card-header {
-    background-color: var(--acorn-card-header);
+    background-color: rgba(5, 39, 53, 0.7) !important;
     border-bottom-color: var(--acorn-card-border);
     border-top-left-radius: 16px !important;
     border-top-right-radius: 16px !important;
     font-family: 'Orbitron', sans-serif;
     letter-spacing: 0.03rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .card-header .card-title {
     font-weight: 500;
+    color: var(--acorn-primary);
+    text-shadow: 0 0 10px rgba(0, 222, 136, 0.3);
 }
 
 .card-footer {
-    background-color: var(--acorn-card-header);
+    background-color: rgba(5, 39, 53, 0.7) !important;
     border-top-color: var(--acorn-card-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 /* Form controls */
@@ -187,13 +193,14 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 .table th {
     border-top-color: var(--acorn-card-border);
     border-bottom-color: var(--acorn-card-border);
-    background-color: var(--acorn-card-header);
+    background-color: rgba(5, 39, 53, 0.7) !important;
     color: var(--acorn-primary);
     font-family: 'Orbitron', 'Montserrat', sans-serif;
     font-weight: 500;
     text-transform: uppercase;
     font-size: 0.9rem;
     letter-spacing: 0.05rem;
+    text-shadow: 0 0 10px rgba(0, 222, 136, 0.3);
 }
 
 /* Button styling */
@@ -246,21 +253,27 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 
 .modal-header {
     border-bottom-color: var(--acorn-card-border);
-    background-color: var(--acorn-card-header);
+    background-color: rgba(5, 39, 53, 0.7) !important;
     border-top-left-radius: 16px;
     border-top-right-radius: 16px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .modal-title {
     font-family: 'Orbitron', 'Montserrat', sans-serif;
     letter-spacing: 0.03rem;
+    color: var(--acorn-primary);
+    text-shadow: 0 0 10px rgba(0, 222, 136, 0.3);
 }
 
 .modal-footer {
     border-top-color: var(--acorn-card-border);
-    background-color: var(--acorn-card-header);
+    background-color: rgba(5, 39, 53, 0.7) !important;
     border-bottom-left-radius: 16px;
     border-bottom-right-radius: 16px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 /* Output panel */
@@ -594,6 +607,52 @@ pre {
     background-color: transparent;
     border-color: transparent;
     border-bottom: 2px solid var(--acorn-primary);
+    text-shadow: 0 0 10px rgba(0, 222, 136, 0.3);
+}
+
+/* Page header and title boxes */
+.page-header {
+    background-color: rgba(5, 39, 53, 0.7) !important;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(5, 216, 227, 0.1);
+}
+
+.page-header h1, 
+.page-header h2, 
+.page-header h3 {
+    color: var(--acorn-primary);
+    margin-bottom: 0.5rem;
+    font-family: 'Orbitron', sans-serif;
+    text-shadow: 0 0 10px rgba(0, 222, 136, 0.3);
+}
+
+.page-header p {
+    color: var(--acorn-light);
+    margin-bottom: 0;
+}
+
+.title-box {
+    background-color: rgba(5, 39, 53, 0.7) !important;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(5, 216, 227, 0.1);
+}
+
+.title-box h4, 
+.title-box h5, 
+.title-box h6 {
+    color: var(--acorn-primary);
+    margin-bottom: 0;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 0.03rem;
     text-shadow: 0 0 10px rgba(0, 222, 136, 0.3);
 }
 
