@@ -1,0 +1,51 @@
+root@acorn:/home/sjones/acorn-app# sudo journalctl -u acorn -n 50
+Mar 30 09:11:09 acorn gunicorn[17517]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispa>
+Mar 30 09:11:09 acorn gunicorn[17517]:     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-an>
+Mar 30 09:11:09 acorn gunicorn[17517]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 09:11:09 acorn gunicorn[17517]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/flask_login/utils.py", line 290, >
+Mar 30 09:11:09 acorn gunicorn[17517]:     return current_app.ensure_sync(func)(*args, **kwargs)
+Mar 30 09:11:09 acorn gunicorn[17517]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 09:11:09 acorn gunicorn[17517]:   File "/home/sjones/acorn-app/routes.py", line 269, in user_credentials
+Mar 30 09:11:09 acorn gunicorn[17517]:     equipment = Equipment.query.all()
+Mar 30 09:11:09 acorn gunicorn[17517]:                 ^^^^^^^^^^^^^^^^^^^^^
+Mar 30 09:11:09 acorn gunicorn[17517]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 27>
+Mar 30 09:11:09 acorn gunicorn[17517]:     return self._iter().all()  # type: ignore
+Mar 30 09:11:09 acorn gunicorn[17517]:            ^^^^^^^^^^^^
+Mar 30 09:11:09 acorn gunicorn[17517]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 28>
+Mar 30 09:11:09 acorn gunicorn[17517]:     result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+Mar 30 09:11:09 acorn gunicorn[17517]:                                                   ^^^^^^^^^^^^^^^^^^^^^
+Mar 30 09:11:09 acorn gunicorn[17517]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line >
+Mar 30 09:11:09 acorn gunicorn[17517]:     return self._execute_internal(
+Mar 30 09:11:09 acorn gunicorn[17517]:            ^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 09:11:09 acorn gunicorn[17517]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line >
+Mar 30 09:11:09 acorn gunicorn[17517]:     result: Result[Any] = compile_state_cls.orm_execute_statement(
+Mar 30 09:11:09 acorn gunicorn[17517]:                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 09:11:09 acorn gunicorn[17517]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line >
+Mar 30 09:11:09 acorn gunicorn[17517]:     result = conn.execute(
+Mar 30 09:11:09 acorn gunicorn[17517]:              ^^^^^^^^^^^^^
+Mar 30 09:11:09 acorn gunicorn[17517]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line >
+Mar 30 09:11:09 acorn gunicorn[17517]:     return meth(
+Mar 30 09:11:09 acorn gunicorn[17517]:            ^^^^^
+Mar 30 09:11:09 acorn gunicorn[17517]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line>
+Mar 30 09:11:09 acorn gunicorn[17517]:     return connection._execute_clauseelement(
+Mar 30 09:11:09 acorn gunicorn[17517]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 09:11:09 acorn gunicorn[17517]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line >
+Mar 30 09:11:09 acorn gunicorn[17517]:     ret = self._execute_context(
+Mar 30 09:11:09 acorn gunicorn[17517]:           ^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 09:11:09 acorn gunicorn[17517]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line >
+Mar 30 09:11:09 acorn gunicorn[17517]:     return self._exec_single_context(
+Mar 30 09:11:09 acorn gunicorn[17517]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mar 30 09:11:09 acorn gunicorn[17517]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line >
+Mar 30 09:11:09 acorn gunicorn[17517]:     self._handle_dbapi_exception(
+Mar 30 09:11:09 acorn gunicorn[17517]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line >
+Mar 30 09:11:09 acorn gunicorn[17517]:     raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+Mar 30 09:11:09 acorn gunicorn[17517]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line >
+Mar 30 09:11:09 acorn gunicorn[17517]:     self.dialect.do_execute(
+Mar 30 09:11:09 acorn gunicorn[17517]:   File "/home/sjones/acorn-app/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", li>
+Mar 30 09:11:09 acorn gunicorn[17517]:     cursor.execute(statement, parameters)
+Mar 30 09:11:09 acorn gunicorn[17517]: sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedColumn) column equipment.key_filename d>
+Mar 30 09:11:09 acorn gunicorn[17517]: LINE 1: ...ername, equipment.password AS equipment_password, equipment....
+Mar 30 09:11:09 acorn gunicorn[17517]:                                                              ^
+Mar 30 09:11:09 acorn gunicorn[17517]: [SQL: SELECT equipment.id AS equipment_id, equipment.name AS equipment_name, equipment.ip_address >
+Mar 30 09:11:09 acorn gunicorn[17517]: FROM equipment]
+Mar 30 09:11:09 acorn gunicorn[17517]: (Background on this error at: https://sqlalche.me/e/20/f405)
