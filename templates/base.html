@@ -17,6 +17,9 @@
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     
+    <!-- Theme CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/themes/' + theme + '.css') }}">
+    
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
 </head>
@@ -61,6 +64,11 @@
                                     <i class="fas fa-users me-1"></i> Manage Users
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path == url_for('theme_settings') %}active{% endif %}" href="{{ url_for('theme_settings') }}">
+                                    <i class="fas fa-palette me-1"></i> Theme Settings
+                                </a>
+                            </li>
                         {% endif %}
                     {% endif %}
                 </ul>
@@ -93,6 +101,13 @@
                                 <li><a class="dropdown-item" href="{{ url_for('test_ssh_connection') }}">
                                     <i class="fas fa-terminal me-2"></i> SSH Connection Tester
                                 </a></li>
+                                
+                                {% if current_user.is_admin %}
+                                <li><a class="dropdown-item" href="{{ url_for('theme_settings') }}">
+                                    <i class="fas fa-palette me-2"></i> Theme Settings
+                                </a></li>
+                                {% endif %}
+                                
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{{ url_for('logout') }}">
                                     <i class="fas fa-sign-out-alt me-2"></i> Logout

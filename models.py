@@ -3,6 +3,12 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 
+# Available themes
+THEMES = {
+    'default': 'Default',
+    'dark_modern': 'Dark Modern'
+}
+
 class User(UserMixin, db.Model):
     """User model for authentication"""
     id = db.Column(db.Integer, primary_key=True)
@@ -156,3 +162,38 @@ class Contact(db.Model):
     
     def __repr__(self):
         return f"<Contact {self.first_name} {self.last_name} ({self.company})>"
+
+
+class AppSettings(db.Model):
+    """Model for application settings"""
+    id = db.Column(db.Integer, primary_key=True)
+    theme = db.Column(db.String(50), nullable=False, default='default')
+    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    
+    @classmethod
+    def get_current_theme(cls):
+        """Get the current theme setting"""
+        settings = cls.query.first()
+        if not settings:
+            settings = cls(theme='default')
+            db.session.add(settings)
+            db.session.commit()
+        return settings.theme
+    
+    @classmethod
+    def set_theme(cls, theme_key):
+        """Set the active theme"""
+        if theme_key not in THEMES:
+            raise ValueError(f"Theme '{theme_key}' not found")
+            
+        settings = cls.query.first()
+        if not settings:
+            settings = cls(theme=theme_key)
+            db.session.add(settings)
+        else:
+            settings.theme = theme_key
+        db.session.commit()
+        return settings.theme
+    
+    def __repr__(self):
+        return f"<AppSettings theme={self.theme}>"

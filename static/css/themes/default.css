@@ -1,0 +1,163 @@
+/* 
+ * Default Theme for ACORN Application
+ * Using Bootstrap 5 Dark Theme Variables
+ */
+
+:root {
+  --acorn-primary: #0d6efd;
+  --acorn-secondary: #6c757d;
+  --acorn-success: #198754;
+  --acorn-danger: #dc3545;
+  --acorn-warning: #ffc107;
+  --acorn-info: #0dcaf0;
+  --acorn-light: #f8f9fa;
+  --acorn-dark: #212529;
+  --acorn-gray: #6c757d;
+  
+  --acorn-body-bg: #222;
+  --acorn-body-color: #dee2e6;
+  --acorn-border-color: #495057;
+  
+  --acorn-navbar-bg: #343a40;
+  --acorn-navbar-color: #fff;
+  
+  --acorn-card-bg: #343a40;
+  --acorn-card-border: #495057;
+  
+  --acorn-input-bg: #2b3035;
+  --acorn-input-color: #dee2e6;
+  --acorn-input-border: #495057;
+  
+  --acorn-table-bg: #343a40;
+  --acorn-table-border: #495057;
+}
+
+/* Global styles */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--acorn-body-bg);
+  color: var(--acorn-body-color);
+}
+
+/* Navbar styling */
+.navbar {
+  background-color: var(--acorn-navbar-bg) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.navbar-brand {
+  font-weight: 700;
+  color: var(--acorn-navbar-color);
+}
+
+/* Card styling */
+.card {
+  background-color: var(--acorn-card-bg);
+  border-color: var(--acorn-card-border);
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.card-header {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid var(--acorn-card-border);
+  font-weight: 600;
+}
+
+/* Form controls */
+.form-control, .form-select {
+  background-color: var(--acorn-input-bg);
+  border-color: var(--acorn-input-border);
+  color: var(--acorn-input-color);
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: var(--acorn-input-bg);
+  color: var(--acorn-input-color);
+  border-color: var(--acorn-primary);
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Table styling */
+.table {
+  color: var(--acorn-body-color);
+  border-color: var(--acorn-table-border);
+}
+
+.table-dark {
+  --bs-table-bg: var(--acorn-table-bg);
+  --bs-table-striped-bg: rgba(255, 255, 255, 0.05);
+  --bs-table-active-bg: rgba(255, 255, 255, 0.1);
+  --bs-table-hover-bg: rgba(255, 255, 255, 0.075);
+}
+
+/* Button styling - mostly rely on Bootstrap's classes */
+.btn-primary {
+  background-color: var(--acorn-primary);
+  border-color: var(--acorn-primary);
+}
+
+.btn-primary:hover {
+  background-color: #0b5ed7;
+  border-color: #0a58ca;
+}
+
+/* Custom code block styling for command output */
+.code-output {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #2d3748;
+  color: #e2e8f0;
+  border: 1px solid #4a5568;
+  border-radius: 0.25rem;
+  padding: 1rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Alert command output styling */
+.alert-output {
+  max-height: 550px;
+  overflow-y: auto;
+}
+
+/* Footer styling */
+footer {
+  background-color: var(--acorn-navbar-bg);
+  color: var(--acorn-navbar-color);
+  padding: 1.5rem 0;
+  margin-top: 2rem;
+}
+
+/* Circuit status indicators */
+.status-success {
+  color: var(--acorn-success);
+}
+
+.status-error {
+  color: var(--acorn-danger);
+}
+
+/* Utility classes */
+.text-card-title {
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.border-subtle {
+  border-color: var(--acorn-border-color) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  
+  .code-output, .alert-output {
+    max-height: 300px;
+  }
+}

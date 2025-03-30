@@ -13,7 +13,7 @@ from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationE
 from sqlalchemy import or_
 from werkzeug.utils import secure_filename
 from app import app, db
-from models import Equipment, CircuitMapping, User, UserCredential, Contact
+from models import Equipment, CircuitMapping, User, UserCredential, Contact, AppSettings, THEMES
 from utils.ssh_client import SSHClient
 
 logger = logging.getLogger(__name__)
@@ -110,6 +110,15 @@ class PasswordChangeForm(FlaskForm):
     new_password = PasswordField('New Password', validators=[DataRequired(), Length(min=8)])
     confirm_password = PasswordField('Confirm New Password', validators=[DataRequired(), EqualTo('new_password')])
     submit = SubmitField('Change Password')
+    
+# Theming form for app settings
+class ThemingForm(FlaskForm):
+    theme = SelectField('Application Theme', validators=[DataRequired()], choices=[])
+    submit = SubmitField('Apply Theme')
+    
+    def __init__(self, *args, **kwargs):
+        super(ThemingForm, self).__init__(*args, **kwargs)
+        self.theme.choices = [(key, name) for key, name in THEMES.items()]
 
 @app.route('/')
 @login_required
@@ -590,6 +599,41 @@ def change_password():
                 flash(f'{getattr(form, field).label.text}: {error}', 'danger')
                 
     return redirect(url_for('user_profile'))
+
+@app.route('/settings/theme', methods=['GET', 'POST'])
+@login_required
+def theme_settings():
+    """Manage application theme settings (admin only)"""
+    if not current_user.is_admin:
+        flash('Admin access required', 'danger')
+        return redirect(url_for('index'))
+        
+    form = ThemingForm()
+    current_theme = AppSettings.get_current_theme()
+    
+    # For GET requests, set the form's default value
+    if request.method == 'GET':
+        form.theme.data = current_theme
+    
+    if form.validate_on_submit():
+        try:
+            # Update the theme setting
+            theme_key = form.theme.data
+            if theme_key in THEMES:
+                AppSettings.set_theme(theme_key)
+                flash(f'Theme changed to {THEMES[theme_key]}', 'success')
+            else:
+                flash('Invalid theme selected', 'danger')
+        except Exception as e:
+            logger.error(f"Error changing theme: {str(e)}")
+            flash(f'Error changing theme: {str(e)}', 'danger')
+            db.session.rollback()
+            
+    # Get theme preview images
+    theme_previews = {key: url_for('static', filename=f'img/themes/{key}_preview.svg') for key in THEMES.keys()}
+    
+    return render_template('theme_settings.html', form=form, current_theme=current_theme, 
+                           themes=THEMES, theme_previews=theme_previews)
 
 @app.route('/submit_alert', methods=['POST'])
 @login_required

@@ -79,6 +79,18 @@ def utility_processor():
     
     return dict(nl2br=nl2br)
 
+# Theme processor for Jinja templates
+@app.context_processor
+def theme_processor():
+    """Provide the current theme to all templates"""
+    try:
+        from models import AppSettings
+        current_theme = AppSettings.get_current_theme()
+        return {'theme': current_theme}
+    except Exception as e:
+        logger.error(f"Error loading theme: {str(e)}")
+        return {'theme': 'default'}
+
 # Initialize the database tables
 with app.app_context():
     # Import models
