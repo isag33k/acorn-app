@@ -6,7 +6,8 @@ import datetime
 # Available themes
 THEMES = {
     'default': 'Default',
-    'dark_modern': 'Dark Modern'
+    'dark_modern': 'Dark Modern',
+    'crystal_green': 'Crystal Green'
 }
 
 class User(UserMixin, db.Model):
