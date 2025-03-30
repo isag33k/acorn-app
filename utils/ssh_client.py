@@ -143,11 +143,21 @@ class SSHClient:
                     connect_params['allow_agent'] = False
                     connect_params['look_for_keys'] = False
                 elif self.password:
-                    # Use password authentication if password is provided and no key file
-                    logger.info("Using password authentication")
+                    # Use both password and keyboard-interactive authentication methods
+                    logger.info("Using password and keyboard-interactive authentication")
                     connect_params['password'] = self.password
                     connect_params['allow_agent'] = False
                     connect_params['look_for_keys'] = False
+                    
+                    # Add keyboard-interactive handler that returns the password
+                    def handler(title, instructions, prompt_list):
+                        logger.info(f"Keyboard interactive auth: {title} - {instructions}")
+                        for prompt in prompt_list:
+                            logger.info(f"Prompt: {prompt[0]}")
+                        # Always return the password for any prompt
+                        return [self.password]
+                    
+                    connect_params['auth_handler'] = handler
                 else:
                     # If no explicit auth method provided, try to use SSH agent or default keys
                     logger.info("No explicit credentials provided, trying SSH agent and default keys")
