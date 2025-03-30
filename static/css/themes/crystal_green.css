@@ -90,6 +90,41 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     letter-spacing: 0.05rem;
 }
 
+/* Crystal-styled A.C.O.R.N. Logo */
+.crystal-brand {
+    color: rgba(255, 255, 255, 0.95);
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.1rem;
+    position: relative;
+    text-shadow: 
+        0 0 10px rgba(0, 222, 136, 0.8),
+        0 0 20px rgba(0, 222, 136, 0.4),
+        0 0 30px rgba(5, 216, 227, 0.3);
+    background: linear-gradient(to bottom, #ffffff, #00de88);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.3s ease;
+}
+
+.crystal-brand:hover {
+    text-shadow: 
+        0 0 10px rgba(0, 222, 136, 1),
+        0 0 20px rgba(0, 222, 136, 0.8),
+        0 0 30px rgba(5, 216, 227, 0.6);
+    animation: pulse 1.5s infinite alternate;
+}
+
+@keyframes pulse {
+    0% {
+        filter: brightness(1);
+    }
+    100% {
+        filter: brightness(1.3);
+    }
+}
+
 .navbar-light {
     --bs-navbar-color: var(--acorn-navbar-color);
     --bs-navbar-hover-color: var(--acorn-primary);

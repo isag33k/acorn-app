@@ -31,7 +31,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg {% if theme in ['dark_modern', 'crystal_green'] %}navbar-dark{% else %}navbar-light{% endif %} mb-4">
         <div class="container">
-            <a class="navbar-brand fw-bold text-3d" href="{{ url_for('index') }}">
+            <a class="navbar-brand fw-bold {% if theme == 'crystal_green' %}crystal-brand{% else %}text-3d{% endif %}" href="{{ url_for('index') }}">
                 A.C.O.R.N.
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -152,7 +152,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6 text-center text-md-start">
-                    <span class="text-muted fw-500">
+                    <span class="{% if theme == 'crystal_green' %}text-glow-primary{% else %}text-muted{% endif %} fw-500">
                         A.C.O.R.N. - Automated Circuit Operations & Reporting Network
                     </span>
                 </div>
