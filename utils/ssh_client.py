@@ -318,9 +318,13 @@ class SSHClient:
                 # Create a client and assign the authenticated transport properly
                 self.client = paramiko.SSHClient()
                 self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                # Using a safer approach than direct _transport assignment
-                # Store the transport object to use directly for operations
-                self._transport = transport  # Store at class level instead of client._transport
+                
+                # Properly set the transport for the client
+                # This is critical to avoid 'NoneType' object has no attribute 'open_session' errors
+                self.client._transport = transport
+                
+                # Also store at class level for backup/reference
+                self._transport = transport
                 self.connected = True
                 
                 # Set keepalive
