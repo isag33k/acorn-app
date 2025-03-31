@@ -1598,6 +1598,37 @@ def circuit_ids():
                     logger.debug(f"Filtering out Cologix - Jacksonville entry with empty/missing Description")
                     continue
                 
+                # Filter out entries where Market = "Market" and Circuit ID = "Circuit ID"
+                # This catches header rows that made it into the data
+                if ('Market' in circuit and 'Circuit ID' in circuit and
+                    circuit.get('Market') == 'Market' and 
+                    circuit.get('Circuit ID') == 'Circuit ID'):
+                    logger.debug(f"Filtering out header row with Market='Market' and Circuit ID='Circuit ID' from {sheet_name}")
+                    continue
+                    
+                # Filter out entries where Provider field = Provider name (e.g., "Uniti", "Windstream") 
+                # and Circuit ID = "Circuit ID" (based on screenshot example)
+                if ('Provider' in circuit and 'Circuit ID' in circuit and
+                    circuit.get('Circuit ID') == 'Circuit ID' and
+                    circuit.get('Provider') in ['Uniti', 'Windstream']):
+                    logger.debug(f"Filtering out header row with Provider={circuit.get('Provider')} and Circuit ID='Circuit ID' from {sheet_name}")
+                    continue
+                
+                # Extra check for the "Market" rows with Uniti or Windstream from the screenshot
+                if ('Market' in circuit and 'Provider' in circuit and 'Circuit ID' in circuit and
+                    circuit.get('Market') == 'Market' and 
+                    circuit.get('Provider') in ['Uniti', 'Windstream'] and
+                    circuit.get('Circuit ID') == 'Circuit ID'):
+                    logger.debug(f"Filtering out Market='Market' row with Provider={circuit.get('Provider')} from {sheet_name}")
+                    continue
+                
+                # Special case shown in the screenshot where Market is literally "Market" and Provider is Uniti or Windstream
+                if ('Market' in circuit and 'Provider' in circuit and
+                    circuit.get('Market') == 'Market' and 
+                    circuit.get('Provider') in ['Uniti', 'Windstream']):
+                    logger.debug(f"Filtering out row with Market='Market' and Provider={circuit.get('Provider')} from {sheet_name}")
+                    continue
+                
                 # Count how many fields contain only field names or provider names
                 header_field_count = 0
                 total_fields_with_data = 0
@@ -1661,6 +1692,37 @@ def circuit_ids():
                         circuit.get('Status') == 'ACTIVE' and
                         (not circuit.get('Description') or circuit.get('Description') == '-')):
                         logger.debug(f"Filtering out Cologix - Jacksonville entry with empty/missing Description in show_all")
+                        skip_circuit = True
+                     
+                    # Filter out entries where Market = "Market" and Circuit ID = "Circuit ID"
+                    # This catches header rows that made it into the data
+                    if not skip_circuit and ('Market' in circuit and 'Circuit ID' in circuit and
+                        circuit.get('Market') == 'Market' and 
+                        circuit.get('Circuit ID') == 'Circuit ID'):
+                        logger.debug(f"Filtering out header row with Market='Market' and Circuit ID='Circuit ID' from {sheet_name} in show_all")
+                        skip_circuit = True
+                        
+                    # Filter out entries where Provider field = Provider name (e.g., "Uniti", "Windstream") 
+                    # and Circuit ID = "Circuit ID" (based on screenshot example)
+                    if not skip_circuit and ('Provider' in circuit and 'Circuit ID' in circuit and
+                        circuit.get('Circuit ID') == 'Circuit ID' and
+                        circuit.get('Provider') in ['Uniti', 'Windstream']):
+                        logger.debug(f"Filtering out header row with Provider={circuit.get('Provider')} and Circuit ID='Circuit ID' from {sheet_name} in show_all")
+                        skip_circuit = True
+                    
+                    # Extra check for the "Market" rows with Uniti or Windstream from the screenshot
+                    if not skip_circuit and ('Market' in circuit and 'Provider' in circuit and 'Circuit ID' in circuit and
+                        circuit.get('Market') == 'Market' and 
+                        circuit.get('Provider') in ['Uniti', 'Windstream'] and
+                        circuit.get('Circuit ID') == 'Circuit ID'):
+                        logger.debug(f"Filtering out Market='Market' row with Provider={circuit.get('Provider')} from {sheet_name} in show_all")
+                        skip_circuit = True
+                        
+                    # Special case shown in the screenshot where Market is literally "Market" and Provider is Uniti or Windstream
+                    if not skip_circuit and ('Market' in circuit and 'Provider' in circuit and
+                        circuit.get('Market') == 'Market' and 
+                        circuit.get('Provider') in ['Uniti', 'Windstream']):
+                        logger.debug(f"Filtering out row with Market='Market' and Provider={circuit.get('Provider')} from {sheet_name} in show_all")
                         skip_circuit = True
                     
                     # Case 2: Check if any field equals its own name
