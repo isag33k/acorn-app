@@ -114,6 +114,63 @@ def analyze_coresite_atlanta():
         logger.error(f"Error analyzing CoreSite - Atlanta: {e}")
         raise
 
+def analyze_arelion():
+    """
+    Focus specifically on Arelion data to identify column structure.
+    """
+    try:
+        excel_path = 'attached_assets/Appendix D - Circuit IDs.xlsx'
+        logger.info(f"Reading Arelion sheet from {excel_path}")
+        
+        # Read the specific sheet
+        df = pd.read_excel(excel_path, sheet_name='Arelion')
+        
+        # Print key column names for reference
+        logger.info("\nKey columns in Arelion sheet:")
+        logger.info(f"Column A (Unnamed: 0) - Expected to be Market")
+        logger.info(f"Column B (Unnamed: 1) - Expected to be Provider")
+        logger.info(f"Column C (Unnamed: 2) - Expected to be Description")
+        logger.info(f"Column D (Unnamed: 3) - Expected to be Circuit ID")
+        logger.info(f"Column E (Unnamed: 4) - Expected to be Status")
+        
+        # Look at the values in all key columns
+        logger.info("\nColumn A values (Market):")
+        logger.info(f"Values: {df.iloc[:, 0].dropna().head(10).tolist()}")
+        
+        logger.info("\nColumn B values (Provider):")
+        logger.info(f"Values: {df.iloc[:, 1].dropna().head(10).tolist()}")
+        
+        logger.info("\nColumn C values (Description):")
+        logger.info(f"Values: {df.iloc[:, 2].dropna().head(10).tolist()}")
+        
+        logger.info("\nColumn D values (Circuit ID):")
+        logger.info(f"Values: {df.iloc[:, 3].dropna().head(10).tolist()}")
+        
+        logger.info("\nColumn E values (Status):")
+        logger.info(f"Values: {df.iloc[:, 4].dropna().head(10).tolist()}")
+        
+        # Print a clearer view of first few rows to understand the structure
+        logger.info("\nFirst 10 rows of Arelion with key columns only:")
+        for idx in range(min(10, len(df))):
+            row_data = []
+            if not pd.isna(df.iloc[idx, 0]):  # Market
+                row_data.append(f"Market: {df.iloc[idx, 0]}")
+            if not pd.isna(df.iloc[idx, 1]):  # Provider
+                row_data.append(f"Provider: {df.iloc[idx, 1]}")
+            if not pd.isna(df.iloc[idx, 2]):  # Description
+                row_data.append(f"Description: {df.iloc[idx, 2]}")
+            if not pd.isna(df.iloc[idx, 3]):  # Circuit ID
+                row_data.append(f"Circuit ID: {df.iloc[idx, 3]}")
+            if not pd.isna(df.iloc[idx, 4]):  # Status
+                row_data.append(f"Status: {df.iloc[idx, 4]}")
+            
+            if row_data:
+                logger.info(f"Row {idx}: {' | '.join(row_data)}")
+    
+    except Exception as e:
+        logger.error(f"Error analyzing Arelion sheet: {e}")
+
 if __name__ == "__main__":
     # analyze_excel_file('attached_assets/Appendix D - Circuit IDs.xlsx')
-    analyze_coresite_atlanta()
+    # analyze_coresite_atlanta()
+    analyze_arelion()
