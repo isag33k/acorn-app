@@ -1452,6 +1452,8 @@ def circuit_ids():
             for sheet_name, circuits in all_data.items():
                 for circuit in circuits:
                     if str(circuit.get('Circuit ID')) == str(circuit_id):
+                        # Debug logging for circuit detection
+                        logger.debug(f"Found circuit: {circuit.get('Circuit ID')} in {sheet_name}")
                         selected_circuit = circuit
                         break
                 if selected_circuit:
@@ -1536,15 +1538,31 @@ def circuit_ids():
                 
                 # First, check if Circuit ID field contains any of the forbidden field names
                 # These are descriptive field headers, not actual circuit IDs
+                # Make sure to include both capitalized and lowercase versions
                 forbidden_circuit_id_values = [
-                    'data center id', 'cage id', 'cabinet number', 'patch panel id', 
-                    'patch panel port capacity', 'patch panel ports used', 
-                    'patch panel ports available', 'patch panel connector type',
-                    'data center description'
+                    'data center id', 'Data Center ID', 
+                    'cage id', 'Cage ID',
+                    'cabinet number', 'Cabinet Number',
+                    'patch panel id', 'Patch Panel ID',
+                    'patch panel port capacity', 'Patch Panel Port Capacity',
+                    'patch panel ports used', 'Patch Panel Ports Used',
+                    'patch panel ports available', 'Patch Panel Ports Available',
+                    'patch panel connector type', 'Patch Panel Connector Type',
+                    'data center description', 'Data Center Description',
+                    '-', 'patch panel connector', 'Patch Panel Connector'
                 ]
                 
-                if circuit_id and any(circuit_id == forbidden_id for forbidden_id in forbidden_circuit_id_values):
-                    continue  # Skip this circuit as it's a header field
+                # Add additional debugging for forbidden entries
+                if circuit.get('Circuit ID') and isinstance(circuit.get('Circuit ID'), str):
+                    actual_circuit_id = circuit.get('Circuit ID')
+                    if actual_circuit_id in forbidden_circuit_id_values:
+                        logger.debug(f"Filtering out forbidden header (exact match): {actual_circuit_id} from {sheet_name}")
+                        continue  # Skip this circuit as it's a header field
+                
+                # Also check case-insensitive match
+                if circuit_id and any(circuit_id == forbidden_id.lower() for forbidden_id in forbidden_circuit_id_values):
+                    logger.debug(f"Filtering out forbidden header (lowercase match): {circuit.get('Circuit ID')} from {sheet_name}")
+                    continue
                 
                 # Count how many fields contain only field names or provider names
                 header_field_count = 0
@@ -1587,7 +1605,16 @@ def circuit_ids():
                     skip_circuit = False
                     
                     # Case 1: First check if Circuit ID field contains any of the forbidden names
-                    if circuit_id and any(circuit_id == forbidden_id for forbidden_id in forbidden_circuit_id_values):
+                    # Check exact match for "Data Center ID", etc.
+                    if circuit.get('Circuit ID') and isinstance(circuit.get('Circuit ID'), str):
+                        actual_circuit_id = circuit.get('Circuit ID')
+                        if actual_circuit_id in forbidden_circuit_id_values:
+                            logger.debug(f"Filtering out forbidden header (exact match) in show_all: {actual_circuit_id} from {sheet_name}")
+                            skip_circuit = True
+                    
+                    # Also check case-insensitive match
+                    if not skip_circuit and circuit_id and any(circuit_id == forbidden_id.lower() for forbidden_id in forbidden_circuit_id_values):
+                        logger.debug(f"Filtering out forbidden header (lowercase match) in show_all: {circuit.get('Circuit ID')} from {sheet_name}")
                         skip_circuit = True
                     
                     # Case 2: Check if any field equals its own name
