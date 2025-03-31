@@ -1,0 +1,79 @@
+[
+    {
+        "id": 4,
+        "circuit_id": "SHA1-FL-OLT-1",
+        "equipment_id": 5,
+        "command": "sh version",
+        "description": "Example of command execution on equipment\t",
+        "contact_name": "Stan Jones",
+        "contact_email": "stan@jonesfamily.tech",
+        "contact_phone": "18504619626",
+        "contact_notes": ""
+    },
+    {
+        "id": 6,
+        "circuit_id": "BWB-FL-GW-01",
+        "equipment_id": 7,
+        "command": "show version",
+        "description": "BWB-FL-GW-01",
+        "contact_name": "Test Guy",
+        "contact_email": "",
+        "contact_phone": "",
+        "contact_notes": ""
+    },
+    {
+        "id": 2,
+        "circuit_id": "JAX-CORE-A",
+        "equipment_id": 3,
+        "command": "sh version",
+        "description": "Example of command execution on equipment",
+        "contact_name": "Stan Jones",
+        "contact_email": "stan@jonesfamily.tech",
+        "contact_phone": "18504619626",
+        "contact_notes": ""
+    },
+    {
+        "id": 3,
+        "circuit_id": "JAX-CORE-B",
+        "equipment_id": 4,
+        "command": "sh version",
+        "description": "Example of command execution on equipment",
+        "contact_name": "Stan Jones",
+        "contact_email": "stan@jonesfamily.tech",
+        "contact_phone": "18504619626",
+        "contact_notes": ""
+    },
+    {
+        "id": 7,
+        "circuit_id": "SHAL-FL-CORE-B",
+        "equipment_id": 32,
+        "command": "sh version",
+        "description": "SHAL-FL-CORE-B",
+        "contact_name": "Stan Jones",
+        "contact_email": "stan@jonesfamily.tech",
+        "contact_phone": "18504619626",
+        "contact_notes": "SHAL-FL-CORE-B"
+    },
+    {
+        "id": 5,
+        "circuit_id": "SHAL-FL-CORE-A",
+        "equipment_id": 6,
+        "command": "sh version",
+        "description": "Example of command execution on equipment\t",
+        "contact_name": "Stan Jones",
+        "contact_email": "stan@jonesfamily.tech",
+        "contact_phone": "18504619626",
+        "contact_notes": ""
+    },
+    {
+        "id": 8,
+        "circuit_id": "SHAL-FL-CORE-B:Vlan71",
+        "equipment_id": 32,
+        "command": "sh vlan br",
+        "description": "SHAL-FL-CORE-B:Vlan71",
+        "contact_name": "",
+        "contact_email": "",
+        "contact_phone": "",
+        "contact_notes": ""
+    }
+]

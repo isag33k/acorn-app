@@ -1,0 +1,272 @@
+[
+    {
+        "id": 3,
+        "name": "JAX-CORE-A",
+        "ip_address": "216.150.11.1",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 4,
+        "name": "JAX-CORE-B",
+        "ip_address": "64.239.43.16",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 6,
+        "name": "SHAL-FL-CORE-A",
+        "ip_address": "216.150.11.2",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 7,
+        "name": "BWB1-FL-OLT-1-MBB-A",
+        "ip_address": "10.160.15.20",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 8,
+        "name": "CRV2-FL-OLT-1-CRV-A",
+        "ip_address": "10.160.15.36",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 9,
+        "name": "CRV3-FL-OLT-1-CRV-A",
+        "ip_address": "10.160.15.84",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 10,
+        "name": "CRV5-FL-OLT-1-CRV-A",
+        "ip_address": "10.160.15.100",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 11,
+        "name": "CRV Core-A",
+        "ip_address": "64.239.43.9",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 12,
+        "name": "CSV Core-B",
+        "ip_address": "64.239.43.10",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 13,
+        "name": "CRV1-FL-OLT-1-CRV-A",
+        "ip_address": "10.160.15.212",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 14,
+        "name": "DST1-FL-OLT-1-MBB-A",
+        "ip_address": "10.160.15.68",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 15,
+        "name": "GRY1-FL-OLT-A",
+        "ip_address": "10.160.16.12",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 16,
+        "name": "SGV1-FL-OLT-01-EME-A",
+        "ip_address": "10.160.16.20",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 17,
+        "name": "SNY1-FL-OLT-B",
+        "ip_address": "10.160.16.44",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 18,
+        "name": "VAL1-FL-OLT-1-MBB-A",
+        "ip_address": "10.160.15.180",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 19,
+        "name": "NCL3-FL-OLT-1-MBB-A",
+        "ip_address": "10.160.15.52",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 20,
+        "name": "NCL1-FL-OLT-1-MBB-A",
+        "ip_address": "10.160.15.116",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 21,
+        "name": "ATL-GA-CORE-A",
+        "ip_address": "216.150.15.1",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 22,
+        "name": "ATL-GA-CORE-B",
+        "ip_address": "64.239.43.14",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 23,
+        "name": "BRUN-CORE-A",
+        "ip_address": "64.239.43.1",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 24,
+        "name": "BRUN-CORE-B",
+        "ip_address": "64.239.43.2",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 25,
+        "name": "BRUN-ASR9K (IP Restricted)",
+        "ip_address": "64.239.43.3",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 26,
+        "name": "BWK3-GA-OLT",
+        "ip_address": "10.150.15.52",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 27,
+        "name": "BWK5-GA-OLT-1",
+        "ip_address": "10.150.15.36",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 28,
+        "name": "BWK6-GA-OLT-1",
+        "ip_address": "10.150.15.100",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 29,
+        "name": "BWK7-GA-OLT-1",
+        "ip_address": "10.150.15.132",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 30,
+        "name": "LND1-GA-OLT-1",
+        "ip_address": "10.170.15.4",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 31,
+        "name": "SSI-1-GA",
+        "ip_address": "10.150.15.180",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 32,
+        "name": "SHAL-FL-CORE-B",
+        "ip_address": "64.239.43.6",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    },
+    {
+        "id": 5,
+        "name": "SHA1-FL-OLT-1",
+        "ip_address": "10.160.15.4",
+        "ssh_port": 22,
+        "username": "TACACS",
+        "password": "TACACS_PLACEHOLDER",
+        "key_filename": null
+    }
+]
