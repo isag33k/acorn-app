@@ -1444,7 +1444,16 @@ def circuit_ids():
         
         # Process data from all sheets and combine into a single list for display
         all_circuits = []
-        providers = set(['all'])  # For filter dropdown
+        
+        # Define valid providers (only these will be shown in filter dropdown)
+        valid_providers = ['Arelion', 'Accelecom', 'Cogent', 'Cologix - Jacksonville', 
+                          'CoreSite - Atlanta', 'Lumen', 'Seimitsu', 'Uniti', 
+                          'CenturyLink', 'Windstream']
+        
+        providers = set(['all'])  # For filter dropdown, starting with 'all'
+        for provider in valid_providers:
+            providers.add(provider)
+            
         statuses = set(['all', 'ACTIVE', 'INACTIVE', 'PENDING'])  # For filter dropdown
         
         # Key fields to include
@@ -1458,9 +1467,10 @@ def circuit_ids():
                 if not circuit.get('Circuit ID') and not circuit.get('Description'):
                     continue
                 
-                # Add provider to the providers set for filter dropdown
-                if circuit.get('Provider'):
-                    providers.add(circuit.get('Provider'))
+                # We're using a predefined provider list, so don't collect from data
+                # Just update the circuit provider if needed
+                if circuit.get('Provider') and circuit.get('Provider') not in valid_providers:
+                    circuit['Provider'] = sheet_name
                 
                 # Add status to the statuses set if not already in predefined list
                 if circuit.get('Status'):
