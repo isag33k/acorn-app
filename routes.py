@@ -1534,6 +1534,18 @@ def circuit_ids():
                 # 1. At least one field is a field name (e.g., "Market", "Circuit ID", etc.)
                 # 2. No field contains any actual useful data (only contains field names or provider names or is empty)
                 
+                # First, check if Circuit ID field contains any of the forbidden field names
+                # These are descriptive field headers, not actual circuit IDs
+                forbidden_circuit_id_values = [
+                    'data center id', 'cage id', 'cabinet number', 'patch panel id', 
+                    'patch panel port capacity', 'patch panel ports used', 
+                    'patch panel ports available', 'patch panel connector type',
+                    'data center description'
+                ]
+                
+                if circuit_id and any(circuit_id == forbidden_id for forbidden_id in forbidden_circuit_id_values):
+                    continue  # Skip this circuit as it's a header field
+                
                 # Count how many fields contain only field names or provider names
                 header_field_count = 0
                 total_fields_with_data = 0
@@ -1567,20 +1579,26 @@ def circuit_ids():
                 # or header-like rows (Market, Arelion, Circuit ID, etc.)
                 if show_all:
                     # Check for specific unwanted patterns:
-                    # 1. Any field equals its own field name
-                    # 2. Header-like rows with just field names
+                    # 1. Circuit ID field contains a forbidden value (e.g., "Data Center ID", "Cage ID")
+                    # 2. Any field equals its own field name
+                    # 3. Header-like rows with just field names
                     
                     # Skip if the circuit has any key field that equals its field name
                     skip_circuit = False
                     
-                    # Case 1: Check if any field equals its own name
-                    for field in key_fields:
-                        field_value = str(circuit.get(field, '')).lower()
-                        if field_value and field_value == field.lower():
-                            skip_circuit = True
-                            break
+                    # Case 1: First check if Circuit ID field contains any of the forbidden names
+                    if circuit_id and any(circuit_id == forbidden_id for forbidden_id in forbidden_circuit_id_values):
+                        skip_circuit = True
                     
-                    # Case 2: Check for header-like rows with key field names as values
+                    # Case 2: Check if any field equals its own name
+                    if not skip_circuit:
+                        for field in key_fields:
+                            field_value = str(circuit.get(field, '')).lower()
+                            if field_value and field_value == field.lower():
+                                skip_circuit = True
+                                break
+                    
+                    # Case 3: Check for header-like rows with key field names as values
                     if not skip_circuit:
                         # Count how many fields contain only field names or provider names
                         header_field_count = 0
