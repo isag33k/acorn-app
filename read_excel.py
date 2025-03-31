@@ -60,6 +60,23 @@ def read_excel_file(excel_path):
             'Unnamed: 16': 'Remote IPv6'  # Column Q
         })
         
+        # Special mapping for Cogent workbook
+        cogent_mapping = column_mapping.copy()
+        cogent_mapping.update({
+            'Unnamed: 0': 'Market',        # Column A
+            'Unnamed: 1': 'Provider',      # Column B
+            'Unnamed: 2': 'Description',   # Column C
+            'Unnamed: 3': 'Circuit ID',    # Column D
+            'Unnamed: 4': 'Status',        # Column E
+            'Unnamed: 10': 'Account Number',    # Column K
+            'Unnamed: 11': '24x7 Support Number', # Column L
+            'Unnamed: 12': 'Support E-mail',   # Column M
+            'Unnamed: 13': 'Local IPv4',   # Column N
+            'Unnamed: 14': 'Remote IPv4',  # Column O
+            'Unnamed: 15': 'Local IPv6',   # Column P
+            'Unnamed: 16': 'Remote IPv6'   # Column Q
+        })
+        
         # Special mapping for CoreSite - Atlanta where Circuit ID is in column F (Notes)
         coresite_mapping = column_mapping.copy()
         coresite_mapping.update({
@@ -101,6 +118,10 @@ def read_excel_file(excel_path):
                 logger.info(f"Using special mapping for Arelion with IP address fields")
                 # Use the special mapping for Arelion with IP address fields
                 df = df.rename(columns=arelion_mapping)
+            elif sheet_name == 'Cogent':
+                logger.info(f"Using special mapping for Cogent with IP address fields")
+                # Use the special mapping for Cogent with IP address fields
+                df = df.rename(columns=cogent_mapping)
             else:
                 # Use the standard mapping for other sheets
                 df = df.rename(columns=column_mapping)
