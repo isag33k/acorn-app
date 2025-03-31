@@ -1536,10 +1536,10 @@ def circuit_ids():
                 # 1. At least one field is a field name (e.g., "Market", "Circuit ID", etc.)
                 # 2. No field contains any actual useful data (only contains field names or provider names or is empty)
                 
-                # First, check if Circuit ID field contains any of the forbidden field names
-                # These are descriptive field headers, not actual circuit IDs
+                # First, check if ANY field contains forbidden values
+                # These are descriptive field headers, not actual circuit data
                 # Make sure to include both capitalized and lowercase versions
-                forbidden_circuit_id_values = [
+                forbidden_values = [
                     'data center id', 'Data Center ID', 
                     'cage id', 'Cage ID',
                     'cabinet number', 'Cabinet Number',
@@ -1552,17 +1552,25 @@ def circuit_ids():
                     '-', 'patch panel connector', 'Patch Panel Connector'
                 ]
                 
-                # Add additional debugging for forbidden entries
-                if circuit.get('Circuit ID') and isinstance(circuit.get('Circuit ID'), str):
-                    actual_circuit_id = circuit.get('Circuit ID')
-                    if actual_circuit_id in forbidden_circuit_id_values:
-                        logger.debug(f"Filtering out forbidden header (exact match): {actual_circuit_id} from {sheet_name}")
-                        continue  # Skip this circuit as it's a header field
-                
-                # Also check case-insensitive match
-                if circuit_id and any(circuit_id == forbidden_id.lower() for forbidden_id in forbidden_circuit_id_values):
-                    logger.debug(f"Filtering out forbidden header (lowercase match): {circuit.get('Circuit ID')} from {sheet_name}")
-                    continue
+                # Check Market, Circuit ID, and Description fields for forbidden values
+                # This covers the case where "Data Center ID" is in the Market field
+                is_forbidden_row = False
+                for field in ['Market', 'Circuit ID', 'Description']:
+                    if field in circuit and circuit[field] and isinstance(circuit[field], str):
+                        field_value = circuit[field]
+                        # Check exact match
+                        if field_value in forbidden_values:
+                            logger.debug(f"Filtering out forbidden header in {field}: {field_value} from {sheet_name}")
+                            is_forbidden_row = True
+                            break
+                        # Check lowercase match 
+                        if field_value.lower() in [val.lower() for val in forbidden_values]:
+                            logger.debug(f"Filtering out forbidden header (case-insensitive) in {field}: {field_value} from {sheet_name}")
+                            is_forbidden_row = True
+                            break
+                        
+                if is_forbidden_row:
+                    continue  # Skip this circuit as it's a header field
                 
                 # Count how many fields contain only field names or provider names
                 header_field_count = 0
@@ -1604,18 +1612,21 @@ def circuit_ids():
                     # Skip if the circuit has any key field that equals its field name
                     skip_circuit = False
                     
-                    # Case 1: First check if Circuit ID field contains any of the forbidden names
-                    # Check exact match for "Data Center ID", etc.
-                    if circuit.get('Circuit ID') and isinstance(circuit.get('Circuit ID'), str):
-                        actual_circuit_id = circuit.get('Circuit ID')
-                        if actual_circuit_id in forbidden_circuit_id_values:
-                            logger.debug(f"Filtering out forbidden header (exact match) in show_all: {actual_circuit_id} from {sheet_name}")
-                            skip_circuit = True
-                    
-                    # Also check case-insensitive match
-                    if not skip_circuit and circuit_id and any(circuit_id == forbidden_id.lower() for forbidden_id in forbidden_circuit_id_values):
-                        logger.debug(f"Filtering out forbidden header (lowercase match) in show_all: {circuit.get('Circuit ID')} from {sheet_name}")
-                        skip_circuit = True
+                    # Case 1: Check all key fields for forbidden values (Data Center ID, Cage ID, etc.)
+                    # First check Market, Circuit ID, and Description fields
+                    for field in ['Market', 'Circuit ID', 'Description']:
+                        if field in circuit and circuit[field] and isinstance(circuit[field], str):
+                            field_value = circuit[field]
+                            # Check exact match
+                            if field_value in forbidden_values:
+                                logger.debug(f"Filtering out forbidden header in {field} (exact match) in show_all: {field_value} from {sheet_name}")
+                                skip_circuit = True
+                                break
+                            # Check lowercase match
+                            if field_value.lower() in [val.lower() for val in forbidden_values]:
+                                logger.debug(f"Filtering out forbidden header in {field} (case-insensitive) in show_all: {field_value} from {sheet_name}")
+                                skip_circuit = True
+                                break
                     
                     # Case 2: Check if any field equals its own name
                     if not skip_circuit:
