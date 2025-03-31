@@ -1500,8 +1500,8 @@ def circuit_ids():
                 # Circuit passed all filters, include in results
                 all_circuits.append(circuit)
         
-        # Sort by Provider, then Circuit ID
-        all_circuits.sort(key=lambda x: (x.get('Provider', ''), x.get('Circuit ID', '')))
+        # Sort by Provider, then Circuit ID - convert values to strings to avoid type comparison issues
+        all_circuits.sort(key=lambda x: (str(x.get('Provider', '')), str(x.get('Circuit ID', ''))))
         
         # Create search form
         search_form = CircuitIDSearchForm()
