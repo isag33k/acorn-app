@@ -1,6 +1,6 @@
 # A.C.O.R.N. - Automated Circuit Operations & Reporting Network
 
-A comprehensive web application for automated network circuit monitoring, delivering advanced user management and real-time equipment tracking capabilities.
+A comprehensive web application for automated network circuit monitoring, delivering advanced SSH connection management and real-time equipment tracking capabilities.
 
 ## Features
 
@@ -10,7 +10,9 @@ A comprehensive web application for automated network circuit monitoring, delive
 - Equipment and circuit mapping management
 - User-specific SSH credentials management
 - Contact information database (POC Database)
+- Circuit ID Database with provider-specific information
 - Real SSH server connectivity testing
+- Customizable UI theme system
 
 ## Technical Stack
 
@@ -71,6 +73,29 @@ A comprehensive web application for automated network circuit monitoring, delive
 3. Add circuit mappings to connect circuit IDs with equipment and commands
 4. Test SSH connectivity using the "SSH Connection Tester" tool
 5. Enter circuit IDs on the main page to check their status
+6. Use the Circuit ID Database to search and filter circuit information by provider
+7. View detailed circuit information by clicking on any circuit in the database
+8. Adjust the application theme through the admin settings
+
+## Circuit ID Database
+
+The Circuit ID Database provides a comprehensive view of all circuit information across different providers. Key features include:
+
+- Searching and filtering circuits by provider, status, and circuit ID
+- Detailed view of individual circuit information
+- Provider-specific status handling (e.g., Cologix - Jacksonville status is ACTIVE when End Date is empty)
+- Unique circuit ID generation for records with duplicate IDs
+- Data is sourced from Excel files and processed using pandas
+
+## Data Processing
+
+The application includes several utilities for processing circuit data:
+
+- `read_excel.py`: Reads Excel files and converts them to JSON format
+- `analyze_excel.py`: Analyzes Excel file structure to identify column mappings
+- `fix_duplicate_circuit_ids.py`: Fixes duplicate circuit IDs by assigning unique identifiers
+- `restore_other_statuses.py`: Ensures proper status values for all provider circuits
+- `update_cologix_status.py`: Updates Cologix circuit statuses based on End Date
 
 ## SSH Server Testing
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-Script to read Excel file containing circuit data and generate a JSON file
+Script to restore the original status values for all providers except Cologix - Jacksonville.
+This will undo any inadvertent status changes made to other providers by regenerating the data
+from the Excel file with the correct mapping.
 """
 import json
 import os
@@ -12,9 +14,18 @@ logging.basicConfig(level=logging.INFO,
                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def read_excel_file(excel_path):
+def json_serial(obj):
     """
-    Read the Excel file with circuit IDs and convert each sheet to JSON
+    Custom JSON serializer for objects not serializable by default json code
+    """
+    if isinstance(obj, pd.Timestamp) or hasattr(obj, 'isoformat'):
+        return obj.isoformat()
+    raise TypeError(f"Type {type(obj)} not serializable")
+
+def read_excel_for_restoration(excel_path):
+    """
+    Read the Excel file with circuit IDs and convert each sheet to JSON,
+    applying special status handling ONLY for Cologix - Jacksonville
     """
     try:
         # Create a data structure to hold all sheets
@@ -60,8 +71,8 @@ def read_excel_file(excel_path):
         
         # Define valid providers list
         valid_providers = ['Arelion', 'Accelecom', 'Cogent', 'Cologix - Jacksonville', 
-                           'CoreSite - Atlanta', 'Lumen', 'Seimitsu', 'Uniti', 
-                           'CenturyLink', 'Windstream']
+                          'CoreSite - Atlanta', 'Lumen', 'Seimitsu', 'Uniti', 
+                          'CenturyLink', 'Windstream']
         
         # Process each sheet
         for sheet_name in excel_file.sheet_names:
@@ -116,11 +127,24 @@ def read_excel_file(excel_path):
                         
                 # For CoreSite records, ensure the Circuit ID is set correctly
                 if sheet_name == 'CoreSite - Atlanta':
-                    # If the Circuit ID is empty but Notes has a value (old mapping), use Notes as Circuit ID
-                    if (not record.get('Circuit ID') or pd.isna(record.get('Circuit ID'))) and record.get('Notes'):
-                        record['Circuit ID'] = record['Notes']
+                    # For CoreSite, we know Column F (Unnamed: 5) contains the Circuit ID values
+                    # and Column D (Unnamed: 3) contains the Service Numbers
+                    # We need to find the original index of this record to access the raw data
+                    row_idx = records.index(record)
+                    
+                    # Set Circuit ID from Column F if it exists
+                    if row_idx < len(df) and 'Unnamed: 5' in df.columns:
+                        circuit_id_value = df.iloc[row_idx]['Unnamed: 5']
+                        if not pd.isna(circuit_id_value) and str(circuit_id_value) != 'Circuit ID':
+                            record['Circuit ID'] = str(circuit_id_value)
+                    
+                    # Store Service Number from Column D if it exists
+                    if row_idx < len(df) and 'Unnamed: 3' in df.columns:
+                        service_number_value = df.iloc[row_idx]['Unnamed: 3']
+                        if not pd.isna(service_number_value) and str(service_number_value).startswith('SVC-'):
+                            record['Service Number'] = str(service_number_value)
                 
-                # Special handling for Cologix - Jacksonville
+                # Special handling for Cologix - Jacksonville ONLY
                 if sheet_name == 'Cologix - Jacksonville':
                     # Use Provider (Column B) as the Circuit ID
                     if record.get('Provider') is not None:
@@ -142,49 +166,35 @@ def read_excel_file(excel_path):
     except Exception as e:
         logger.error(f"Error reading Excel file: {e}")
         raise
-        
-def json_serial(obj):
-    """
-    Custom JSON serializer for objects not serializable by default json code
-    """
-    if isinstance(obj, pd.Timestamp) or hasattr(obj, 'isoformat'):
-        return obj.isoformat()
-    raise TypeError(f"Type {type(obj)} not serializable")
 
-def save_json(data, output_path):
+def restore_other_statuses():
     """
-    Save data to a JSON file
-    """
-    try:
-        with open(output_path, 'w') as f:
-            json.dump(data, f, indent=2, default=json_serial)
-        logger.info(f"Data saved to {output_path}")
-    except Exception as e:
-        logger.error(f"Error saving JSON file: {e}")
-        raise
-
-def main():
-    """
-    Main function to process Excel file and save as JSON
+    Regenerate the JSON data with proper status handling for all providers
     """
     # Input and output paths
     excel_path = 'attached_assets/Appendix D - Circuit IDs.xlsx'
-    output_path = 'circuit_ids_data.json'
+    json_file = 'circuit_ids_data.json'
     
     # Check if the Excel file exists
     if not os.path.exists(excel_path):
         logger.error(f"Excel file not found: {excel_path}")
         return
     
-    # Read the Excel file
-    logger.info(f"Reading Excel file: {excel_path}")
-    data = read_excel_file(excel_path)
-    
-    # Save the data to a JSON file
-    logger.info(f"Saving data to JSON file: {output_path}")
-    save_json(data, output_path)
-    
-    logger.info("Circuit ID data processing complete")
+    try:
+        # Read the Excel file with correct Cologix - Jacksonville handling
+        logger.info(f"Reading Excel file: {excel_path}")
+        data = read_excel_for_restoration(excel_path)
+        
+        # Save the data to the JSON file
+        logger.info(f"Saving data to JSON file: {json_file}")
+        with open(json_file, 'w') as f:
+            json.dump(data, f, indent=2, default=json_serial)
+        
+        logger.info("Circuit ID data restoration complete")
+        
+    except Exception as e:
+        logger.error(f"Error restoring data: {e}")
+        raise
 
 if __name__ == "__main__":
-    main()
+    restore_other_statuses()

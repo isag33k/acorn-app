@@ -1,5 +1,6 @@
 {pkgs}: {
   deps = [
+    pkgs.jq
     pkgs.glibcLocales
     pkgs.iproute2
     pkgs.gh
