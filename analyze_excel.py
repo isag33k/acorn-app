@@ -116,7 +116,8 @@ def analyze_coresite_atlanta():
 
 def analyze_arelion():
     """
-    Focus specifically on Arelion data to identify column structure.
+    Focus specifically on Arelion data to identify column structure,
+    including IP address columns: Local IPv4 (N), Remote IPv4 (O), Local IPv6 (P), Remote IPv6 (Q).
     """
     try:
         excel_path = 'attached_assets/Appendix D - Circuit IDs.xlsx'
@@ -149,23 +150,48 @@ def analyze_arelion():
         logger.info("\nColumn E values (Status):")
         logger.info(f"Values: {df.iloc[:, 4].dropna().head(10).tolist()}")
         
-        # Print a clearer view of first few rows to understand the structure
-        logger.info("\nFirst 10 rows of Arelion with key columns only:")
-        for idx in range(min(10, len(df))):
-            row_data = []
-            if not pd.isna(df.iloc[idx, 0]):  # Market
-                row_data.append(f"Market: {df.iloc[idx, 0]}")
-            if not pd.isna(df.iloc[idx, 1]):  # Provider
-                row_data.append(f"Provider: {df.iloc[idx, 1]}")
-            if not pd.isna(df.iloc[idx, 2]):  # Description
-                row_data.append(f"Description: {df.iloc[idx, 2]}")
-            if not pd.isna(df.iloc[idx, 3]):  # Circuit ID
-                row_data.append(f"Circuit ID: {df.iloc[idx, 3]}")
-            if not pd.isna(df.iloc[idx, 4]):  # Status
-                row_data.append(f"Status: {df.iloc[idx, 4]}")
+        # IP address columns (N, O, P, Q)
+        logger.info("\nIP address columns:")
+        
+        # Map columns to their expected meanings
+        ip_columns = {
+            13: 'Local IPv4',   # Column N
+            14: 'Remote IPv4',  # Column O
+            15: 'Local IPv6',   # Column P
+            16: 'Remote IPv6'   # Column Q
+        }
+        
+        # Print column headers for all columns to see what's available
+        logger.info("\nAll column headers:")
+        for i, col in enumerate(df.columns):
+            col_letter = chr(65 + i) if i < 26 else chr(64 + i//26) + chr(65 + i%26)
+            logger.info(f"Column {col_letter} ({i}): {col}")
+        
+        # Examine the IP address columns
+        for col_idx, ip_type in ip_columns.items():
+            if col_idx < len(df.columns):
+                col_name = df.columns[col_idx]
+                col_letter = chr(65 + col_idx) if col_idx < 26 else chr(64 + col_idx//26) + chr(65 + col_idx%26)
+                logger.info(f"\nColumn {col_letter} ({col_name}) - {ip_type}:")
+                values = df.iloc[:, col_idx].dropna().head(5).tolist()
+                logger.info(f"Sample values: {values}")
+            else:
+                logger.info(f"\nColumn index {col_idx} ({ip_type}) is out of range")
+        
+        # Print sample rows with both basic info and IP addresses
+        logger.info("\nSample rows with IP addresses:")
+        for idx in range(3, min(8, len(df))):  # Skip header rows
+            if pd.isna(df.iloc[idx, 3]):  # Skip rows without Circuit ID
+                continue
+                
+            row_info = [f"Circuit ID: {df.iloc[idx, 3]}"]
             
-            if row_data:
-                logger.info(f"Row {idx}: {' | '.join(row_data)}")
+            # Add IP address information if available
+            for col_idx, ip_type in ip_columns.items():
+                if col_idx < len(df.columns) and not pd.isna(df.iloc[idx, col_idx]):
+                    row_info.append(f"{ip_type}: {df.iloc[idx, col_idx]}")
+            
+            logger.info(" | ".join(row_info))
     
     except Exception as e:
         logger.error(f"Error analyzing Arelion sheet: {e}")

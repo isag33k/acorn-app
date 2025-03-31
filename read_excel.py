@@ -51,6 +51,15 @@ def read_excel_file(excel_path):
             'Unnamed: 23': 'Account Manager Mobile'
         }
         
+        # Special mapping for Arelion with IP address fields
+        arelion_mapping = column_mapping.copy()
+        arelion_mapping.update({
+            'Unnamed: 13': 'Local IPv4',  # Column N
+            'Unnamed: 14': 'Remote IPv4', # Column O
+            'Unnamed: 15': 'Local IPv6',  # Column P
+            'Unnamed: 16': 'Remote IPv6'  # Column Q
+        })
+        
         # Special mapping for CoreSite - Atlanta where Circuit ID is in column F (Notes)
         coresite_mapping = column_mapping.copy()
         coresite_mapping.update({
@@ -88,6 +97,10 @@ def read_excel_file(excel_path):
                 logger.info(f"Using special mapping for CoreSite - Atlanta")
                 # Use the special mapping for CoreSite - Atlanta
                 df = df.rename(columns=coresite_mapping)
+            elif sheet_name == 'Arelion':
+                logger.info(f"Using special mapping for Arelion with IP address fields")
+                # Use the special mapping for Arelion with IP address fields
+                df = df.rename(columns=arelion_mapping)
             else:
                 # Use the standard mapping for other sheets
                 df = df.rename(columns=column_mapping)
