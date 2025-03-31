@@ -1508,7 +1508,8 @@ def circuit_ids():
         for provider in valid_providers:
             providers.add(provider)
             
-        statuses = set(['all', 'ACTIVE', 'INACTIVE', 'PENDING'])  # For filter dropdown
+        # Set fixed status options - only these three values will be shown in dropdown regardless of data
+        statuses = set(['all', 'ACTIVE', 'INACTIVE', 'PENDING'])
         
         # Key fields to include
         key_fields = ['Market', 'Provider', 'Circuit ID', 'Status', 'Description', 
@@ -1526,9 +1527,8 @@ def circuit_ids():
                 if circuit.get('Provider') and circuit.get('Provider') not in valid_providers:
                     circuit['Provider'] = sheet_name
                 
-                # Add status to the statuses set if not already in predefined list
-                if circuit.get('Status'):
-                    statuses.add(circuit.get('Status'))
+                # No longer adding statuses from data - using only our predefined list
+                # of ACTIVE, INACTIVE, and PENDING
                 
                 # Skip filtering if show_all is true
                 if show_all:
@@ -1613,11 +1613,13 @@ def circuit_ids():
                 provider_choices.append((provider, provider))
         search_form.provider_filter.choices = provider_choices
         
-        # Update the status choices in the form
-        status_choices = [('all', 'All Statuses')]
-        for status in sorted(statuses):
-            if status != 'all':
-                status_choices.append((status, status))
+        # Set the status choices in the form to only the three allowed values
+        status_choices = [
+            ('all', 'All Statuses'),
+            ('ACTIVE', 'ACTIVE'),
+            ('INACTIVE', 'INACTIVE'),
+            ('PENDING', 'PENDING')
+        ]
         search_form.status_filter.choices = status_choices
         
         # CSRF form for any actions that require it
