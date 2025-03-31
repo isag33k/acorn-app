@@ -1888,3 +1888,158 @@ def circuit_ids():
                               circuit_data=None, 
                               search_form=CircuitIDSearchForm(),
                               csrf_form=FlaskForm())
+                              
+@app.route('/update_circuit', methods=['POST'])
+@login_required
+def update_circuit():
+    """Update circuit information in the JSON database"""
+    # Check if user has editor or admin privileges
+    if not current_user.is_admin and not current_user.is_editor:
+        flash('You do not have permission to edit circuits', 'danger')
+        return redirect(url_for('circuit_ids'))
+        
+    # CSRF Validation
+    form = FlaskForm()
+    if not form.validate_on_submit():
+        flash('Security validation failed. Please try again.', 'danger')
+        return redirect(url_for('circuit_ids'))
+    
+    # Get form data
+    original_circuit_id = request.form.get('original_circuit_id')
+    provider = request.form.get('provider')
+    circuit_id = request.form.get('circuit_id')
+    status = request.form.get('status')
+    market = request.form.get('market')
+    description = request.form.get('description')
+    parent_cid = request.form.get('parent_cid')
+    access_cid = request.form.get('access_cid')
+    access_provider = request.form.get('access_provider')
+    capacity = request.form.get('capacity')
+    
+    if not original_circuit_id or not provider:
+        flash('Missing required fields', 'danger')
+        return redirect(url_for('circuit_ids'))
+    
+    try:
+        # Load circuit data
+        circuit_data_file = 'circuit_ids_data.json'
+        if not os.path.exists(circuit_data_file):
+            flash('Circuit IDs database file not found', 'danger')
+            return redirect(url_for('circuit_ids'))
+            
+        with open(circuit_data_file, 'r') as f:
+            all_data = json.load(f)
+        
+        # Find and update the circuit
+        found = False
+        for sheet_name, circuits in all_data.items():
+            for i, circuit in enumerate(circuits):
+                if str(circuit.get('Circuit ID')) == str(original_circuit_id) and str(circuit.get('Provider')) == str(provider):
+                    # Update the circuit with new values
+                    all_data[sheet_name][i]['Circuit ID'] = circuit_id
+                    all_data[sheet_name][i]['Status'] = status
+                    
+                    if market:
+                        all_data[sheet_name][i]['Market'] = market
+                    if description:
+                        all_data[sheet_name][i]['Description'] = description
+                    if parent_cid:
+                        all_data[sheet_name][i]['Parent CID'] = parent_cid
+                    if access_cid:
+                        all_data[sheet_name][i]['Access CID'] = access_cid
+                    if access_provider:
+                        all_data[sheet_name][i]['Access Provider'] = access_provider
+                    if capacity:
+                        all_data[sheet_name][i]['Capacity'] = capacity
+                    
+                    found = True
+                    break
+            if found:
+                break
+        
+        if not found:
+            flash(f'Circuit ID "{original_circuit_id}" not found', 'warning')
+            return redirect(url_for('circuit_ids'))
+        
+        # Save updated data back to file
+        with open(circuit_data_file, 'w') as f:
+            json.dump(all_data, f, indent=4)
+        
+        flash(f'Circuit "{original_circuit_id}" updated successfully', 'success')
+        
+        # Redirect to view the updated circuit
+        if original_circuit_id != circuit_id:
+            # If the circuit ID changed, redirect to the new one
+            return redirect(url_for('circuit_ids', circuit_id=circuit_id))
+        else:
+            # Otherwise redirect to the same circuit to see changes
+            return redirect(url_for('circuit_ids', circuit_id=original_circuit_id))
+            
+    except Exception as e:
+        logger.error(f"Error updating circuit: {str(e)}")
+        logger.error(traceback.format_exc())
+        flash(f'Error updating circuit: {str(e)}', 'danger')
+        return redirect(url_for('circuit_ids', circuit_id=original_circuit_id))
+
+@app.route('/delete_circuit', methods=['POST'])
+@login_required
+def delete_circuit():
+    """Delete circuit from the JSON database"""
+    # Check if user has editor or admin privileges
+    if not current_user.is_admin and not current_user.is_editor:
+        flash('You do not have permission to delete circuits', 'danger')
+        return redirect(url_for('circuit_ids'))
+        
+    # CSRF Validation
+    form = FlaskForm()
+    if not form.validate_on_submit():
+        flash('Security validation failed. Please try again.', 'danger')
+        return redirect(url_for('circuit_ids'))
+    
+    # Get form data
+    circuit_id = request.form.get('circuit_id')
+    provider = request.form.get('provider')
+    
+    if not circuit_id or not provider:
+        flash('Missing required fields', 'danger')
+        return redirect(url_for('circuit_ids'))
+    
+    try:
+        # Load circuit data
+        circuit_data_file = 'circuit_ids_data.json'
+        if not os.path.exists(circuit_data_file):
+            flash('Circuit IDs database file not found', 'danger')
+            return redirect(url_for('circuit_ids'))
+            
+        with open(circuit_data_file, 'r') as f:
+            all_data = json.load(f)
+        
+        # Find and delete the circuit
+        found = False
+        for sheet_name, circuits in all_data.items():
+            for i, circuit in enumerate(circuits):
+                if str(circuit.get('Circuit ID')) == str(circuit_id) and str(circuit.get('Provider')) == str(provider):
+                    # Remove the circuit from the list
+                    deleted_circuit = all_data[sheet_name].pop(i)
+                    logger.info(f"Deleted circuit: {deleted_circuit}")
+                    found = True
+                    break
+            if found:
+                break
+        
+        if not found:
+            flash(f'Circuit ID "{circuit_id}" not found', 'warning')
+            return redirect(url_for('circuit_ids'))
+        
+        # Save updated data back to file
+        with open(circuit_data_file, 'w') as f:
+            json.dump(all_data, f, indent=4)
+        
+        flash(f'Circuit "{circuit_id}" deleted successfully', 'success')
+        return redirect(url_for('circuit_ids'))
+            
+    except Exception as e:
+        logger.error(f"Error deleting circuit: {str(e)}")
+        logger.error(traceback.format_exc())
+        flash(f'Error deleting circuit: {str(e)}', 'danger')
+        return redirect(url_for('circuit_ids'))
