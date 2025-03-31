@@ -1518,8 +1518,40 @@ def circuit_ids():
         # Process each sheet
         for sheet_name, circuits in all_data.items():
             for circuit in circuits:
-                # Skip rows without a circuit ID or description
+                # Skip rows without a circuit ID or description, or that are header-like rows
                 if not circuit.get('Circuit ID') and not circuit.get('Description'):
+                    continue
+                    
+                # Skip if we have header-like rows (Market, Arelion, Circuit ID, etc.)
+                market = str(circuit.get('Market', '')).lower()
+                provider = str(circuit.get('Provider', '')).lower() 
+                circuit_id = str(circuit.get('Circuit ID', '')).lower()
+                description = str(circuit.get('Description', '')).lower()
+                status = str(circuit.get('Status', '')).lower()
+                
+                # Check for header-like pattern with field names as values
+                # For this logic, we consider it to be a header row if:
+                # 1. At least one field is a field name (e.g., "Market", "Circuit ID", etc.)
+                # 2. No field contains any actual useful data (only contains field names or provider names or is empty)
+                
+                # Count how many fields contain only field names or provider names
+                header_field_count = 0
+                total_fields_with_data = 0
+                
+                for field in key_fields:
+                    field_value = str(circuit.get(field, '')).lower()
+                    if field_value:
+                        total_fields_with_data += 1
+                        
+                        # Check if this field contains its own name
+                        if field_value == field.lower():
+                            header_field_count += 1
+                        # Check for provider names as values
+                        elif field_value in ['accelecom', 'arelion', 'cogent']:
+                            header_field_count += 1
+                
+                # If any field is a header name AND all populated fields are header-like, skip it
+                if header_field_count > 0 and header_field_count == total_fields_with_data:
                     continue
                 
                 # We're using a predefined provider list, so don't collect from data
@@ -1532,15 +1564,43 @@ def circuit_ids():
                 
                 # Even with show_all, we still want to skip rows that are just 
                 # field name matches (e.g., Market = Market, Provider = Provider, etc.)
+                # or header-like rows (Market, Arelion, Circuit ID, etc.)
                 if show_all:
-                    # Check if the circuit has any key field that equals its field name
+                    # Check for specific unwanted patterns:
+                    # 1. Any field equals its own field name
+                    # 2. Header-like rows with just field names
+                    
+                    # Skip if the circuit has any key field that equals its field name
                     skip_circuit = False
+                    
+                    # Case 1: Check if any field equals its own name
                     for field in key_fields:
                         field_value = str(circuit.get(field, '')).lower()
-                        # Skip if field value is exactly the same as the field name
                         if field_value and field_value == field.lower():
                             skip_circuit = True
                             break
+                    
+                    # Case 2: Check for header-like rows with key field names as values
+                    if not skip_circuit:
+                        # Count how many fields contain only field names or provider names
+                        header_field_count = 0
+                        total_fields_with_data = 0
+                        
+                        for field in key_fields:
+                            field_value = str(circuit.get(field, '')).lower()
+                            if field_value:
+                                total_fields_with_data += 1
+                                
+                                # Check if this field contains its own name
+                                if field_value == field.lower():
+                                    header_field_count += 1
+                                # Check for provider names as values
+                                elif field_value in ['accelecom', 'arelion', 'cogent']:
+                                    header_field_count += 1
+                        
+                        # If any field is a header name AND all populated fields are header-like, skip it
+                        if header_field_count > 0 and header_field_count == total_fields_with_data:
+                            skip_circuit = True
                     
                     if skip_circuit:
                         continue
