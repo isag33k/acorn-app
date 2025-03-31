@@ -84,6 +84,27 @@ def read_excel_file(excel_path):
             'Unnamed: 5': 'Circuit ID'       # The real Circuit ID is in the Notes column (F)
         })
         
+        # Special mapping for Uniti workbook with location fields
+        uniti_mapping = column_mapping.copy()
+        uniti_mapping.update({
+            'Unnamed: 0': 'Market',              # Column A
+            'Unnamed: 1': 'Provider',            # Column B
+            'Unnamed: 2': 'Description',         # Column C
+            'Unnamed: 3': 'Circuit ID',          # Column D
+            'Unnamed: 4': 'Status',              # Column E
+            'Unnamed: 10': '24x7 Support Number', # Column K
+            'Unnamed: 11': 'Maintenance E-mail', # Column L
+            'Unnamed: 28': 'A LOC Description',  # Column AC
+            'Unnamed: 29': 'A LOC Address 1',    # Column AD
+            'Unnamed: 31': 'A LOC City',         # Column AF
+            'Unnamed: 32': 'A LOC State',        # Column AG
+            'Unnamed: 36': 'Z LOC Description',  # Column AK
+            'Unnamed: 37': 'Z LOC Address 1',    # Column AL
+            'Unnamed: 38': 'Z LOC Address 2',    # Column AM
+            'Unnamed: 39': 'Z LOC City',         # Column AN
+            'Unnamed: 40': 'Z LOC State'         # Column AO
+        })
+        
         # Define valid providers list
         valid_providers = ['Arelion', 'Accelecom', 'Cogent', 'Cologix - Jacksonville', 
                            'CoreSite - Atlanta', 'Lumen', 'Seimitsu', 'Uniti', 
@@ -122,6 +143,10 @@ def read_excel_file(excel_path):
                 logger.info(f"Using special mapping for Cogent with IP address fields")
                 # Use the special mapping for Cogent with IP address fields
                 df = df.rename(columns=cogent_mapping)
+            elif sheet_name == 'Uniti':
+                logger.info(f"Using special mapping for Uniti with location fields")
+                # Use the special mapping for Uniti with location fields
+                df = df.rename(columns=uniti_mapping)
             else:
                 # Use the standard mapping for other sheets
                 df = df.rename(columns=column_mapping)
