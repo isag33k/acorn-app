@@ -1434,6 +1434,50 @@ def circuit_ids():
         
         with open(circuit_data_file, 'r') as f:
             all_data = json.load(f)
+            
+        # Check if we're viewing a specific circuit
+        circuit_id = request.args.get('circuit_id')
+        if circuit_id:
+            # Create a back link that preserves the search parameters
+            back_params = {}
+            for param in ['search_term', 'search_field', 'provider_filter', 'status_filter', 'show_all']:
+                value = request.args.get(param)
+                if value:
+                    back_params[param] = value
+            
+            back_link = url_for('circuit_ids', **back_params)
+            
+            # Find the specific circuit
+            selected_circuit = None
+            for sheet_name, circuits in all_data.items():
+                for circuit in circuits:
+                    if str(circuit.get('Circuit ID')) == str(circuit_id):
+                        selected_circuit = circuit
+                        break
+                if selected_circuit:
+                    break
+            
+            if selected_circuit:
+                # Create search form for the filters
+                search_form = CircuitIDSearchForm()
+                
+                # All fields to display
+                all_fields = {}
+                for key, value in selected_circuit.items():
+                    if value is not None and value != '':
+                        all_fields[key] = value
+                
+                return render_template('circuit_detail.html',
+                                    circuit=selected_circuit,
+                                    all_fields=all_fields,
+                                    back_link=back_link,
+                                    search_form=search_form,
+                                    csrf_form=FlaskForm())
+            else:
+                flash(f'Circuit ID "{circuit_id}" not found.', 'warning')
+                # Redirect back to search page without the circuit_id parameter
+                redirect_params = {k: v for k, v in request.args.items() if k != 'circuit_id'}
+                return redirect(url_for('circuit_ids', **redirect_params))
         
         # Get search parameters
         search_term = request.args.get('search_term', '')

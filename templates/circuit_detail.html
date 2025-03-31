@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>
+                <i class="fas fa-network-wired me-2"></i>
+                Circuit Details
+            </h2>
+        </div>
+        <div>
+            <a href="{{ back_link }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Back to Results
+            </a>
+        </div>
+    </div>
+    
+    <!-- Circuit Detail Card -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0 d-flex justify-content-between">
+                <span><i class="fas fa-info-circle me-2"></i> Circuit Information</span>
+                {% if circuit.get('Status') == 'ACTIVE' %}
+                    <span class="badge bg-success">ACTIVE</span>
+                {% elif circuit.get('Status') == 'INACTIVE' %}
+                    <span class="badge bg-danger">INACTIVE</span>
+                {% elif circuit.get('Status') == 'PENDING' %}
+                    <span class="badge bg-warning text-dark">PENDING</span>
+                {% else %}
+                    <span class="badge bg-secondary">{{ circuit.get('Status') or 'UNKNOWN' }}</span>
+                {% endif %}
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-4">
+                        <h4 class="border-bottom pb-2">Basic Information</h4>
+                        <table class="table table-borderless">
+                            <tr>
+                                <th class="text-nowrap" style="width: 150px">Circuit ID:</th>
+                                <td class="fs-5 fw-bold">{{ circuit.get('Circuit ID') or 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Provider:</th>
+                                <td>{{ circuit.get('Provider') or 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Market:</th>
+                                <td>{{ circuit.get('Market') or 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Description:</th>
+                                <td>{{ circuit.get('Description') or 'N/A' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="border-bottom pb-2">Related Circuits</h4>
+                        <table class="table table-borderless">
+                            <tr>
+                                <th style="width: 150px">Parent CID:</th>
+                                <td>{{ circuit.get('Parent CID') or 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Access CID:</th>
+                                <td>{{ circuit.get('Access CID') or 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Access Provider:</th>
+                                <td>{{ circuit.get('Access Provider') or 'N/A' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-4">
+                        <h4 class="border-bottom pb-2">Contact Information</h4>
+                        <table class="table table-borderless">
+                            {% if circuit.get('Support E-mail') %}
+                            <tr>
+                                <th style="width: 150px"><i class="fas fa-envelope me-2"></i>Email:</th>
+                                <td>{{ circuit.get('Support E-mail') }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if circuit.get('24x7 Support Number') %}
+                            <tr>
+                                <th><i class="fas fa-phone me-2"></i>Support:</th>
+                                <td>{{ circuit.get('24x7 Support Number') }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if circuit.get('Account Manager') %}
+                            <tr>
+                                <th><i class="fas fa-user me-2"></i>Account Manager:</th>
+                                <td>{{ circuit.get('Account Manager') }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if not circuit.get('Support E-mail') and not circuit.get('24x7 Support Number') and not circuit.get('Account Manager') %}
+                            <tr>
+                                <td colspan="2" class="text-muted">No contact information available</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="border-bottom pb-2">Technical Details</h4>
+                        <table class="table table-borderless">
+                            {% if circuit.get('Capacity') %}
+                            <tr>
+                                <th style="width: 150px">Capacity:</th>
+                                <td>{{ circuit.get('Capacity') }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if circuit.get('Handoff Type') %}
+                            <tr>
+                                <th>Handoff Type:</th>
+                                <td>{{ circuit.get('Handoff Type') }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if circuit.get('POP') %}
+                            <tr>
+                                <th>POP:</th>
+                                <td>{{ circuit.get('POP') }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if not circuit.get('Capacity') and not circuit.get('Handoff Type') and not circuit.get('POP') %}
+                            <tr>
+                                <td colspan="2" class="text-muted">No technical details available</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- All fields section -->
+            <div class="mt-4">
+                <h4 class="border-bottom pb-2">All Circuit Information</h4>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="crystal-header">
+                            <tr>
+                                <th>Field</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, value in all_fields.items() %}
+                            <tr>
+                                <th>{{ key }}</th>
+                                <td>{{ value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="d-flex justify-content-between mb-4">
+        <a href="{{ back_link }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i> Back to Results
+        </a>
+        
+        {% if circuit.get('Circuit ID') %}
+        <a href="{{ url_for('index', circuit_id=circuit.get('Circuit ID')) }}" class="btn btn-primary">
+            <i class="fas fa-check-circle me-2"></i> Check Circuit Status
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

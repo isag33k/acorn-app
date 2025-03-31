@@ -68,7 +68,7 @@
                         </thead>
                         <tbody>
                             {% for circuit in circuit_data %}
-                                <tr>
+                                <tr class="clickable-row" style="cursor: pointer;" data-circuit-id="{{ circuit.get('Circuit ID') }}">
                                     <td>{{ circuit.get('Market') or '-' }}</td>
                                     <td>{{ circuit.get('Provider') or '-' }}</td>
                                     <td>
@@ -146,6 +146,30 @@
         if (statusFilter) {
             document.querySelector('select[name="status_filter"]').value = statusFilter;
         }
+        
+        // Make table rows clickable to view circuit details
+        const clickableRows = document.querySelectorAll('.clickable-row');
+        clickableRows.forEach(row => {
+            row.addEventListener('click', function() {
+                const circuitId = this.getAttribute('data-circuit-id');
+                if (circuitId) {
+                    // Build the URL with all current query parameters
+                    const currentParams = new URLSearchParams(window.location.search);
+                    currentParams.set('circuit_id', circuitId);
+                    
+                    // Navigate to the circuit detail view
+                    window.location.href = '{{ url_for("circuit_ids") }}?' + currentParams.toString();
+                }
+            });
+            
+            // Add hover effect
+            row.addEventListener('mouseenter', function() {
+                this.classList.add('table-active');
+            });
+            row.addEventListener('mouseleave', function() {
+                this.classList.remove('table-active');
+            });
+        });
     });
 </script>
 {% endblock %}
