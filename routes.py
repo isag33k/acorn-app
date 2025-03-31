@@ -1440,6 +1440,7 @@ def circuit_ids():
         search_field = request.args.get('search_field', 'all')
         provider_filter = request.args.get('provider_filter', 'all')
         status_filter = request.args.get('status_filter', 'all')
+        show_all = request.args.get('show_all', '0') == '1'  # Show all records if show_all=1
         
         # Process data from all sheets and combine into a single list for display
         all_circuits = []
@@ -1453,7 +1454,7 @@ def circuit_ids():
         # Process each sheet
         for sheet_name, circuits in all_data.items():
             for circuit in circuits:
-                # Skip rows without a circuit ID
+                # Skip rows without a circuit ID or description
                 if not circuit.get('Circuit ID') and not circuit.get('Description'):
                     continue
                 
@@ -1465,6 +1466,12 @@ def circuit_ids():
                 if circuit.get('Status'):
                     statuses.add(circuit.get('Status'))
                 
+                # Skip filtering if show_all is true
+                if show_all:
+                    # Just include the circuit in the results
+                    all_circuits.append(circuit)
+                    continue
+                
                 # Apply provider filter if selected
                 if provider_filter != 'all' and circuit.get('Provider') != provider_filter:
                     continue
@@ -1473,11 +1480,29 @@ def circuit_ids():
                 if status_filter != 'all' and circuit.get('Status') != status_filter:
                     continue
                 
-                # Apply search filter
+                # Apply search filter if search term is provided
                 if search_term:
+                    # Handle case where circuit ID might be in different formats (with or without dashes)
+                    # Remove non-alphanumeric chars for more flexible matching
                     if search_field == 'circuit_id':
-                        if not circuit.get('Circuit ID') or search_term.lower() not in str(circuit.get('Circuit ID')).lower():
+                        circuit_id = str(circuit.get('Circuit ID') or '').lower()
+                        search = search_term.lower()
+                        
+                        # Try exact match first
+                        if search in circuit_id:
+                            all_circuits.append(circuit)
                             continue
+                        
+                        # Try normalized match (remove non-alphanumeric characters)
+                        circuit_id_norm = ''.join(c for c in circuit_id if c.isalnum())
+                        search_norm = ''.join(c for c in search if c.isalnum())
+                        
+                        if search_norm and circuit_id_norm and search_norm in circuit_id_norm:
+                            all_circuits.append(circuit)
+                            continue
+                        else:
+                            continue  # Skip if no match
+                            
                     elif search_field == 'market':
                         if not circuit.get('Market') or search_term.lower() not in str(circuit.get('Market')).lower():
                             continue
@@ -1494,6 +1519,17 @@ def circuit_ids():
                             if field in circuit and circuit[field] and search_term.lower() in str(circuit[field]).lower():
                                 found = True
                                 break
+                                
+                        # Try normalized circuit ID match as well
+                        if not found and 'Circuit ID' in circuit and circuit['Circuit ID']:
+                            circuit_id = str(circuit.get('Circuit ID')).lower()
+                            search = search_term.lower()
+                            circuit_id_norm = ''.join(c for c in circuit_id if c.isalnum())
+                            search_norm = ''.join(c for c in search if c.isalnum())
+                            
+                            if search_norm and circuit_id_norm and search_norm in circuit_id_norm:
+                                found = True
+                                
                         if not found:
                             continue
                 

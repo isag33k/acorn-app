@@ -23,6 +23,34 @@ def read_excel_file(excel_path):
         # Read the Excel file into a pandas ExcelFile object
         excel_file = pd.ExcelFile(excel_path)
         
+        # Define column mappings for standardization
+        column_mapping = {
+            'Unnamed: 0': 'Market',
+            'Unnamed: 1': 'Provider',
+            'Unnamed: 2': 'Description',
+            'Unnamed: 3': 'Circuit ID',
+            'Unnamed: 4': 'Status',
+            'Unnamed: 5': 'Notes',
+            'Unnamed: 6': 'Parent CID',
+            'Unnamed: 7': 'Access CID',
+            'Unnamed: 8': 'Access Provider',
+            'Unnamed: 9': 'Bandwidth',
+            'Unnamed: 10': 'Account Number',
+            'Unnamed: 11': '24x7 Support Number',
+            'Unnamed: 12': 'Support E-mail',
+            'Unnamed: 13': 'MTU',
+            'Unnamed: 14': 'Port',
+            'Unnamed: 15': 'VLAN',
+            'Unnamed: 16': 'IP Addresses',
+            'Unnamed: 17': 'Start Date',
+            'Unnamed: 18': 'Term',
+            'Unnamed: 19': 'End Date',
+            'Unnamed: 20': 'Renewal Notice Date',
+            'Unnamed: 21': 'Account Manager',
+            'Unnamed: 22': 'Account Manager Phone',
+            'Unnamed: 23': 'Account Manager Mobile'
+        }
+        
         # Process each sheet
         for sheet_name in excel_file.sheet_names:
             # Skip sheets that might be for documentation or other purposes
@@ -43,11 +71,27 @@ def read_excel_file(excel_path):
             # Remove completely empty rows
             df = df.dropna(how='all')
             
-            # Remove rows where all cells are empty except for formatting
-            # (Some Excel files have empty rows with formatting that pandas reads as NaN)
+            # Rename columns according to the mapping
+            df = df.rename(columns=column_mapping)
+            
+            # Set the provider name for all records in this sheet if not already present
+            if 'Provider' in df.columns:
+                df['Provider'].fillna(sheet_name, inplace=True)
+            else:
+                df['Provider'] = sheet_name
             
             # Convert DataFrame to list of dictionaries
             records = df.to_dict(orient='records')
+            
+            # Clean up records (remove NaN values and standardize circuit IDs)
+            for record in records:
+                # Replace NaN values with None for clean JSON
+                for key, value in list(record.items()):
+                    if pd.isna(value):
+                        record[key] = None
+                    elif key == 'Circuit ID' and value is not None:
+                        # Ensure circuit ID is a string
+                        record[key] = str(value)
             
             # Add the records to the all_data dictionary under the sheet name
             all_data[sheet_name] = records
