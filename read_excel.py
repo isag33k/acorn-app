@@ -119,6 +119,14 @@ def read_excel_file(excel_path):
                     # If the Circuit ID is empty but Notes has a value (old mapping), use Notes as Circuit ID
                     if (not record.get('Circuit ID') or pd.isna(record.get('Circuit ID'))) and record.get('Notes'):
                         record['Circuit ID'] = record['Notes']
+                
+                # For Cologix - Jacksonville, set status based on End Date column
+                if sheet_name == 'Cologix - Jacksonville':
+                    # Check if there's data in End Date (column S)
+                    if record.get('End Date') is not None and record.get('End Date') != "":
+                        record['Status'] = 'INACTIVE'
+                    else:
+                        record['Status'] = 'ACTIVE'
             
             # Add the records to the all_data dictionary under the sheet name
             all_data[sheet_name] = records
