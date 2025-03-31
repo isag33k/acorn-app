@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>
+                <i class="fas fa-network-wired me-2"></i>
+                Circuit IDs Database
+            </h2>
+        </div>
+    </div>
+    
+    <!-- Search Form -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="fas fa-search me-2"></i> Search Circuit IDs</h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('circuit_ids') }}" class="row g-3">
+                <div class="col-md-4">
+                    {{ search_form.search_term(class="form-control", placeholder="Enter search term...", value=search_term) }}
+                </div>
+                <div class="col-md-2">
+                    {{ search_form.search_field(class="form-select") }}
+                </div>
+                <div class="col-md-2">
+                    {{ search_form.provider_filter(class="form-select") }}
+                </div>
+                <div class="col-md-2">
+                    {{ search_form.status_filter(class="form-select") }}
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Results -->
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i> Circuit List</h5>
+            <span class="badge bg-light text-primary">{{ count if count is defined else 0 }} circuit{{ 's' if count != 1 else '' }}</span>
+        </div>
+        <div class="card-body">
+            {% if circuit_data %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="crystal-header">
+                            <tr>
+                                <th>Market</th>
+                                <th>Provider</th>
+                                <th>Circuit ID</th>
+                                <th>Status</th>
+                                <th>Description</th>
+                                <th>Parent CID</th>
+                                <th>Access Info</th>
+                                <th>Contact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for circuit in circuit_data %}
+                                <tr>
+                                    <td>{{ circuit.get('Market') or '-' }}</td>
+                                    <td>{{ circuit.get('Provider') or '-' }}</td>
+                                    <td>
+                                        <strong>{{ circuit.get('Circuit ID') or '-' }}</strong>
+                                    </td>
+                                    <td>
+                                        {% if circuit.get('Status') == 'ACTIVE' %}
+                                            <span class="badge bg-success">ACTIVE</span>
+                                        {% elif circuit.get('Status') == 'INACTIVE' %}
+                                            <span class="badge bg-danger">INACTIVE</span>
+                                        {% elif circuit.get('Status') == 'PENDING' %}
+                                            <span class="badge bg-warning text-dark">PENDING</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ circuit.get('Status') or 'UNKNOWN' }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ circuit.get('Description') or '-' }}</td>
+                                    <td>{{ circuit.get('Parent CID') or '-' }}</td>
+                                    <td>
+                                        {% if circuit.get('Access CID') %}
+                                            <div><small>Access CID:</small> {{ circuit.get('Access CID') }}</div>
+                                        {% endif %}
+                                        {% if circuit.get('Access Provider') %}
+                                            <div><small>Provider:</small> {{ circuit.get('Access Provider') }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if circuit.get('Support E-mail') %}
+                                            <div><i class="fas fa-envelope me-1"></i> {{ circuit.get('Support E-mail') }}</div>
+                                        {% endif %}
+                                        {% if circuit.get('24x7 Support Number') %}
+                                            <div><i class="fas fa-phone me-1"></i> {{ circuit.get('24x7 Support Number') }}</div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    {% if search_term %}
+                        <i class="fas fa-info-circle me-2"></i>
+                        No circuits found matching your search criteria.
+                    {% else %}
+                        <i class="fas fa-info-circle me-2"></i>
+                        No circuit data found. Please check the circuit_ids_data.json file.
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Circuit Details (could be added in the future) -->
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // When the page loads, select the search field based on URL parameters
+    document.addEventListener('DOMContentLoaded', function() {
+        const params = new URLSearchParams(window.location.search);
+        const searchField = params.get('search_field');
+        const providerFilter = params.get('provider_filter');
+        const statusFilter = params.get('status_filter');
+        
+        if (searchField) {
+            document.querySelector('select[name="search_field"]').value = searchField;
+        }
+        
+        if (providerFilter) {
+            document.querySelector('select[name="provider_filter"]').value = providerFilter;
+        }
+        
+        if (statusFilter) {
+            document.querySelector('select[name="status_filter"]').value = statusFilter;
+        }
+    });
+</script>
+{% endblock %}

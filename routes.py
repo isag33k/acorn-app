@@ -3,6 +3,7 @@ import datetime
 import traceback
 import os
 import uuid
+import json
 from flask import render_template, request, redirect, url_for, flash, jsonify, send_from_directory, Response
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_wtf import FlaskForm
@@ -93,6 +94,28 @@ class ContactSearchForm(FlaskForm):
         ('company', 'Company'),
         ('phone', 'Phone Number'),
         ('location', 'City/State')
+    ])
+    submit = SubmitField('Search')
+    
+# Circuit IDs search form
+class CircuitIDSearchForm(FlaskForm):
+    search_term = StringField('Search', validators=[Length(max=100)])
+    search_field = SelectField('Search By', choices=[
+        ('all', 'All Fields'),
+        ('circuit_id', 'Circuit ID'),
+        ('market', 'Market'),
+        ('provider', 'Provider'),
+        ('status', 'Status')
+    ])
+    provider_filter = SelectField('Provider Filter', choices=[
+        ('all', 'All Providers')
+        # Additional providers will be loaded dynamically
+    ])
+    status_filter = SelectField('Status Filter', choices=[
+        ('all', 'All Statuses'),
+        ('ACTIVE', 'ACTIVE'),
+        ('INACTIVE', 'INACTIVE'),
+        ('PENDING', 'PENDING')
     ])
     submit = SubmitField('Search')
     
@@ -1393,3 +1416,129 @@ def test_ssh_connection():
         command=command,
         key_filename=request.form.get('key_filename', '')
     )
+    
+@app.route('/circuit_ids', methods=['GET'])
+@login_required
+def circuit_ids():
+    """Display and search Circuit IDs database"""
+    try:
+        # Load circuit data from JSON file
+        circuit_data_file = 'circuit_ids_data.json'
+        if not os.path.exists(circuit_data_file):
+            flash('Circuit IDs database file not found', 'danger')
+            return render_template('circuit_ids.html', 
+                                circuit_data=None, 
+                                providers=[], 
+                                search_form=CircuitIDSearchForm(),
+                                csrf_form=FlaskForm())
+        
+        with open(circuit_data_file, 'r') as f:
+            all_data = json.load(f)
+        
+        # Get search parameters
+        search_term = request.args.get('search_term', '')
+        search_field = request.args.get('search_field', 'all')
+        provider_filter = request.args.get('provider_filter', 'all')
+        status_filter = request.args.get('status_filter', 'all')
+        
+        # Process data from all sheets and combine into a single list for display
+        all_circuits = []
+        providers = set(['all'])  # For filter dropdown
+        statuses = set(['all', 'ACTIVE', 'INACTIVE', 'PENDING'])  # For filter dropdown
+        
+        # Key fields to include
+        key_fields = ['Market', 'Provider', 'Circuit ID', 'Status', 'Description', 
+                      'Parent CID', 'Access CID', 'Access Provider']
+        
+        # Process each sheet
+        for sheet_name, circuits in all_data.items():
+            for circuit in circuits:
+                # Skip rows without a circuit ID
+                if not circuit.get('Circuit ID') and not circuit.get('Description'):
+                    continue
+                
+                # Add provider to the providers set for filter dropdown
+                if circuit.get('Provider'):
+                    providers.add(circuit.get('Provider'))
+                
+                # Add status to the statuses set if not already in predefined list
+                if circuit.get('Status'):
+                    statuses.add(circuit.get('Status'))
+                
+                # Apply provider filter if selected
+                if provider_filter != 'all' and circuit.get('Provider') != provider_filter:
+                    continue
+                
+                # Apply status filter if selected
+                if status_filter != 'all' and circuit.get('Status') != status_filter:
+                    continue
+                
+                # Apply search filter
+                if search_term:
+                    if search_field == 'circuit_id':
+                        if not circuit.get('Circuit ID') or search_term.lower() not in str(circuit.get('Circuit ID')).lower():
+                            continue
+                    elif search_field == 'market':
+                        if not circuit.get('Market') or search_term.lower() not in str(circuit.get('Market')).lower():
+                            continue
+                    elif search_field == 'provider':
+                        if not circuit.get('Provider') or search_term.lower() not in str(circuit.get('Provider')).lower():
+                            continue
+                    elif search_field == 'status':
+                        if not circuit.get('Status') or search_term.lower() not in str(circuit.get('Status')).lower():
+                            continue
+                    else:  # 'all' fields
+                        # Search across multiple fields
+                        found = False
+                        for field in key_fields:
+                            if field in circuit and circuit[field] and search_term.lower() in str(circuit[field]).lower():
+                                found = True
+                                break
+                        if not found:
+                            continue
+                
+                # Circuit passed all filters, include in results
+                all_circuits.append(circuit)
+        
+        # Sort by Provider, then Circuit ID
+        all_circuits.sort(key=lambda x: (x.get('Provider', ''), x.get('Circuit ID', '')))
+        
+        # Create search form
+        search_form = CircuitIDSearchForm()
+        
+        # Update the providers choices in the form
+        provider_choices = [('all', 'All Providers')]
+        for provider in sorted(providers):
+            if provider != 'all':
+                provider_choices.append((provider, provider))
+        search_form.provider_filter.choices = provider_choices
+        
+        # Update the status choices in the form
+        status_choices = [('all', 'All Statuses')]
+        for status in sorted(statuses):
+            if status != 'all':
+                status_choices.append((status, status))
+        search_form.status_filter.choices = status_choices
+        
+        # CSRF form for any actions that require it
+        csrf_form = FlaskForm()
+        
+        return render_template('circuit_ids.html', 
+                              circuit_data=all_circuits, 
+                              search_form=search_form,
+                              csrf_form=csrf_form,
+                              search_term=search_term,
+                              search_field=search_field,
+                              provider_filter=provider_filter,
+                              status_filter=status_filter,
+                              count=len(all_circuits),
+                              key_fields=key_fields)
+    
+    except Exception as e:
+        logger.error(f"Error loading circuit IDs: {str(e)}")
+        logger.error(traceback.format_exc())
+        flash(f'Error loading Circuit IDs data: {str(e)}', 'danger')
+        return render_template('circuit_ids.html', 
+                              circuit_data=None, 
+                              search_form=CircuitIDSearchForm(),
+                              csrf_form=FlaskForm())
