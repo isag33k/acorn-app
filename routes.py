@@ -1536,7 +1536,6 @@ def circuit_ids():
                 # 1. At least one field is a field name (e.g., "Market", "Circuit ID", etc.)
                 # 2. No field contains any actual useful data (only contains field names or provider names or is empty)
                 
-                # First, check if ANY field contains forbidden values
                 # These are descriptive field headers, not actual circuit data
                 # Make sure to include both capitalized and lowercase versions
                 forbidden_values = [
@@ -1552,25 +1551,52 @@ def circuit_ids():
                     '-', 'patch panel connector', 'Patch Panel Connector'
                 ]
                 
-                # Check Market, Circuit ID, and Description fields for forbidden values
-                # This covers the case where "Data Center ID" is in the Market field
-                is_forbidden_row = False
-                for field in ['Market', 'Circuit ID', 'Description']:
-                    if field in circuit and circuit[field] and isinstance(circuit[field], str):
-                        field_value = circuit[field]
-                        # Check exact match
-                        if field_value in forbidden_values:
-                            logger.debug(f"Filtering out forbidden header in {field}: {field_value} from {sheet_name}")
-                            is_forbidden_row = True
-                            break
-                        # Check lowercase match 
-                        if field_value.lower() in [val.lower() for val in forbidden_values]:
-                            logger.debug(f"Filtering out forbidden header (case-insensitive) in {field}: {field_value} from {sheet_name}")
-                            is_forbidden_row = True
-                            break
+                # Check for header rows - these can appear in various patterns:
+                # 1. Market field contains a forbidden value (e.g., "Data Center ID")
+                # 2. Market is empty but Circuit ID contains a forbidden value
+                # 3. Market is "-" (a dash or hyphen) - often used as spacers
+                
+                # Filter out any row where Market field contains any of our forbidden values
+                if 'Market' in circuit and circuit['Market'] and isinstance(circuit['Market'], str):
+                    market_value = circuit['Market']
+                    
+                    # Check for exact match with forbidden values
+                    if market_value in forbidden_values:
+                        logger.debug(f"Filtering out forbidden header in Market: {market_value} from {sheet_name}")
+                        continue
                         
-                if is_forbidden_row:
-                    continue  # Skip this circuit as it's a header field
+                    # Check lowercase match
+                    if market_value.lower() in [val.lower() for val in forbidden_values]:
+                        logger.debug(f"Filtering out forbidden header (case-insensitive) in Market: {market_value} from {sheet_name}")
+                        continue
+                        
+                    # Check for other problematic Market values
+                    if market_value == "-" or market_value == "":
+                        logger.debug(f"Filtering out empty or dash Market value: '{market_value}' from {sheet_name}")
+                        continue
+                
+                # Also filter rows where Circuit ID field contains forbidden values 
+                if 'Circuit ID' in circuit and circuit['Circuit ID'] and isinstance(circuit['Circuit ID'], str):
+                    circuit_id_value = circuit['Circuit ID']
+                    
+                    # Check for exact match with forbidden values
+                    if circuit_id_value in forbidden_values:
+                        logger.debug(f"Filtering out forbidden header in Circuit ID: {circuit_id_value} from {sheet_name}")
+                        continue
+                        
+                    # Check lowercase match
+                    if circuit_id_value.lower() in [val.lower() for val in forbidden_values]:
+                        logger.debug(f"Filtering out forbidden header (case-insensitive) in Circuit ID: {circuit_id_value} from {sheet_name}")
+                        continue
+                
+                # Special case for rows where circuit_id = provider = "Cologix - Jacksonville"
+                # This pattern appears in the problematic rows from the screenshot
+                if (circuit.get('Circuit ID') == 'Cologix - Jacksonville' and 
+                    circuit.get('Provider') == 'Cologix - Jacksonville' and
+                    circuit.get('Status') == 'ACTIVE' and
+                    (not circuit.get('Description') or circuit.get('Description') == '-')):
+                    logger.debug(f"Filtering out Cologix - Jacksonville entry with empty/missing Description")
+                    continue
                 
                 # Count how many fields contain only field names or provider names
                 header_field_count = 0
@@ -1627,6 +1653,15 @@ def circuit_ids():
                                 logger.debug(f"Filtering out forbidden header in {field} (case-insensitive) in show_all: {field_value} from {sheet_name}")
                                 skip_circuit = True
                                 break
+                    
+                    # Special case for rows where circuit_id = provider = "Cologix - Jacksonville"
+                    # This pattern appears in the problematic rows from the screenshot
+                    if not skip_circuit and (circuit.get('Circuit ID') == 'Cologix - Jacksonville' and 
+                        circuit.get('Provider') == 'Cologix - Jacksonville' and
+                        circuit.get('Status') == 'ACTIVE' and
+                        (not circuit.get('Description') or circuit.get('Description') == '-')):
+                        logger.debug(f"Filtering out Cologix - Jacksonville entry with empty/missing Description in show_all")
+                        skip_circuit = True
                     
                     # Case 2: Check if any field equals its own name
                     if not skip_circuit:
