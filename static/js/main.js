@@ -67,6 +67,52 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleCredentialFields();
     }
     
+    // Fix for TACACS modal issues
+    const tacacsModalTriggers = document.querySelectorAll('[data-bs-target="#editTacacsModal"]');
+    const tacacsModal = document.getElementById('editTacacsModal');
+    
+    if (tacacsModalTriggers.length > 0 && tacacsModal) {
+        console.log("TACACS modal found, applying fixes");
+        
+        // Add special event listeners for TACACS modal
+        tacacsModalTriggers.forEach(trigger => {
+            trigger.addEventListener('click', function(e) {
+                console.log("TACACS modal trigger clicked");
+                
+                // Force proper z-index on modal elements
+                setTimeout(() => {
+                    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+                        backdrop.style.zIndex = '1040';
+                        backdrop.style.opacity = '0.5';
+                    });
+                    
+                    tacacsModal.style.zIndex = '1050';
+                    
+                    const modalDialog = tacacsModal.querySelector('.modal-dialog');
+                    if (modalDialog) modalDialog.style.zIndex = '1051';
+                    
+                    const modalContent = tacacsModal.querySelector('.modal-content');
+                    if (modalContent) modalContent.style.zIndex = '1052';
+                }, 10);
+            });
+        });
+        
+        // Add event handler for modal close
+        tacacsModal.addEventListener('hidden.bs.modal', function() {
+            console.log("TACACS modal closed, cleaning up");
+            
+            // Ensure backdrop is removed correctly
+            document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+                backdrop.remove();
+            });
+            
+            // Restore normal scrolling
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        });
+    }
+    
     // Tab switching functionality
     document.querySelectorAll('.nav-tabs .nav-link').forEach(function(tabLink) {
         tabLink.addEventListener('click', function(e) {
