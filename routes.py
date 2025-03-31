@@ -1530,9 +1530,22 @@ def circuit_ids():
                 # No longer adding statuses from data - using only our predefined list
                 # of ACTIVE, INACTIVE, and PENDING
                 
-                # Skip filtering if show_all is true
+                # Even with show_all, we still want to skip rows that are just 
+                # field name matches (e.g., Market = Market, Provider = Provider, etc.)
                 if show_all:
-                    # Just include the circuit in the results
+                    # Check if the circuit has any key field that equals its field name
+                    skip_circuit = False
+                    for field in key_fields:
+                        field_value = str(circuit.get(field, '')).lower()
+                        # Skip if field value is exactly the same as the field name
+                        if field_value and field_value == field.lower():
+                            skip_circuit = True
+                            break
+                    
+                    if skip_circuit:
+                        continue
+                        
+                    # Include the circuit if it passed the field name check
                     all_circuits.append(circuit)
                     continue
                 
