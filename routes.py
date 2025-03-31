@@ -1549,6 +1549,10 @@ def circuit_ids():
                     # Handle case where circuit ID might be in different formats (with or without dashes)
                     # Remove non-alphanumeric chars for more flexible matching
                     if search_field == 'circuit_id':
+                        # Skip if search term is exactly "Circuit ID"
+                        if search_term.lower() == "circuit id":
+                            continue
+                            
                         circuit_id = str(circuit.get('Circuit ID') or '').lower()
                         search = search_term.lower()
                         
@@ -1568,18 +1572,32 @@ def circuit_ids():
                             continue  # Skip if no match
                             
                     elif search_field == 'market':
+                        # Skip if search term is exactly "Market"
+                        if search_term.lower() == "market":
+                            continue
                         if not circuit.get('Market') or search_term.lower() not in str(circuit.get('Market')).lower():
                             continue
                     elif search_field == 'provider':
+                        # Skip if search term is exactly "Provider"
+                        if search_term.lower() == "provider":
+                            continue
                         if not circuit.get('Provider') or search_term.lower() not in str(circuit.get('Provider')).lower():
                             continue
                     elif search_field == 'status':
+                        # Skip if search term is exactly "Status"
+                        if search_term.lower() == "status":
+                            continue
                         if not circuit.get('Status') or search_term.lower() not in str(circuit.get('Status')).lower():
                             continue
                     else:  # 'all' fields
                         # Search across multiple fields
                         found = False
                         for field in key_fields:
+                            # Skip if the search term is exactly a field name (case-insensitive)
+                            if search_term.lower() == field.lower():
+                                continue
+                                
+                            # Check if the field value contains the search term
                             if field in circuit and circuit[field] and search_term.lower() in str(circuit[field]).lower():
                                 found = True
                                 break
