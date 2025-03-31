@@ -51,6 +51,13 @@ def read_excel_file(excel_path):
             'Unnamed: 23': 'Account Manager Mobile'
         }
         
+        # Special mapping for CoreSite - Atlanta where Circuit ID is in column F (Notes)
+        coresite_mapping = column_mapping.copy()
+        coresite_mapping.update({
+            'Unnamed: 3': 'Service Number',  # What was labeled as Circuit ID is actually Service Number
+            'Unnamed: 5': 'Circuit ID'       # The real Circuit ID is in the Notes column (F)
+        })
+        
         # Define valid providers list
         valid_providers = ['Arelion', 'Accelecom', 'Cogent', 'Cologix - Jacksonville', 
                            'CoreSite - Atlanta', 'Lumen', 'Seimitsu', 'Uniti', 
@@ -76,8 +83,14 @@ def read_excel_file(excel_path):
             # Remove completely empty rows
             df = df.dropna(how='all')
             
-            # Rename columns according to the mapping
-            df = df.rename(columns=column_mapping)
+            # Select the appropriate column mapping based on the sheet name
+            if sheet_name == 'CoreSite - Atlanta':
+                logger.info(f"Using special mapping for CoreSite - Atlanta")
+                # Use the special mapping for CoreSite - Atlanta
+                df = df.rename(columns=coresite_mapping)
+            else:
+                # Use the standard mapping for other sheets
+                df = df.rename(columns=column_mapping)
             
             # Set the provider name for all records in this sheet if not already present
             if 'Provider' in df.columns:
@@ -97,9 +110,15 @@ def read_excel_file(excel_path):
                 for key, value in list(record.items()):
                     if pd.isna(value):
                         record[key] = None
-                    elif key == 'Circuit ID' and value is not None:
-                        # Ensure circuit ID is a string
+                    elif key in ['Circuit ID', 'Service Number'] and value is not None:
+                        # Ensure circuit ID and service number are strings
                         record[key] = str(value)
+                        
+                # For CoreSite records, ensure the Circuit ID is set correctly
+                if sheet_name == 'CoreSite - Atlanta':
+                    # If the Circuit ID is empty but Notes has a value (old mapping), use Notes as Circuit ID
+                    if (not record.get('Circuit ID') or pd.isna(record.get('Circuit ID'))) and record.get('Notes'):
+                        record['Circuit ID'] = record['Notes']
             
             # Add the records to the all_data dictionary under the sheet name
             all_data[sheet_name] = records
