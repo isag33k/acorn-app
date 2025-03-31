@@ -51,6 +51,11 @@ def read_excel_file(excel_path):
             'Unnamed: 23': 'Account Manager Mobile'
         }
         
+        # Define valid providers list
+        valid_providers = ['Arelion', 'Accelecom', 'Cogent', 'Cologix - Jacksonville', 
+                           'CoreSite - Atlanta', 'Lumen', 'Seimitsu', 'Uniti', 
+                           'CenturyLink', 'Windstream']
+        
         # Process each sheet
         for sheet_name in excel_file.sheet_names:
             # Skip sheets that might be for documentation or other purposes
@@ -76,7 +81,10 @@ def read_excel_file(excel_path):
             
             # Set the provider name for all records in this sheet if not already present
             if 'Provider' in df.columns:
-                df['Provider'].fillna(sheet_name, inplace=True)
+                # Update provider if it's not in the valid list
+                for index, provider in enumerate(df['Provider']):
+                    if provider is None or pd.isna(provider) or provider not in valid_providers:
+                        df.loc[index, 'Provider'] = sheet_name
             else:
                 df['Provider'] = sheet_name
             

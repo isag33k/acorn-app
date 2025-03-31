@@ -1461,10 +1461,20 @@ def circuit_ids():
                 # Create search form for the filters
                 search_form = CircuitIDSearchForm()
                 
-                # All fields to display
+                # All fields to display (filter out empty and meaningfully organize)
                 all_fields = {}
+                # Add important fields first in a specific order
+                key_order = ['Circuit ID', 'Provider', 'Market', 'Status', 'Description']
+                
+                # First add the key fields in order
+                for key in key_order:
+                    if key in selected_circuit and selected_circuit[key] is not None and selected_circuit[key] != '':
+                        all_fields[key] = selected_circuit[key]
+                
+                # Then add all remaining fields except Unnamed
                 for key, value in selected_circuit.items():
-                    if value is not None and value != '':
+                    if (key not in all_fields and not key.startswith('Unnamed:') and 
+                        value is not None and value != ''):
                         all_fields[key] = value
                 
                 return render_template('circuit_detail.html',

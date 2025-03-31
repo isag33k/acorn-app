@@ -157,7 +157,7 @@
                         <tbody>
                             {% for key, value in all_fields.items() %}
                             <tr>
-                                <th>{{ key }}</th>
+                                <th>{% if not key.startswith('Unnamed:') %}{{ key }}{% endif %}</th>
                                 <td>{{ value }}</td>
                             </tr>
                             {% endfor %}

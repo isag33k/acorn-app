@@ -61,9 +61,7 @@
                                 <th>Circuit ID</th>
                                 <th>Status</th>
                                 <th>Description</th>
-                                <th>Parent CID</th>
-                                <th>Access Info</th>
-                                <th>Contact</th>
+                                <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -86,22 +84,10 @@
                                         {% endif %}
                                     </td>
                                     <td>{{ circuit.get('Description') or '-' }}</td>
-                                    <td>{{ circuit.get('Parent CID') or '-' }}</td>
-                                    <td>
-                                        {% if circuit.get('Access CID') %}
-                                            <div><small>Access CID:</small> {{ circuit.get('Access CID') }}</div>
-                                        {% endif %}
-                                        {% if circuit.get('Access Provider') %}
-                                            <div><small>Provider:</small> {{ circuit.get('Access Provider') }}</div>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if circuit.get('Support E-mail') %}
-                                            <div><i class="fas fa-envelope me-1"></i> {{ circuit.get('Support E-mail') }}</div>
-                                        {% endif %}
-                                        {% if circuit.get('24x7 Support Number') %}
-                                            <div><i class="fas fa-phone me-1"></i> {{ circuit.get('24x7 Support Number') }}</div>
-                                        {% endif %}
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-outline-primary view-details-btn" data-circuit-id="{{ circuit.get('Circuit ID') }}">
+                                            <i class="fas fa-info-circle me-1"></i> View Details
+                                        </button>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -147,18 +133,26 @@
             document.querySelector('select[name="status_filter"]').value = statusFilter;
         }
         
+        // Function to navigate to detail view
+        function navigateToDetailView(circuitId) {
+            if (circuitId) {
+                // Build the URL with all current query parameters
+                const currentParams = new URLSearchParams(window.location.search);
+                currentParams.set('circuit_id', circuitId);
+                
+                // Navigate to the circuit detail view
+                window.location.href = '{{ url_for("circuit_ids") }}?' + currentParams.toString();
+            }
+        }
+        
         // Make table rows clickable to view circuit details
         const clickableRows = document.querySelectorAll('.clickable-row');
         clickableRows.forEach(row => {
-            row.addEventListener('click', function() {
-                const circuitId = this.getAttribute('data-circuit-id');
-                if (circuitId) {
-                    // Build the URL with all current query parameters
-                    const currentParams = new URLSearchParams(window.location.search);
-                    currentParams.set('circuit_id', circuitId);
-                    
-                    // Navigate to the circuit detail view
-                    window.location.href = '{{ url_for("circuit_ids") }}?' + currentParams.toString();
+            row.addEventListener('click', function(e) {
+                // Only handle row clicks if not clicking the button
+                if (!e.target.closest('.view-details-btn')) {
+                    const circuitId = this.getAttribute('data-circuit-id');
+                    navigateToDetailView(circuitId);
                 }
             });
             
@@ -168,6 +162,16 @@
             });
             row.addEventListener('mouseleave', function() {
                 this.classList.remove('table-active');
+            });
+        });
+        
+        // Handle view details button clicks
+        const detailButtons = document.querySelectorAll('.view-details-btn');
+        detailButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent the row click from firing
+                const circuitId = this.getAttribute('data-circuit-id');
+                navigateToDetailView(circuitId);
             });
         });
     });
