@@ -77,7 +77,7 @@ def analyze_excel_file(excel_path):
 
 def analyze_coresite_atlanta():
     """
-    Focus specifically on CoreSite - Atlanta data to identify the Circuit ID column.
+    Focus specifically on CoreSite - Atlanta data to identify all required columns.
     """
     try:
         excel_path = 'attached_assets/Appendix D - Circuit IDs.xlsx'
@@ -86,26 +86,45 @@ def analyze_coresite_atlanta():
         # Read the specific sheet
         df = pd.read_excel(excel_path, sheet_name='CoreSite - Atlanta')
         
-        # Print info about column D (Unnamed: 3, expected to be Service Number)
-        logger.info("\nColumn D (Unnamed:.3, expected to be Service Number):")
-        if 'Unnamed: 3' in df.columns:
-            values = df['Unnamed: 3'].dropna().head(10).tolist()
-            logger.info(f"Values: {values}")
-        else:
-            logger.info("Column not found")
+        # List of columns to analyze based on requirements
+        columns_to_check = {
+            'A': ('Unnamed: 0', 'Cross Connect Description'),
+            'B': ('Unnamed: 1', 'CoreSite XCON ID'),
+            'C': ('Unnamed: 2', 'CoreSite Case Number'),
+            'D': ('Unnamed: 3', 'CoreSite Service Number'),
+            'E': ('Unnamed: 4', 'Provider'),
+            'F': ('Unnamed: 5', 'Circuit ID'),
+            'G': ('Unnamed: 6', 'Space ID - A Location'),
+            'H': ('Unnamed: 7', 'Cabinet Number - A Location'),
+            'I': ('Unnamed: 8', 'Demarc Location - A Location'),
+            'J': ('Unnamed: 9', 'Patch Panel Port - A Location'),
+            'L': ('Unnamed: 11', 'Space ID - Z Location'),
+            'M': ('Unnamed: 12', 'Cabinet Number - Z Location'),
+            'N': ('Unnamed: 13', 'Demarc Location - Z Location'),
+            'P': ('Unnamed: 15', 'Patch Panel Port - Z Location')
+        }
+        
+        # Print all column headers
+        logger.info("\nAll column headers in CoreSite - Atlanta sheet:")
+        for i, col in enumerate(df.columns):
+            col_letter = chr(65 + i) if i < 26 else chr(64 + i // 26) + chr(65 + i % 26)
+            logger.info(f"Column {col_letter} ({i}): {col}")
             
-        # Print info about column F (Unnamed: 5, expected to be Circuit ID)
-        logger.info("\nColumn F (Unnamed: 5, expected to be true Circuit ID):")
-        if 'Unnamed: 5' in df.columns:
-            values = df['Unnamed: 5'].dropna().head(10).tolist()
-            logger.info(f"Values: {values}")
-        else:
-            logger.info("Column not found")
-            
-        # Look at first few rows to understand the structure
-        logger.info("\nFirst few rows of CoreSite - Atlanta:")
-        for idx, row in df.head(5).iterrows():
-            logger.info(f"Row {idx}:")
+        # Print info about each required column
+        logger.info("\nRequired columns analysis:")
+        for col_letter, (col_name, expected_content) in columns_to_check.items():
+            logger.info(f"\nColumn {col_letter} ({col_name}, expected to be {expected_content}):")
+            if col_name in df.columns:
+                values = df[col_name].dropna().head(5).tolist()
+                logger.info(f"Values: {values}")
+            else:
+                logger.info("Column not found")
+                
+        # Look at some key rows to understand the structure
+        logger.info("\nSome key rows with circuit data:")
+        # Find rows with actual circuit data (typically after the header rows)
+        for idx, row in df.iloc[15:20].iterrows():
+            logger.info(f"\nRow {idx}:")
             for col, val in row.items():
                 if not pd.isna(val):
                     logger.info(f"  {col}: {val}")
@@ -198,5 +217,5 @@ def analyze_arelion():
 
 if __name__ == "__main__":
     # analyze_excel_file('attached_assets/Appendix D - Circuit IDs.xlsx')
-    # analyze_coresite_atlanta()
-    analyze_arelion()
+    analyze_coresite_atlanta()
+    # analyze_arelion()

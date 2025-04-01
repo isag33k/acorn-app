@@ -78,11 +78,22 @@ def read_excel_file(excel_path):
             'Unnamed: 16': 'Remote IPv6'     # Column Q
         })
         
-        # Special mapping for CoreSite - Atlanta where Circuit ID is in column F (Notes)
+        # Special mapping for CoreSite - Atlanta with comprehensive information
         coresite_mapping = column_mapping.copy()
         coresite_mapping.update({
-            'Unnamed: 3': 'Service Number',  # What was labeled as Circuit ID is actually Service Number
-            'Unnamed: 5': 'Circuit ID'       # The real Circuit ID is in the Notes column (F)
+            'Unnamed: 0': 'Cross Connect Description',  # Column A
+            'Unnamed: 1': 'CoreSite XCON ID',           # Column B
+            'Unnamed: 2': 'CoreSite Case Number',       # Column C
+            'Unnamed: 3': 'Service Number',             # Column D
+            'Unnamed: 4': 'Provider',                   # Column E
+            'Unnamed: 5': 'Circuit ID',                 # Column F
+            'Unnamed: 7': 'Cabinet Number A',           # Column H
+            'Unnamed: 8': 'Demarc A',                   # Column I
+            'Unnamed: 9': 'Patch Panel Port A',         # Column J
+            'Unnamed: 11': 'Space ID Z',                # Column L
+            'Unnamed: 12': 'Cabinet Number Z',          # Column M
+            'Unnamed: 13': 'Demarc Z',                  # Column N
+            'Unnamed: 15': 'Patch Panel Port Z'         # Column P
         })
         
         # Special mapping for Uniti workbook with location fields
@@ -165,6 +176,7 @@ def read_excel_file(excel_path):
             records = df.to_dict(orient='records')
             
             # Clean up records (remove NaN values and standardize circuit IDs)
+            clean_records = []
             for record in records:
                 # Replace NaN values with None for clean JSON
                 for key, value in list(record.items()):
@@ -173,15 +185,53 @@ def read_excel_file(excel_path):
                     elif key in ['Circuit ID', 'Service Number'] and value is not None:
                         # Ensure circuit ID and service number are strings
                         record[key] = str(value)
-                        
-                # For CoreSite records, ensure the Circuit ID is set correctly
+                
+                # Special handling for different sheet types
                 if sheet_name == 'CoreSite - Atlanta':
-                    # If the Circuit ID is empty but Notes has a value (old mapping), use Notes as Circuit ID
-                    if (not record.get('Circuit ID') or pd.isna(record.get('Circuit ID'))) and record.get('Notes'):
-                        record['Circuit ID'] = record['Notes']
+                    # Determine if this is a valid record or should be skipped
+                    should_skip = False
+                    
+                    # Comprehensive list of header rows, metadata, and non-circuit rows to skip
+                    header_patterns = [
+                        'Data Center', 'Center Description', 'Cage ID', 'Cabinet Number', 
+                        'Patch Panel', 'Circuit ID', 'CoreSite Circuit ID', 'Cross Connect Description',
+                        'Space ID', 'Demarc Location', 'Welcome Letter', 'Main Support',
+                        'N/A. All operations', 'Account Rep', 'Notes'
+                    ]
+                    
+                    # Skip header and metadata rows
+                    for pattern in header_patterns:
+                        for field in ['Cross Connect Description', 'Service Number', 'Provider', 'Circuit ID']:
+                            value = record.get(field)
+                            if value and isinstance(value, str) and pattern in value:
+                                should_skip = True
+                                break
+                        if should_skip:
+                            break
+                    
+                    # Skip rows where the Circuit ID or Provider are missing or header-like values
+                    if not should_skip and (not record.get('Circuit ID') or record.get('Circuit ID') in ['Circuit ID', None]):
+                        should_skip = True
+                    
+                    if not should_skip and (not record.get('Provider') or record.get('Provider') in ['Provider', None]):
+                        should_skip = True
+                    
+                    # Only process valid records
+                    if not should_skip:
+                        # If the Circuit ID is empty but Notes has a value (old mapping), use Notes as Circuit ID
+                        if (not record.get('Circuit ID') or pd.isna(record.get('Circuit ID'))) and record.get('Notes'):
+                            record['Circuit ID'] = record['Notes']
+                            
+                        # Ensure we have XCON ID and Service Number as strings
+                        for key in ['CoreSite XCON ID', 'Service Number']:
+                            if record.get(key) is not None and not pd.isna(record.get(key)):
+                                record[key] = str(record.get(key))
+                        
+                        # Add this record to the clean_records list
+                        clean_records.append(record)
                 
                 # Special handling for Cologix - Jacksonville
-                if sheet_name == 'Cologix - Jacksonville':
+                elif sheet_name == 'Cologix - Jacksonville':
                     # Use Provider (Column B) as the Circuit ID
                     if record.get('Provider') is not None:
                         record['Circuit ID'] = record.get('Provider')
@@ -191,11 +241,17 @@ def read_excel_file(excel_path):
                         record['Status'] = 'INACTIVE'
                     else:
                         record['Status'] = 'ACTIVE'
+                    
+                    # Add this record to the clean_records list
+                    clean_records.append(record)
+                
+                # Add all other records by default
+                else:
+                    clean_records.append(record)
             
-            # Add the records to the all_data dictionary under the sheet name
-            all_data[sheet_name] = records
-            
-            logger.info(f"Added {len(records)} records from sheet {sheet_name}")
+            # Add the clean records to the all_data dictionary under the sheet name
+            all_data[sheet_name] = clean_records
+            logger.info(f"Added {len(clean_records)} records from sheet {sheet_name} (filtered from {len(records)} original records)")
         
         return all_data
     
