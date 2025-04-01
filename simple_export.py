@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Simplified export script for equipment and circuit mapping data
+Very simple script to export equipment and circuit mapping data to JSON files.
 """
 
 import json
@@ -58,5 +58,5 @@ with app.app_context():
     
     print(f"Exported {len(mapping_data)} circuit mappings to production_circuit_mappings.json")
     
-    print("Export completed. Files created: production_equipment.json, production_circuit_mappings.json")
+    print("Export completed successfully.")
     print("!!! IMPORTANT !!! The equipment JSON file contains real passwords. Secure this file appropriately.")

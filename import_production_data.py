@@ -7,35 +7,33 @@ Run this script in your DEVELOPMENT environment after copying the JSON files fro
 import os
 import sys
 import json
-import logging
 from app import app, db
 from models import Equipment, CircuitMapping
-from sqlalchemy.exc import SQLAlchemyError
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+print("Starting import of production data...")
 
 def import_equipment(json_file='production_equipment.json'):
     """Import equipment data from a JSON file"""
     try:
         # Check if file exists
         if not os.path.exists(json_file):
-            logger.error(f"File not found: {json_file}")
-            logger.error("Run export_production_data.py on your production server first")
+            print(f"File not found: {json_file}")
+            print("Run export_production_data.py on your production server first")
             return
             
         # Load JSON data
         with open(json_file, 'r') as f:
             equipment_data = json.load(f)
             
-        logger.info(f"Loaded {len(equipment_data)} equipment records from {json_file}")
+        print(f"Loaded {len(equipment_data)} equipment records from {json_file}")
         
         with app.app_context():
             # Clear existing equipment (except the original 3)
-            db.session.execute(db.delete(Equipment).where(Equipment.id > 7))
+            # We'll keep IDs 5, 6, 7 which are likely the original test equipment
+            original_ids = [5, 6, 7]
+            db.session.execute(db.delete(Equipment).where(Equipment.id.notin_(original_ids)))
             db.session.commit()
-            logger.info("Cleared existing equipment data (kept original 3 records)")
+            print("Cleared existing equipment data (kept original test records)")
             
             # Get existing equipment IDs
             existing_ids = {e.id for e in Equipment.query.all()}
@@ -45,7 +43,7 @@ def import_equipment(json_file='production_equipment.json'):
             for e in equipment_data:
                 # Skip if this ID already exists
                 if e['id'] in existing_ids:
-                    logger.warning(f"Equipment ID {e['id']} already exists, skipping")
+                    print(f"Equipment ID {e['id']} already exists, skipping")
                     continue
                     
                 # Create new equipment
@@ -64,14 +62,11 @@ def import_equipment(json_file='production_equipment.json'):
                 
             # Commit changes
             db.session.commit()
-            logger.info(f"Imported {imported_count} new equipment records")
+            print(f"Imported {imported_count} new equipment records")
             
-    except SQLAlchemyError as e:
-        logger.error(f"Database error importing equipment: {str(e)}")
-        db.session.rollback()
-        sys.exit(1)
     except Exception as e:
-        logger.error(f"Error importing equipment data: {str(e)}")
+        print(f"Error importing equipment data: {str(e)}")
+        db.session.rollback()
         sys.exit(1)
 
 def import_circuit_mappings(json_file='production_circuit_mappings.json'):
@@ -79,24 +74,24 @@ def import_circuit_mappings(json_file='production_circuit_mappings.json'):
     try:
         # Check if file exists
         if not os.path.exists(json_file):
-            logger.error(f"File not found: {json_file}")
-            logger.error("Run export_production_data.py on your production server first")
+            print(f"File not found: {json_file}")
+            print("Run export_production_data.py on your production server first")
             return
             
         # Load JSON data
         with open(json_file, 'r') as f:
             mapping_data = json.load(f)
             
-        logger.info(f"Loaded {len(mapping_data)} circuit mappings from {json_file}")
+        print(f"Loaded {len(mapping_data)} circuit mappings from {json_file}")
         
         with app.app_context():
-            # Clear existing circuit mappings that aren't associated with the original 3 equipment
+            # Clear existing circuit mappings that aren't associated with the original test equipment
             original_equipment_ids = [5, 6, 7]
             db.session.execute(db.delete(CircuitMapping).where(
                 CircuitMapping.equipment_id.notin_(original_equipment_ids)
             ))
             db.session.commit()
-            logger.info("Cleared existing circuit mappings (kept mappings for original equipment)")
+            print("Cleared existing circuit mappings (kept mappings for original equipment)")
             
             # Get existing mapping IDs and equipment IDs
             existing_mapping_ids = {m.id for m in CircuitMapping.query.all()}
@@ -108,13 +103,13 @@ def import_circuit_mappings(json_file='production_circuit_mappings.json'):
             for m in mapping_data:
                 # Skip if this ID already exists
                 if m['id'] in existing_mapping_ids:
-                    logger.warning(f"Circuit mapping ID {m['id']} already exists, skipping")
+                    print(f"Circuit mapping ID {m['id']} already exists, skipping")
                     skipped_count += 1
                     continue
                     
                 # Skip if referenced equipment doesn't exist
                 if m['equipment_id'] not in existing_equipment_ids:
-                    logger.warning(f"Equipment ID {m['equipment_id']} not found, skipping circuit mapping {m['id']}")
+                    print(f"Equipment ID {m['equipment_id']} not found, skipping circuit mapping {m['id']}")
                     skipped_count += 1
                     continue
                     
@@ -136,20 +131,18 @@ def import_circuit_mappings(json_file='production_circuit_mappings.json'):
                 
             # Commit changes
             db.session.commit()
-            logger.info(f"Imported {imported_count} new circuit mappings")
+            print(f"Imported {imported_count} new circuit mappings")
             if skipped_count > 0:
-                logger.warning(f"Skipped {skipped_count} circuit mappings")
+                print(f"Skipped {skipped_count} circuit mappings")
             
-    except SQLAlchemyError as e:
-        logger.error(f"Database error importing circuit mappings: {str(e)}")
+    except Exception as e:
+        print(f"Error importing circuit mapping data: {str(e)}")
         db.session.rollback()
         sys.exit(1)
-    except Exception as e:
-        logger.error(f"Error importing circuit mapping data: {str(e)}")
-        sys.exit(1)
 
+# Main execution
 if __name__ == "__main__":
-    logger.info("Starting import of production data...")
+    # Run the import functions
     import_equipment()
     import_circuit_mappings()
-    logger.info("Import completed.")
+    print("Import completed.")

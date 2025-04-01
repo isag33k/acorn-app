@@ -5,10 +5,10 @@ This document explains how to keep your development and production environments 
 ## Option 1: Using Python Scripts (Recommended)
 
 ### Step 1: Export Data from Production
-1. Copy the `export_production_data.py` script to your production server
+1. Copy the `simple_export.py` script to your production server
 2. Run it on the production server:
    ```bash
-   python export_production_data.py
+   python simple_export.py
    ```
 3. This will create two files:
    - `production_equipment.json`
@@ -33,8 +33,8 @@ This document explains how to keep your development and production environments 
 ### Step 1: Export Tables from Production
 1. On your production server, run:
    ```bash
-   pg_dump -h $PGHOST -U $PGUSER -d $PGDATABASE -t equipment -f equipment_export.sql
-   pg_dump -h $PGHOST -U $PGUSER -d $PGDATABASE -t circuit_mapping -f circuit_mapping_export.sql
+   pg_dump -h $PGHOST -U $PGUSER -d $PGDATABASE --table=equipment -f equipment_export.sql
+   pg_dump -h $PGHOST -U $PGUSER -d $PGDATABASE --table=circuit_mapping -f circuit_mapping_export.sql
    ```
 
 ### Step 2: Transfer Files to Development
