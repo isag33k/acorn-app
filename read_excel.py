@@ -286,6 +286,26 @@ def read_excel_file(excel_path):
                     # Add this record to the clean_records list
                     clean_records.append(record)
                 
+                # Special handling for Cogent
+                elif sheet_name == 'Cogent':
+                    # Skip header rows and metadata
+                    if record.get('Market') == 'Market' and record.get('Circuit ID') == 'Circuit ID':
+                        logger.debug(f"Filtering out header row with Market='Market' and Circuit ID='Circuit ID' from Cogent")
+                        continue
+                    
+                    # Skip rows without a valid Circuit ID
+                    if not record.get('Circuit ID') or pd.isna(record.get('Circuit ID')):
+                        logger.debug(f"Filtering out Cogent entry with empty/missing Circuit ID")
+                        continue
+                    
+                    # Make sure Status is set to 'ACTIVE' if not present or invalid
+                    if not record.get('Status') or pd.isna(record.get('Status')) or record.get('Status') not in ['ACTIVE', 'INACTIVE', 'PENDING']:
+                        record['Status'] = 'ACTIVE'
+                        logger.debug(f"Setting missing/invalid Status to ACTIVE for Cogent circuit: {record.get('Circuit ID')}")
+                    
+                    # Add this record to the clean_records list
+                    clean_records.append(record)
+                
                 # Special handling for Accelecom
                 elif sheet_name == 'Accelecom':
                     # Skip header rows and metadata

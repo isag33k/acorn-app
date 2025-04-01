@@ -1500,7 +1500,7 @@ def circuit_ids():
         search_term = request.args.get('search_term', '')
         search_field = request.args.get('search_field', 'all')
         provider_filter = request.args.get('provider_filter', 'all')
-        status_filter = request.args.get('status_filter', 'all')
+        status_filter = request.args.get('status_filter', 'ACTIVE')
         show_all = request.args.get('show_all', '0') == '1'  # Show all records if show_all=1
         
         # Process data from all sheets and combine into a single list for display
