@@ -69,7 +69,8 @@ def import_circuit_mappings(json_file='dev_circuit_mappings.json', replace_exist
             
             # Import circuit mappings
             imported_count = 0
-            skipped_count = 0
+            skipped_equipment_count = 0
+            skipped_duplicate_count = 0
             error_count = 0
             
             for m in mapping_data:
@@ -79,10 +80,18 @@ def import_circuit_mappings(json_file='dev_circuit_mappings.json', replace_exist
                 # Skip if referenced equipment doesn't exist (but continue with others)
                 if m['equipment_id'] not in existing_equipment_ids:
                     logger.warning(f"Skipping circuit {m['circuit_id']} (ID: {mapping_id}): Equipment ID {m['equipment_id']} not found")
-                    skipped_count += 1
+                    skipped_equipment_count += 1
                     continue
                 
                 try:
+                    # Check if this mapping already exists (only if not replacing)
+                    if not replace_existing and mapping_id is not None:
+                        existing = CircuitMapping.query.get(mapping_id)
+                        if existing:
+                            logger.info(f"Skipping existing circuit mapping with ID {mapping_id}")
+                            skipped_duplicate_count += 1
+                            continue
+                    
                     # Create new circuit mapping
                     new_mapping = CircuitMapping(
                         id=mapping_id,
@@ -112,8 +121,10 @@ def import_circuit_mappings(json_file='dev_circuit_mappings.json', replace_exist
             # Final commit
             db.session.commit()
             logger.info(f"Successfully imported {imported_count} circuit mappings")
-            if skipped_count > 0:
-                logger.info(f"Skipped {skipped_count} circuit mappings due to missing equipment references")
+            if skipped_equipment_count > 0:
+                logger.info(f"Skipped {skipped_equipment_count} circuit mappings due to missing equipment references")
+            if skipped_duplicate_count > 0:
+                logger.info(f"Skipped {skipped_duplicate_count} circuit mappings because they already exist")
             if error_count > 0:
                 logger.warning(f"Encountered {error_count} errors during import")
             
