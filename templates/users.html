@@ -2,6 +2,48 @@
 
 {% block title %}User Management{% endblock %}
 
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fix for user deletion modals
+        document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target^="#deleteUserModal"]').forEach(function(button) {
+            button.addEventListener('click', function() {
+                console.log("Modal shown:", button.getAttribute('data-bs-target'));
+                
+                // Force proper z-index on modal elements
+                setTimeout(() => {
+                    // Set correct z-index for backdrop
+                    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+                        backdrop.style.zIndex = '1040';
+                        backdrop.style.opacity = '0.5';
+                    });
+                    
+                    // Get modal ID from the button's data attribute
+                    const modalId = button.getAttribute('data-bs-target');
+                    const modal = document.querySelector(modalId);
+                    
+                    if (modal) {
+                        modal.style.zIndex = '1050';
+                        
+                        const modalDialog = modal.querySelector('.modal-dialog');
+                        if (modalDialog) {
+                            modalDialog.style.zIndex = '1051';
+                            modalDialog.style.position = 'relative';
+                        }
+                        
+                        const modalContent = modal.querySelector('.modal-content');
+                        if (modalContent) {
+                            modalContent.style.zIndex = '1052';
+                            modalContent.style.position = 'relative';
+                        }
+                    }
+                }, 10);
+            });
+        });
+    });
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <h2>User Management</h2>
@@ -106,9 +148,9 @@
                                                 </div>
                                                 
                                                 <!-- Delete Confirmation Modal -->
-                                                <div class="modal fade" id="deleteUserModal{{ user.id }}" tabindex="-1" aria-hidden="true">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
+                                                <div class="modal fade" id="deleteUserModal{{ user.id }}" tabindex="-1" aria-hidden="true" style="z-index: 1050 !important;">
+                                                    <div class="modal-dialog" style="z-index: 1051 !important; position: relative;">
+                                                        <div class="modal-content" style="z-index: 1052 !important; position: relative;">
                                                             <div class="modal-header">
                                                                 <h5 class="modal-title">Confirm Delete</h5>
                                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
