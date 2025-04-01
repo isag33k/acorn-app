@@ -227,6 +227,7 @@ def add_user():
     return redirect(url_for('user_list'))
 
 @app.route('/users/delete/<int:id>', methods=['POST'])
+@app.route('/delete_user/<int:id>', methods=['POST'])  # Added for our custom modals
 @login_required
 def delete_user(id):
     """Delete a user (admin only)"""

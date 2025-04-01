@@ -3,41 +3,147 @@
 {% block title %}User Management{% endblock %}
 
 {% block scripts %}
+<style>
+    /* Custom modal styles */
+    .custom-modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 9998;
+    }
+    
+    .custom-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: var(--bs-body-bg);
+        border-radius: 6px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        width: 400px;
+        max-width: 90%;
+        z-index: 9999;
+    }
+    
+    .custom-modal-header {
+        padding: 1rem;
+        border-bottom: 1px solid var(--bs-border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .custom-modal-body {
+        padding: 1rem;
+    }
+    
+    .custom-modal-footer {
+        padding: 1rem;
+        border-top: 1px solid var(--bs-border-color);
+        display: flex;
+        justify-content: flex-end;
+    }
+</style>
+
 <script>
+    // Custom modal implementation to replace Bootstrap modals completely
     document.addEventListener('DOMContentLoaded', function() {
-        // Fix for user deletion modals
-        document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target^="#deleteUserModal"]').forEach(function(button) {
-            button.addEventListener('click', function() {
-                console.log("Modal shown:", button.getAttribute('data-bs-target'));
+        console.log("DOM fully loaded - initializing custom user delete modals");
+        
+        let customBackdrop;
+        let activeModal;
+        
+        // Function to create backdrop once
+        function ensureBackdropExists() {
+            if (!customBackdrop) {
+                customBackdrop = document.createElement('div');
+                customBackdrop.className = 'custom-modal-backdrop';
+                customBackdrop.style.display = 'none';
+                document.body.appendChild(customBackdrop);
                 
-                // Force proper z-index on modal elements
-                setTimeout(() => {
-                    // Set correct z-index for backdrop
-                    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
-                        backdrop.style.zIndex = '1040';
-                        backdrop.style.opacity = '0.5';
-                    });
-                    
-                    // Get modal ID from the button's data attribute
-                    const modalId = button.getAttribute('data-bs-target');
-                    const modal = document.querySelector(modalId);
-                    
-                    if (modal) {
-                        modal.style.zIndex = '1050';
-                        
-                        const modalDialog = modal.querySelector('.modal-dialog');
-                        if (modalDialog) {
-                            modalDialog.style.zIndex = '1051';
-                            modalDialog.style.position = 'relative';
-                        }
-                        
-                        const modalContent = modal.querySelector('.modal-content');
-                        if (modalContent) {
-                            modalContent.style.zIndex = '1052';
-                            modalContent.style.position = 'relative';
-                        }
-                    }
-                }, 10);
+                // Global click handler for backdrop
+                customBackdrop.addEventListener('click', function() {
+                    closeCurrentModal();
+                });
+            }
+            return customBackdrop;
+        }
+        
+        // Function to close current modal
+        function closeCurrentModal() {
+            if (activeModal) {
+                document.body.removeChild(activeModal);
+                activeModal = null;
+            }
+            
+            if (customBackdrop) {
+                customBackdrop.style.display = 'none';
+            }
+        }
+        
+        // Find all delete buttons and replace their behavior
+        document.querySelectorAll('button[data-bs-toggle="modal"][data-bs-target^="#deleteUserModal"]').forEach(function(button) {
+            console.log("Found delete button", button);
+            
+            // Get the user information from the table row
+            const userId = button.getAttribute('data-bs-target').replace('#deleteUserModal', '');
+            const username = button.closest('tr').querySelector('td:first-child').textContent.trim();
+            
+            // Remove the bootstrap modal attributes so Bootstrap's JS doesn't interfere
+            button.removeAttribute('data-bs-toggle');
+            button.removeAttribute('data-bs-target');
+            
+            // Add our custom click handler
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log("Custom delete modal triggered for user:", username, "ID:", userId);
+                
+                // Ensure the backdrop exists and is ready
+                const backdrop = ensureBackdropExists();
+                
+                // Close any existing modal
+                closeCurrentModal();
+                
+                // Create our custom modal
+                const modal = document.createElement('div');
+                modal.className = 'custom-modal';
+                activeModal = modal;
+                
+                // Get the CSRF token
+                const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+                
+                // Create the modal content
+                modal.innerHTML = `
+                    <div class="custom-modal-header">
+                        <h5 class="mb-0">Confirm Delete</h5>
+                        <button type="button" class="btn-close custom-modal-close" aria-label="Close"></button>
+                    </div>
+                    <div class="custom-modal-body">
+                        Are you sure you want to delete user <strong>${username}</strong>?
+                    </div>
+                    <div class="custom-modal-footer">
+                        <button type="button" class="btn btn-secondary me-2 custom-modal-cancel">Cancel</button>
+                        <form method="POST" action="/delete_user/${userId}">
+                            <input type="hidden" name="csrf_token" value="${csrfToken}">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                `;
+                
+                // Add the modal to the document
+                document.body.appendChild(modal);
+                
+                // Show the backdrop
+                backdrop.style.display = 'block';
+                
+                // Setup event handlers for the close and cancel buttons
+                modal.querySelector('.custom-modal-close').addEventListener('click', closeCurrentModal);
+                modal.querySelector('.custom-modal-cancel').addEventListener('click', closeCurrentModal);
             });
         });
     });
@@ -147,27 +253,8 @@
                                                     {% endif %}
                                                 </div>
                                                 
-                                                <!-- Delete Confirmation Modal -->
-                                                <div class="modal fade" id="deleteUserModal{{ user.id }}" tabindex="-1" aria-hidden="true" style="z-index: 1050 !important;">
-                                                    <div class="modal-dialog" style="z-index: 1051 !important; position: relative;">
-                                                        <div class="modal-content" style="z-index: 1052 !important; position: relative;">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title">Confirm Delete</h5>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                Are you sure you want to delete user <strong>{{ user.username }}</strong>?
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                <form method="POST" action="{{ url_for('delete_user', id=user.id) }}">
-                                                                    {{ form.hidden_tag() }}
-                                                                    <button type="submit" class="btn btn-danger">Delete</button>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <!-- We no longer need Bootstrap modals since we're using custom modals -->
+                                                <!-- The custom modal is created by JavaScript -->
                                             </td>
                                         </tr>
                                     {% endfor %}
