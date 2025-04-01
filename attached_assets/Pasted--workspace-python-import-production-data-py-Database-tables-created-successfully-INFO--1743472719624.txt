@@ -1,0 +1,41 @@
+~/workspace$ python import_production_data.py
+Database tables created successfully
+INFO - ================================================================================
+INFO:utils.ssh_client:================================================================================
+INFO - SSH Client Initialized at 2025-04-01 01:58:23
+INFO:utils.ssh_client:SSH Client Initialized at 2025-04-01 01:58:23
+INFO - ================================================================================
+INFO:utils.ssh_client:================================================================================
+Routes imported successfully
+Starting import of production data...
+Loaded 30 equipment records from production_equipment.json
+Error importing equipment data: (psycopg2.errors.ForeignKeyViolation) update or delete on table "equipment" violates foreign key constraint "circuit_mapping_equipment_id_fkey" on table "circuit_mapping"
+DETAIL:  Key (id)=(3) is still referenced from table "circuit_mapping".
+
+[SQL: DELETE FROM equipment WHERE (equipment.id NOT IN (%(id_1_1)s, %(id_1_2)s, %(id_1_3)s))]
+[parameters: {'id_1_1': 5, 'id_1_2': 6, 'id_1_3': 7}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+Traceback (most recent call last):
+  File "/home/runner/workspace/import_production_data.py", line 146, in <module>
+    import_equipment()
+  File "/home/runner/workspace/import_production_data.py", line 69, in import_equipment
+    db.session.rollback()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/orm/scoping.py", line 1794, in rollback
+    return self._proxied.rollback()
+           ^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/orm/scoping.py", line 197, in _proxied
+    return self.registry()
+           ^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sqlalchemy/util/_collections.py", line 634, in __call__
+    key = self.scopefunc()
+          ^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask_sqlalchemy/session.py", line 111, in _app_ctx_id
+    return id(app_ctx._get_current_object())  # type: ignore[attr-defined]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/werkzeug/local.py", line 519, in _get_current_object
+    raise RuntimeError(unbound_message) from None
+RuntimeError: Working outside of application context.
+
+This typically means that you attempted to use functionality that needed
+the current application. To solve this, set up an application context
+with app.app_context(). See the documentation for more information.

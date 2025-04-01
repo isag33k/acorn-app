@@ -10,32 +10,46 @@ import json
 from app import app, db
 from models import Equipment, CircuitMapping
 
-print("Starting import of production data...")
+# Main execution - place app context at the outermost level
+with app.app_context():
+    print("Starting import of production data...")
 
-def import_equipment(json_file='production_equipment.json'):
-    """Import equipment data from a JSON file"""
-    try:
-        # Check if file exists
-        if not os.path.exists(json_file):
-            print(f"File not found: {json_file}")
-            print("Run export_production_data.py on your production server first")
-            return
+    def import_equipment(json_file='production_equipment.json'):
+        """Import equipment data from a JSON file"""
+        try:
+            # Check if file exists
+            if not os.path.exists(json_file):
+                print(f"File not found: {json_file}")
+                print("Run simple_export.py on your production server first")
+                return
+                
+            # Load JSON data
+            with open(json_file, 'r') as f:
+                equipment_data = json.load(f)
+                
+            print(f"Loaded {len(equipment_data)} equipment records from {json_file}")
             
-        # Load JSON data
-        with open(json_file, 'r') as f:
-            equipment_data = json.load(f)
+            # First find and save all existing circuit mappings
+            existing_mappings = CircuitMapping.query.filter(CircuitMapping.equipment_id.notin_([5, 6, 7])).all()
+            print(f"Found {len(existing_mappings)} circuit mappings with equipment IDs not in protected list")
             
-        print(f"Loaded {len(equipment_data)} equipment records from {json_file}")
-        
-        with app.app_context():
-            # Clear existing equipment (except the original 3)
-            # We'll keep IDs 5, 6, 7 which are likely the original test equipment
-            original_ids = [5, 6, 7]
-            db.session.execute(db.delete(Equipment).where(Equipment.id.notin_(original_ids)))
+            # Delete those circuit mappings first to avoid foreign key constraints
+            for mapping in existing_mappings:
+                db.session.delete(mapping)
             db.session.commit()
-            print("Cleared existing equipment data (kept original test records)")
+            print("Deleted circuit mappings with non-protected equipment IDs")
             
-            # Get existing equipment IDs
+            # Now we can safely delete equipment
+            # Keep IDs 5, 6, 7 which are likely the original test equipment
+            protected_ids = [5, 6, 7]
+            equipment_to_delete = Equipment.query.filter(Equipment.id.notin_(protected_ids)).all()
+            
+            for equipment in equipment_to_delete:
+                db.session.delete(equipment)
+            db.session.commit()
+            print(f"Deleted {len(equipment_to_delete)} equipment records")
+            
+            # Get existing equipment IDs after deletion
             existing_ids = {e.id for e in Equipment.query.all()}
             
             # Import equipment
@@ -64,34 +78,27 @@ def import_equipment(json_file='production_equipment.json'):
             db.session.commit()
             print(f"Imported {imported_count} new equipment records")
             
-    except Exception as e:
-        print(f"Error importing equipment data: {str(e)}")
-        db.session.rollback()
-        sys.exit(1)
-
-def import_circuit_mappings(json_file='production_circuit_mappings.json'):
-    """Import circuit mapping data from a JSON file"""
-    try:
-        # Check if file exists
-        if not os.path.exists(json_file):
-            print(f"File not found: {json_file}")
-            print("Run export_production_data.py on your production server first")
-            return
-            
-        # Load JSON data
-        with open(json_file, 'r') as f:
-            mapping_data = json.load(f)
-            
-        print(f"Loaded {len(mapping_data)} circuit mappings from {json_file}")
+        except Exception as e:
+            print(f"Error importing equipment data: {str(e)}")
+            db.session.rollback()
+            return False
         
-        with app.app_context():
-            # Clear existing circuit mappings that aren't associated with the original test equipment
-            original_equipment_ids = [5, 6, 7]
-            db.session.execute(db.delete(CircuitMapping).where(
-                CircuitMapping.equipment_id.notin_(original_equipment_ids)
-            ))
-            db.session.commit()
-            print("Cleared existing circuit mappings (kept mappings for original equipment)")
+        return True
+
+    def import_circuit_mappings(json_file='production_circuit_mappings.json'):
+        """Import circuit mapping data from a JSON file"""
+        try:
+            # Check if file exists
+            if not os.path.exists(json_file):
+                print(f"File not found: {json_file}")
+                print("Run simple_export.py on your production server first")
+                return
+                
+            # Load JSON data
+            with open(json_file, 'r') as f:
+                mapping_data = json.load(f)
+                
+            print(f"Loaded {len(mapping_data)} circuit mappings from {json_file}")
             
             # Get existing mapping IDs and equipment IDs
             existing_mapping_ids = {m.id for m in CircuitMapping.query.all()}
@@ -135,14 +142,15 @@ def import_circuit_mappings(json_file='production_circuit_mappings.json'):
             if skipped_count > 0:
                 print(f"Skipped {skipped_count} circuit mappings")
             
-    except Exception as e:
-        print(f"Error importing circuit mapping data: {str(e)}")
-        db.session.rollback()
-        sys.exit(1)
+        except Exception as e:
+            print(f"Error importing circuit mapping data: {str(e)}")
+            db.session.rollback()
+            return False
+        
+        return True
 
-# Main execution
-if __name__ == "__main__":
     # Run the import functions
-    import_equipment()
-    import_circuit_mappings()
+    if import_equipment():
+        import_circuit_mappings()
+    
     print("Import completed.")
