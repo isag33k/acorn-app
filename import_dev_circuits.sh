@@ -1,15 +1,17 @@
 #!/bin/bash
 # Script to run circuit import with the correct environment variables
 
-# Activate the virtual environment
-source /home/sjones/acorn-app/venv/bin/activate
+# For Replit environment - no need to activate a virtual environment
 
-# Set required environment variables
-export DATABASE_URL="$(grep -oP 'SQLALCHEMY_DATABASE_URI\s*=\s*\K[^#\s]+' /home/sjones/acorn-app/.env 2>/dev/null || grep -oP 'DATABASE_URL\s*=\s*\K[^#\s]+' /home/sjones/acorn-app/.env 2>/dev/null)"
-
-# If the .env file doesn't have the DATABASE_URL, let's try to get it from the systemd service file
-if [ -z "$DATABASE_URL" ]; then
-    export DATABASE_URL="$(grep -oP 'Environment="DATABASE_URL=\K[^"]+' /etc/systemd/system/acorn.service 2>/dev/null)"
+# Check if DATABASE_URL environment variable is already set
+if [ -n "$DATABASE_URL" ]; then
+    echo "Using existing DATABASE_URL environment variable"
+else
+    # For Replit environment, use the PostgreSQL connection details
+    if [ -n "$PGDATABASE" ] && [ -n "$PGHOST" ] && [ -n "$PGPORT" ] && [ -n "$PGUSER" ] && [ -n "$PGPASSWORD" ]; then
+        export DATABASE_URL="postgresql://$PGUSER:$PGPASSWORD@$PGHOST:$PGPORT/$PGDATABASE"
+        echo "Created DATABASE_URL from PostgreSQL environment variables"
+    fi
 fi
 
 # If we still don't have it, ask the user
@@ -35,8 +37,8 @@ python circuit_import.py
 # Check if the import was successful
 if [ $? -eq 0 ]; then
     echo "✅ Circuit import completed successfully!"
-    echo "Restart the application for changes to take effect:"
-    echo "sudo systemctl restart acorn"
+    echo "Restart the application for changes to take effect."
+    echo "For Replit, this happens automatically when you restart the workflow."
 else
     echo "❌ Circuit import failed. Please check the error messages above."
 fi
