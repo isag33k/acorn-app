@@ -17,6 +17,9 @@ def read_excel_file(excel_path):
     Read the Excel file with circuit IDs and convert each sheet to JSON
     """
     try:
+        # Store the excel path for later use if needed
+        input_excel_path = excel_path
+        
         # Create a data structure to hold all sheets
         all_data = {}
         
@@ -96,6 +99,32 @@ def read_excel_file(excel_path):
             'Unnamed: 15': 'Patch Panel Port Z'         # Column P
         })
         
+        # Special mapping for Accelecom workbook with detailed location fields
+        accelecom_mapping = column_mapping.copy()
+        accelecom_mapping.update({
+            'Unnamed: 0': 'Market',              # Column A
+            'Unnamed: 1': 'Provider',            # Column B
+            'Unnamed: 2': 'Description',         # Column C
+            'Unnamed: 3': 'Circuit ID',          # Column D
+            'Unnamed: 4': 'Status',              # Column E
+            'Unnamed: 7': 'Access Provider',     # Column H
+            'Unnamed: 9': 'Account Number',      # Column J
+            'Unnamed: 10': 'Online Portal',      # Column K
+            'Unnamed: 11': '24x7 Support Number', # Column L
+            'Unnamed: 12': 'Support E-mail',     # Column M
+            'Unnamed: 29': 'A LOC Description',  # Column AD
+            'Unnamed: 30': 'A LOC Address 1',    # Column AE
+            'Unnamed: 32': 'A LOC City',         # Column AG
+            'Unnamed: 33': 'A LOC State',        # Column AH
+            'Unnamed: 34': 'A LOC Zip',          # Column AI
+            'Unnamed: 37': 'Z LOC Description',  # Column AL
+            'Unnamed: 38': 'Z LOC Address 1',    # Column AM
+            'Unnamed: 39': 'Z LOC Address 2',    # Column AN
+            'Unnamed: 40': 'Z LOC City',         # Column AO
+            'Unnamed: 41': 'Z LOC State',        # Column AP
+            'Unnamed: 53': 'Notes'               # Column BC
+        })
+        
         # Special mapping for Uniti workbook with location fields
         uniti_mapping = column_mapping.copy()
         uniti_mapping.update({
@@ -155,6 +184,18 @@ def read_excel_file(excel_path):
                 logger.info(f"Using special mapping for Cogent with IP address fields")
                 # Use the special mapping for Cogent with IP address fields
                 df = df.rename(columns=cogent_mapping)
+            elif sheet_name == 'Accelecom':
+                logger.info(f"Using special mapping for Accelecom with detailed location fields")
+                
+                # Fix for duplicate columns in Accelecom sheet
+                # First read with standard index to avoid duplicate column errors
+                df_fixed = pd.read_excel(input_excel_path, sheet_name='Accelecom', index_col=0)
+                
+                # Reset index to get proper DataFrame with unique columns
+                df_fixed = df_fixed.reset_index()
+                
+                # Now apply the mapping
+                df = df_fixed.rename(columns=accelecom_mapping)
             elif sheet_name == 'Uniti':
                 logger.info(f"Using special mapping for Uniti with location fields")
                 # Use the special mapping for Uniti with location fields
@@ -241,6 +282,33 @@ def read_excel_file(excel_path):
                         record['Status'] = 'INACTIVE'
                     else:
                         record['Status'] = 'ACTIVE'
+                    
+                    # Add this record to the clean_records list
+                    clean_records.append(record)
+                
+                # Special handling for Accelecom
+                elif sheet_name == 'Accelecom':
+                    # Skip header rows and metadata
+                    if record.get('Market') == 'Market' and record.get('Circuit ID') == 'Circuit ID':
+                        logger.debug(f"Filtering out header row with Market='Market' and Circuit ID='Circuit ID' from Accelecom")
+                        continue
+                    
+                    # Skip rows without a valid Circuit ID
+                    if not record.get('Circuit ID') or pd.isna(record.get('Circuit ID')):
+                        logger.debug(f"Filtering out Accelecom entry with empty/missing Circuit ID")
+                        continue
+                        
+                    # Clean up Z location data
+                    if record.get('Z LOC Description') and record.get('Z LOC Address 1'):
+                        # Ensure consistent formatting
+                        record['Z LOC Description'] = str(record['Z LOC Description']).strip()
+                        record['Z LOC Address 1'] = str(record['Z LOC Address 1']).strip()
+                        
+                    # Clean up A location data
+                    if record.get('A LOC Description') and record.get('A LOC Address 1'):
+                        # Ensure consistent formatting
+                        record['A LOC Description'] = str(record['A LOC Description']).strip()
+                        record['A LOC Address 1'] = str(record['A LOC Address 1']).strip()
                     
                     # Add this record to the clean_records list
                     clean_records.append(record)

@@ -4,6 +4,7 @@ Script to analyze the Excel file structure and identify the columns for each she
 """
 import pandas as pd
 import logging
+import numpy as np
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, 
@@ -215,7 +216,108 @@ def analyze_arelion():
     except Exception as e:
         logger.error(f"Error analyzing Arelion sheet: {e}")
 
+def analyze_accelecom():
+    """
+    Focus specifically on Accelecom data to identify the column structure
+    and check for duplicate column headers that might be causing issues.
+    """
+    try:
+        excel_path = 'attached_assets/Appendix D - Circuit IDs.xlsx'
+        logger.info(f"Reading Accelecom sheet from {excel_path}")
+        
+        # Read the specific sheet
+        df = pd.read_excel(excel_path, sheet_name='Accelecom')
+        
+        # Analyze column structure to check for duplicates
+        logger.info("\nChecking for duplicate column headers in Accelecom sheet:")
+        column_counts = {}
+        for i, col in enumerate(df.columns):
+            col_letter = chr(65 + i) if i < 26 else chr(64 + i//26) + chr(65 + i%26)
+            logger.info(f"Column {col_letter} ({i}): {col}")
+            
+            if col in column_counts:
+                column_counts[col] += 1
+            else:
+                column_counts[col] = 1
+        
+        # Print any duplicate columns
+        duplicate_cols = {col: count for col, count in column_counts.items() if count > 1}
+        if duplicate_cols:
+            logger.info("\nDuplicate column headers found:")
+            for col, count in duplicate_cols.items():
+                logger.info(f"Column {col} appears {count} times")
+        else:
+            logger.info("\nNo duplicate column headers found")
+        
+        # Print the first row to see the actual header values
+        logger.info("\nFirst row (likely header row):")
+        first_row = df.iloc[0]
+        for i, val in enumerate(first_row):
+            col_letter = chr(65 + i) if i < 26 else chr(64 + i//26) + chr(65 + i%26)
+            col_name = df.columns[i]
+            logger.info(f"Column {col_letter} ({col_name}): {val}")
+        
+        # Print specific column mappings requested by the user
+        logger.info("\nChecking requested column mappings:")
+        column_mappings = {
+            'A': 'Market',
+            'B': 'Provider',
+            'C': 'Description',
+            'D': 'Circuit ID',
+            'E': 'Status',
+            'H': 'Access Provider',
+            'J': 'Account Number',
+            'K': 'Online Portal',
+            'L': '24x7 Support Number',
+            'M': 'Support E-mail',
+            'AD': 'A LOC Description',
+            'AE': 'A LOC Address 1',
+            'AG': 'A LOC City',
+            'AH': 'A LOC State',
+            'AI': 'A LOC Zip',
+            'AL': 'Z LOC Description',
+            'AM': 'Z LOC Address 1',
+            'AN': 'Z LOC Address 2',
+            'AO': 'Z LOC City',
+            'AP': 'Z LOC State',
+            'BC': 'Notes'
+        }
+        
+        # Convert column letters to indices
+        col_to_index = {}
+        for col_letter, field_name in column_mappings.items():
+            if len(col_letter) == 1:
+                idx = ord(col_letter) - ord('A')
+            else:
+                idx = (ord(col_letter[0]) - ord('A') + 1) * 26 + (ord(col_letter[1]) - ord('A'))
+            
+            if idx < len(df.columns):
+                col_name = df.columns[idx]
+                sample_values = df.iloc[1:4, idx].dropna().tolist()
+                logger.info(f"{col_letter} ({col_name}) => {field_name}: {sample_values}")
+                col_to_index[field_name] = idx
+            else:
+                logger.info(f"{col_letter} => {field_name}: Column index out of range")
+                
+        # Print sample records from the sheet
+        logger.info("\nSample records from Accelecom sheet:")
+        for idx in range(1, min(5, len(df))):  # Skip header row(s)
+            record = {}
+            for field_name, col_idx in col_to_index.items():
+                if col_idx < len(df.columns) and not pd.isna(df.iloc[idx, col_idx]):
+                    record[field_name] = df.iloc[idx, col_idx]
+            
+            if record.get('Circuit ID'):
+                logger.info(f"\nRecord {idx}:")
+                for field, value in record.items():
+                    logger.info(f"  {field}: {value}")
+    
+    except Exception as e:
+        logger.error(f"Error analyzing Accelecom sheet: {e}")
+        raise
+
 if __name__ == "__main__":
     # analyze_excel_file('attached_assets/Appendix D - Circuit IDs.xlsx')
-    analyze_coresite_atlanta()
+    # analyze_coresite_atlanta()
     # analyze_arelion()
+    analyze_accelecom()
