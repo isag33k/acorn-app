@@ -127,21 +127,42 @@ def import_circuit_mappings(json_file='dev_circuit_mappings.json', replace_exist
 if __name__ == "__main__":
     logger.info("Starting import of circuit mapping data...")
     
-    # Check if the file path is provided as a command-line argument
-    if len(sys.argv) > 1:
-        json_file = sys.argv[1]
-        logger.info(f"Using JSON file: {json_file}")
+    # Parse command line arguments
+    json_file = 'dev_circuit_mappings.json'  # Default file
+    replace_option = None  # Default to interactive mode
+    
+    # Check for command line arguments
+    i = 1
+    while i < len(sys.argv):
+        if sys.argv[i] == '--file' and i+1 < len(sys.argv):
+            json_file = sys.argv[i+1]
+            i += 2
+        elif sys.argv[i] == '--replace' and i+1 < len(sys.argv):
+            replace_option = sys.argv[i+1]
+            i += 2
+        else:
+            # Backward compatibility: first arg is file name
+            json_file = sys.argv[i]
+            i += 1
+    
+    logger.info(f"Using JSON file: {json_file}")
+    
+    # If no replace option was specified on the command line, prompt interactively
+    if replace_option is None:
+        print("\nImport Options:")
+        print("1. Replace ALL existing circuit mappings with the imported data")
+        print("2. Keep existing circuit mappings and add new ones")
+        
+        choice = input("\nSelect option (1 or 2): ").strip()
+        replace_existing = (choice == '1')
     else:
-        json_file = 'dev_circuit_mappings.json'
-        logger.info(f"Using default JSON file: {json_file}")
-    
-    # Ask user for confirmation about replacement behavior
-    print("\nImport Options:")
-    print("1. Replace ALL existing circuit mappings with the imported data")
-    print("2. Keep existing circuit mappings and add new ones")
-    
-    choice = input("\nSelect option (1 or 2): ").strip()
-    replace_existing = (choice == '1')
+        replace_existing = (replace_option == '1')
+        
+        # Echo the option chosen from command line
+        print("\nImport Options:")
+        print("1. Replace ALL existing circuit mappings with the imported data")
+        print("2. Keep existing circuit mappings and add new ones")
+        print(f"\nSelected option: {replace_option}")
     
     if replace_existing:
         logger.info("Will REPLACE all existing circuit mappings with imported data")
@@ -149,7 +170,13 @@ if __name__ == "__main__":
         logger.info("Will KEEP existing circuit mappings and add new ones from import")
     
     # Final confirmation
-    confirm = input("\nReady to proceed with import? (y/n): ").strip().lower()
+    # Check if we have a --yes flag to skip confirmation
+    if '--yes' in sys.argv:
+        confirm = 'y'
+        print("\nAuto-confirmed with --yes flag")
+    else:
+        confirm = input("\nReady to proceed with import? (y/n): ").strip().lower()
+    
     if confirm != 'y':
         logger.info("Import cancelled")
         sys.exit(0)
