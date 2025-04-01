@@ -140,9 +140,14 @@ if __name__ == "__main__":
         elif sys.argv[i] == '--replace' and i+1 < len(sys.argv):
             replace_option = sys.argv[i+1]
             i += 2
+        elif sys.argv[i] == '--yes':
+            # Just skip the --yes flag as it's handled later
+            i += 1
         else:
-            # Backward compatibility: first arg is file name
-            json_file = sys.argv[i]
+            # Backward compatibility: first arg without flag is assumed to be file name
+            # But only if it doesn't start with '--'
+            if not sys.argv[i].startswith('--'):
+                json_file = sys.argv[i]
             i += 1
     
     logger.info(f"Using JSON file: {json_file}")
