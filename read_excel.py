@@ -63,18 +63,19 @@ def read_excel_file(excel_path):
         # Special mapping for Cogent workbook
         cogent_mapping = column_mapping.copy()
         cogent_mapping.update({
-            'Unnamed: 0': 'Market',        # Column A
-            'Unnamed: 1': 'Provider',      # Column B
-            'Unnamed: 2': 'Description',   # Column C
-            'Unnamed: 3': 'Circuit ID',    # Column D
-            'Unnamed: 4': 'Status',        # Column E
-            'Unnamed: 10': 'Account Number',    # Column K
+            'Unnamed: 0': 'Market',          # Column A
+            'Unnamed: 1': 'Provider',        # Column B
+            'Unnamed: 2': 'Description',     # Column C
+            'Unnamed: 3': 'Circuit ID',      # Column D
+            'Unnamed: 4': 'Status',          # Column E
+            'Unnamed: 5': 'Notes',           # Column F
+            'Unnamed: 10': 'Account Number', # Column K
             'Unnamed: 11': '24x7 Support Number', # Column L
-            'Unnamed: 12': 'Support E-mail',   # Column M
-            'Unnamed: 13': 'Local IPv4',   # Column N
-            'Unnamed: 14': 'Remote IPv4',  # Column O
-            'Unnamed: 15': 'Local IPv6',   # Column P
-            'Unnamed: 16': 'Remote IPv6'   # Column Q
+            'Unnamed: 12': 'Support E-mail', # Column M
+            'Unnamed: 13': 'Local IPv4',     # Column N
+            'Unnamed: 14': 'Remote IPv4',    # Column O
+            'Unnamed: 15': 'Local IPv6',     # Column P
+            'Unnamed: 16': 'Remote IPv6'     # Column Q
         })
         
         # Special mapping for CoreSite - Atlanta where Circuit ID is in column F (Notes)
