@@ -31,8 +31,57 @@ if [ ! -f "dev_circuit_mappings.json" ]; then
     exit 1
 fi
 
-# Run the import script
-python circuit_import.py
+# Check if replace_option argument is provided
+REPLACE_OPTION=${1:-"2"}  # Default to option 2 (add new only) if not specified
+
+# Create a temporary script to automate the input selection
+cat << EOF > /tmp/select_option.py
+import sys
+
+# Just print the selected option and exit
+print("$REPLACE_OPTION")
+EOF
+
+# Run the import script with automated input selection
+python -c "
+import sys
+import subprocess
+
+# Start circuit_import.py with stdin/stdout directed to our process
+process = subprocess.Popen(['python', 'circuit_import.py'], 
+                          stdin=subprocess.PIPE, 
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE,
+                          universal_newlines=True)
+
+# Read output until we find the prompt
+while True:
+    output = process.stdout.readline()
+    if not output:
+        break
+    print(output.strip())
+    if 'Select option' in output:
+        break
+
+# Send the option choice
+process.stdin.write('$REPLACE_OPTION\\n')
+process.stdin.flush()
+
+# Continue reading the remaining output
+while True:
+    output = process.stdout.readline()
+    if not output:
+        break
+    print(output.strip())
+
+# Read any error output
+for line in process.stderr:
+    print(line.strip())
+
+# Get the exit code
+exit_code = process.wait()
+sys.exit(exit_code)
+"
 
 # Check if the import was successful
 if [ $? -eq 0 ]; then
