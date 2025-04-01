@@ -13,15 +13,25 @@ The migration process involves:
 
 ### On Your Development Server
 
-1. Run the export script to create a JSON file with all circuit mapping data:
+1. Pull the latest code changes from GitHub:
 
 ```bash
-python circuit_export.py
+git pull origin main
 ```
 
-2. This will create a file called `dev_circuit_mappings.json` in the current directory.
+2. Run the export script to create a JSON file with all circuit mapping data:
 
-3. Copy this file to your production server using SCP, SFTP, or any other secure file transfer method.
+```bash
+# If your environment is already set up correctly
+python circuit_export.py
+
+# Or use the helper shell script we created
+./export_prod_circuits.sh
+```
+
+3. This will create a file called `dev_circuit_mappings.json` in the current directory.
+
+4. Copy this file to your production server using SCP, SFTP, or any other secure file transfer method.
 
 Example:
 ```bash
@@ -30,27 +40,62 @@ scp dev_circuit_mappings.json user@production-server:/path/to/acorn-app/
 
 ### On Your Production Server
 
-1. Place the `dev_circuit_mappings.json` file in the root directory of your ACORN application.
-
-2. **IMPORTANT**: Make a backup of your production database before proceeding.
-
-3. Run the import script:
+1. Pull the latest code changes from GitHub:
 
 ```bash
-python circuit_import.py
+git pull origin main
 ```
 
-4. Follow the prompts in the import script:
+2. Place the `dev_circuit_mappings.json` file in the root directory of your ACORN application.
+
+3. **IMPORTANT**: Make a backup of your production database before proceeding:
+
+```bash
+# Use our helper script to create a backup
+./export_prod_circuits.sh
+```
+
+4. Run the import script:
+
+```bash
+# If your environment is already set up correctly
+python circuit_import.py
+
+# Or use the helper shell script we created
+./import_dev_circuits.sh
+```
+
+5. Follow the prompts in the import script:
    - You'll be asked if you want to replace all existing circuit mappings or just add new ones
    - The script will confirm your choice before proceeding
 
-5. Once the import is complete, restart your application to ensure all changes take effect:
+6. Once the import is complete, restart your application to ensure all changes take effect:
 
 ```bash
 sudo systemctl restart acorn
 ```
 
 ## Troubleshooting
+
+### Environment Setup Issues
+
+If you encounter issues with missing Python modules or database connection errors:
+
+1. Make sure your virtual environment is activated:
+   ```bash
+   source /home/sjones/acorn-app/venv/bin/activate
+   ```
+
+2. Make sure the DATABASE_URL environment variable is set:
+   ```bash
+   export DATABASE_URL="your_postgresql_connection_string"
+   ```
+
+3. Use the helper scripts we created that handle environment setup automatically:
+   ```bash
+   ./export_prod_circuits.sh
+   ./import_dev_circuits.sh
+   ```
 
 ### Missing Equipment References
 
@@ -65,10 +110,11 @@ To fix this:
 If you encounter file permission issues, ensure that:
 1. The JSON file is readable by the user running the import script
 2. The database file (or database server) is writable by the application
+3. The helper scripts are executable: `chmod +x export_prod_circuits.sh import_dev_circuits.sh`
 
 ### Database Rollback
 
 If the import fails and you need to restore your database:
-1. Stop the application
+1. Stop the application: `sudo systemctl stop acorn`
 2. Restore your database backup
-3. Restart the application
+3. Restart the application: `sudo systemctl start acorn`
