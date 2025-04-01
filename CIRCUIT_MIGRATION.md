@@ -58,18 +58,33 @@ git pull origin main
 4. Run the import script:
 
 ```bash
-# If your environment is already set up correctly
+# Interactive mode (with prompts)
 python circuit_import.py
 
-# Or use the helper shell script we created
+# Non-interactive mode with command-line arguments
+python circuit_import.py --file dev_circuit_mappings.json --replace 2 --yes
+
+# Or use the helper shell script we created (simplest option)
 ./import_dev_circuits.sh
 ```
 
-5. Follow the prompts in the import script:
+5. When using interactive mode, follow the prompts in the import script:
    - You'll be asked if you want to replace all existing circuit mappings or just add new ones
    - The script will confirm your choice before proceeding
 
-6. Once the import is complete, restart your application to ensure all changes take effect:
+6. When using the helper script, you can specify the replace option as a parameter:
+   ```bash
+   # Replace all existing circuit mappings (option 1)
+   ./import_dev_circuits.sh 1
+   
+   # Keep existing mappings and add new ones (option 2, default)
+   ./import_dev_circuits.sh 2
+   
+   # Or just use the default (option 2)
+   ./import_dev_circuits.sh
+   ```
+
+7. Once the import is complete, restart your application to ensure all changes take effect:
 
 ```bash
 sudo systemctl restart acorn
@@ -104,6 +119,14 @@ If the import script shows warnings about missing equipment references, it means
 To fix this:
 1. Either import the equipment data first using `import_production_data.py`
 2. Or modify the `dev_circuit_mappings.json` file to only include circuits that reference existing equipment
+
+### Duplicate Circuit Mappings
+
+If you're using option 2 (keep existing and add new ones) and see messages about skipped duplicates:
+
+1. This is normal behavior and prevents duplicate circuit mappings with the same ID.
+2. The script will log how many duplicates were skipped.
+3. If you want to replace all existing mappings, use option 1 instead.
 
 ### File Permission Issues
 
