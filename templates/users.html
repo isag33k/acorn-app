@@ -41,6 +41,11 @@
                             {{ form.is_admin.label(class="form-check-label") }}
                         </div>
                         
+                        <div class="mb-3 form-check">
+                            {{ form.is_editor(class="form-check-input") }}
+                            {{ form.is_editor.label(class="form-check-label") }}
+                        </div>
+                        
                         <div class="d-grid">
                             {{ form.submit(class="btn btn-primary") }}
                         </div>
@@ -74,7 +79,11 @@
                                             <td>
                                                 {% if user.is_admin %}
                                                     <span class="badge bg-primary">Admin</span>
-                                                {% else %}
+                                                {% endif %}
+                                                {% if user.is_editor %}
+                                                    <span class="badge bg-success">Editor</span>
+                                                {% endif %}
+                                                {% if not user.is_admin and not user.is_editor %}
                                                     <span class="badge bg-secondary">Standard</span>
                                                 {% endif %}
                                             </td>

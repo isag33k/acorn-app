@@ -43,6 +43,7 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8)])
     password2 = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     is_admin = BooleanField('Admin User')
+    is_editor = BooleanField('Editor Role')
     submit = SubmitField('Register')
     
     def validate_username(self, username):
@@ -211,7 +212,8 @@ def add_user():
         user = User(
             username=form.username.data,
             email=form.email.data,
-            is_admin=form.is_admin.data
+            is_admin=form.is_admin.data,
+            is_editor=form.is_editor.data
         )
         user.set_password(form.password.data)
         db.session.add(user)
@@ -261,6 +263,7 @@ def edit_user(id):
         email = request.form.get('email')
         password = request.form.get('password')
         is_admin = 'is_admin' in request.form
+        is_editor = 'is_editor' in request.form
         
         # Check if username already exists
         if username != user.username and User.query.filter_by(username=username).first():
@@ -275,6 +278,7 @@ def edit_user(id):
         user.username = username
         user.email = email
         user.is_admin = is_admin
+        user.is_editor = is_editor
         
         if password:
             user.set_password(password)
