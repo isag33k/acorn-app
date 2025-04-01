@@ -1,0 +1,112 @@
+[
+    {
+        "id": 10,
+        "circuit_id": "SHA1-FL-OLT-1",
+        "equipment_id": 7,
+        "command": "sh run",
+        "description": "Florida OLT Device 1 - Show Running Configuration",
+        "contact_name": null,
+        "contact_email": null,
+        "contact_phone": null,
+        "contact_notes": null
+    },
+    {
+        "id": 6,
+        "circuit_id": "BWB-FL-GW-01",
+        "equipment_id": 7,
+        "command": "show version",
+        "description": "BWB-FL-GW-01",
+        "contact_name": "Test Guy",
+        "contact_email": "",
+        "contact_phone": "",
+        "contact_notes": ""
+    },
+    {
+        "id": 22,
+        "circuit_id": "FLT-PON-001",
+        "equipment_id": 7,
+        "command": "show pon interface gpon 1/1\nshow pon ont status gpon 1/1",
+        "description": "Test OLT circuit for mock SSH server",
+        "contact_name": "Network Admin",
+        "contact_email": "admin@example.com",
+        "contact_phone": "555-987-6543",
+        "contact_notes": "This is a test circuit for the OLT. It connects to the mock SSH server running locally."
+    },
+    {
+        "id": 23,
+        "circuit_id": "TEST-SHA-001",
+        "equipment_id": 7,
+        "command": "show pon interface gpon 1/1\nshow pon ont status gpon 1/1",
+        "description": "Test circuit mapping for SHA1-FL-OLT-1",
+        "contact_name": "Test Contact",
+        "contact_email": "test@example.com",
+        "contact_phone": "555-123-4567",
+        "contact_notes": "This is a test circuit mapping."
+    },
+    {
+        "id": 4,
+        "circuit_id": "SHA1-FL-OLT-1",
+        "equipment_id": 5,
+        "command": "sh version",
+        "description": "Example of command execution on equipment\t",
+        "contact_name": "Stan Jones",
+        "contact_email": "stan@jonesfamily.tech",
+        "contact_phone": "18504619626",
+        "contact_notes": ""
+    },
+    {
+        "id": 2,
+        "circuit_id": "JAX-CORE-A",
+        "equipment_id": 3,
+        "command": "sh version",
+        "description": "Example of command execution on equipment",
+        "contact_name": "Stan Jones",
+        "contact_email": "stan@jonesfamily.tech",
+        "contact_phone": "18504619626",
+        "contact_notes": ""
+    },
+    {
+        "id": 3,
+        "circuit_id": "JAX-CORE-B",
+        "equipment_id": 4,
+        "command": "sh version",
+        "description": "Example of command execution on equipment",
+        "contact_name": "Stan Jones",
+        "contact_email": "stan@jonesfamily.tech",
+        "contact_phone": "18504619626",
+        "contact_notes": ""
+    },
+    {
+        "id": 7,
+        "circuit_id": "SHAL-FL-CORE-B",
+        "equipment_id": 32,
+        "command": "sh version",
+        "description": "SHAL-FL-CORE-B",
+        "contact_name": "Stan Jones",
+        "contact_email": "stan@jonesfamily.tech",
+        "contact_phone": "18504619626",
+        "contact_notes": "SHAL-FL-CORE-B"
+    },
+    {
+        "id": 5,
+        "circuit_id": "SHAL-FL-CORE-A",
+        "equipment_id": 6,
+        "command": "sh version",
+        "description": "Example of command execution on equipment\t",
+        "contact_name": "Stan Jones",
+        "contact_email": "stan@jonesfamily.tech",
+        "contact_phone": "18504619626",
+        "contact_notes": ""
+    },
+    {
+        "id": 8,
+        "circuit_id": "SHAL-FL-CORE-B:Vlan71",
+        "equipment_id": 32,
+        "command": "sh vlan br",
+        "description": "SHAL-FL-CORE-B:Vlan71",
+        "contact_name": "",
+        "contact_email": "",
+        "contact_phone": "",
+        "contact_notes": ""
+    }
+]
