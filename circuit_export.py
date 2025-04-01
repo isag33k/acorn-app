@@ -59,5 +59,16 @@ def export_circuit_mappings(output_file='dev_circuit_mappings.json'):
 
 if __name__ == "__main__":
     logger.info("Starting export of circuit mapping data...")
-    count = export_circuit_mappings()
-    logger.info(f"Export completed. {count} circuit mappings exported to dev_circuit_mappings.json")
+    
+    # Check if output file is specified as argument
+    import sys
+    output_file = 'dev_circuit_mappings.json'
+    
+    # Parse command line arguments
+    for i in range(1, len(sys.argv)):
+        if sys.argv[i].startswith('--output='):
+            output_file = sys.argv[i].split('=')[1]
+            logger.info(f"Using output file: {output_file}")
+    
+    count = export_circuit_mappings(output_file)
+    logger.info(f"Export completed. {count} circuit mappings exported to {output_file}")
