@@ -35,7 +35,7 @@ fi
 REPLACE_OPTION=${1:-"2"}  # Default to option 2 (add new only) if not specified
 
 # Run the import script with command line arguments
-python circuit_import.py --replace $REPLACE_OPTION --yes
+python circuit_import.py --file dev_circuit_mappings.json --replace $REPLACE_OPTION --yes
 
 # Check if the import was successful
 if [ $? -eq 0 ]; then
