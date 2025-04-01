@@ -84,7 +84,7 @@ def read_excel_file(excel_path):
         # Special mapping for CoreSite - Atlanta with comprehensive information
         coresite_mapping = column_mapping.copy()
         coresite_mapping.update({
-            'Unnamed: 0': 'Cross Connect Description',  # Column A
+            'Unnamed: 0': 'Description',                # Column A (changed from Cross Connect Description)
             'Unnamed: 1': 'CoreSite XCON ID',           # Column B
             'Unnamed: 2': 'CoreSite Case Number',       # Column C
             'Unnamed: 3': 'Service Number',             # Column D
@@ -237,12 +237,12 @@ def read_excel_file(excel_path):
                         'Data Center', 'Center Description', 'Cage ID', 'Cabinet Number', 
                         'Patch Panel', 'Circuit ID', 'CoreSite Circuit ID', 'Cross Connect Description',
                         'Space ID', 'Demarc Location', 'Welcome Letter', 'Main Support',
-                        'N/A. All operations', 'Account Rep', 'Notes'
+                        'N/A. All operations', 'Account Rep', 'Notes', 'Description'
                     ]
                     
                     # Skip header and metadata rows
                     for pattern in header_patterns:
-                        for field in ['Cross Connect Description', 'Service Number', 'Provider', 'Circuit ID']:
+                        for field in ['Description', 'Service Number', 'Provider', 'Circuit ID']:
                             value = record.get(field)
                             if value and isinstance(value, str) and pattern in value:
                                 should_skip = True

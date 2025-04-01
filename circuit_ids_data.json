@@ -2382,7 +2382,7 @@
   ],
   "CoreSite - Atlanta": [
     {
-      "Cross Connect Description": "Uniti 100G - Atlanta to Shalimar",
+      "Description": "Uniti 100G - Atlanta to Shalimar",
       "CoreSite XCON ID": "CLR-02824920-1",
       "CoreSite Case Number": "CAS-02824920",
       "Service Number": "SVC-001797762",
@@ -2406,7 +2406,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Uniti 100G - Atlanta to Shalimar",
+      "Description": "Uniti 100G - Atlanta to Shalimar",
       "CoreSite XCON ID": "CLR-02824920-1",
       "CoreSite Case Number": "CAS-02824920",
       "Service Number": "SVC-001797762",
@@ -2430,7 +2430,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Arelion 100G",
+      "Description": "Arelion 100G",
       "CoreSite XCON ID": "CLR-02824914-1",
       "CoreSite Case Number": "CAS-02824914",
       "Service Number": "SVC-001797761",
@@ -2454,7 +2454,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Arelion 100G",
+      "Description": "Arelion 100G",
       "CoreSite XCON ID": "CLR-02824914-1",
       "CoreSite Case Number": "CAS-02824914",
       "Service Number": "SVC-001797761",
@@ -2478,7 +2478,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Cogent 100G",
+      "Description": "Cogent 100G",
       "CoreSite XCON ID": "CLR-02838420-1",
       "CoreSite Case Number": "CAS-02838420",
       "Service Number": "SVC-001800781",
@@ -2502,7 +2502,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Cogent 100G",
+      "Description": "Cogent 100G",
       "CoreSite XCON ID": "CLR-02838420-1",
       "CoreSite Case Number": "CAS-02838420",
       "Service Number": "SVC-001800781",
@@ -2526,7 +2526,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Lumen 100G To Jacksonville",
+      "Description": "Lumen 100G To Jacksonville",
       "CoreSite XCON ID": "CLR-02918750-1",
       "CoreSite Case Number": "CAS-02918750",
       "Service Number": "SVC-001827369",
@@ -2550,7 +2550,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Lumen 100G To Jacksonville",
+      "Description": "Lumen 100G To Jacksonville",
       "CoreSite XCON ID": "CLR-02918750-1",
       "CoreSite Case Number": "CAS-02918750",
       "Service Number": "SVC-001827369",
@@ -2574,7 +2574,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Accelecom 10G - Atlanta to Savannah",
+      "Description": "Accelecom 10G - Atlanta to Savannah",
       "CoreSite XCON ID": "CLR-02926947-1",
       "CoreSite Case Number": "CAS-02926947",
       "Service Number": "SVC-001830355",
@@ -2598,7 +2598,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Accelecom 10G - Atlanta to Savannah",
+      "Description": "Accelecom 10G - Atlanta to Savannah",
       "CoreSite XCON ID": "CLR-02926947-1",
       "CoreSite Case Number": "CAS-02926947",
       "Service Number": "SVC-001830355",
@@ -2622,7 +2622,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Windstream - Atlanta to Crestview",
+      "Description": "Windstream - Atlanta to Crestview",
       "CoreSite XCON ID": "CLR-02926347-1",
       "CoreSite Case Number": "CAS-02926347",
       "Service Number": "SVC-001829657",
@@ -2646,7 +2646,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Windstream - Atlanta to Crestview",
+      "Description": "Windstream - Atlanta to Crestview",
       "CoreSite XCON ID": "CLR-02926347-1",
       "CoreSite Case Number": "CAS-02926347",
       "Service Number": "SVC-001829657",
@@ -2670,7 +2670,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Windstream - Atlanta to Crestview",
+      "Description": "Windstream - Atlanta to Crestview",
       "CoreSite XCON ID": "CLR-02937462-1",
       "CoreSite Case Number": "CAS-02937462",
       "Service Number": "SVC-001831712",
@@ -2694,7 +2694,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Windstream - Atlanta to Crestview",
+      "Description": "Windstream - Atlanta to Crestview",
       "CoreSite XCON ID": "CLR-02937462-1",
       "CoreSite Case Number": "CAS-02937462",
       "Service Number": "SVC-001831712",
@@ -2718,7 +2718,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Accelecom 100G - Atlanta to Savannah",
+      "Description": "Accelecom 100G - Atlanta to Savannah",
       "CoreSite XCON ID": "CLR-02983998-1",
       "CoreSite Case Number": "CAS-02983998",
       "Service Number": "SVC-001847202",
@@ -2742,7 +2742,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Accelecom 100G - Atlanta to Savannah",
+      "Description": "Accelecom 100G - Atlanta to Savannah",
       "CoreSite XCON ID": "CLR-02983998-1",
       "CoreSite Case Number": "CAS-02983998",
       "Service Number": "SVC-001847202",
@@ -2766,7 +2766,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Arelion 400G",
+      "Description": "Arelion 400G",
       "CoreSite XCON ID": "CLR-03111687-1",
       "CoreSite Case Number": "CAS-03111687",
       "Service Number": "SVC-001896625",
@@ -2790,7 +2790,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Arelion 400G",
+      "Description": "Arelion 400G",
       "CoreSite XCON ID": "CLR-03111687-1",
       "CoreSite Case Number": "CAS-03111687",
       "Service Number": "SVC-001896625",
@@ -2814,7 +2814,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Cogent 400G",
+      "Description": "Cogent 400G",
       "CoreSite XCON ID": "CLR-03111688-1",
       "CoreSite Case Number": "CAS-03111688",
       "Service Number": "SVC-001895793",
@@ -2838,7 +2838,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Cogent 400G",
+      "Description": "Cogent 400G",
       "CoreSite XCON ID": "CLR-03111688-1",
       "CoreSite Case Number": "CAS-03111688",
       "Service Number": "SVC-001895793",
@@ -2862,7 +2862,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Seimitsu 100G - Atlanta to Jacksonville",
+      "Description": "Seimitsu 100G - Atlanta to Jacksonville",
       "CoreSite XCON ID": "CLR-03096188-1",
       "CoreSite Case Number": "CAS-03096188",
       "Service Number": "SVC-001891980",
@@ -2886,7 +2886,7 @@
       "Account Manager": "3/13/2025 HJM"
     },
     {
-      "Cross Connect Description": "Seimitsu 100G - Atlanta to Jacksonville",
+      "Description": "Seimitsu 100G - Atlanta to Jacksonville",
       "CoreSite XCON ID": "CLR-03096188-1",
       "CoreSite Case Number": "CAS-03096188",
       "Service Number": "SVC-001891980",
